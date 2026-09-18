@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { getGroupMemberCount, type Group } from "@/lib/groups";
+import GroupCard from "@/components/group-card";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -8,8 +10,20 @@ export default async function DashboardPage() {
   // Guaranteed by the (app) layout, which redirects unauthenticated requests.
   if (!user) return null;
 
+  const { data: publicGroups } = await supabase
+    .from("groups")
+    .select("*")
+    .eq("visibility", "public")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  const groups = (publicGroups ?? []) as Group[];
+  const counts = await Promise.all(
+    groups.map((g) => getGroupMemberCount(supabase, g.id))
+  );
+
   return (
-    <div className="flex flex-1 items-center justify-center px-6">
+    <div className="mx-auto w-full max-w-lg px-6 py-10">
       <div className="text-center">
         <h1 className="text-xl font-semibold">
           Velkommen, {user.user_metadata.full_name ?? user.email}
@@ -19,10 +33,25 @@ export default async function DashboardPage() {
             @{user.user_metadata.username}
           </p>
         )}
-        <p className="mt-2 text-sm text-muted">
-          Du er logget inn. Her kommer snart kollokviegruppene dine.
-        </p>
       </div>
+
+      <section className="mt-10">
+        <h2 className="mb-3 text-sm font-semibold text-muted">
+          Offentlige kollokviegrupper
+        </h2>
+        {groups.length === 0 ? (
+          <p className="text-sm text-muted">
+            Ingen offentlige grupper ennå — lag den første under &quot;Mine
+            grupper&quot;.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {groups.map((group, i) => (
+              <GroupCard key={group.id} group={group} memberCount={counts[i]} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

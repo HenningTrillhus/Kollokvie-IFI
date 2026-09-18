@@ -9,6 +9,8 @@ import {
 import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
 import ProfileLinks from "@/components/profile-links";
+import CourseChips from "@/components/course-chips";
+import { getUserCourses } from "@/lib/courses";
 
 export default async function PublicProfilePage({
   params,
@@ -26,8 +28,9 @@ export default async function PublicProfilePage({
   if (!profile) notFound();
   if (profile.id === user.id) redirect("/profile");
 
-  const [counts, { data: myFollowRow }] = await Promise.all([
+  const [counts, courses, { data: myFollowRow }] = await Promise.all([
     getFollowCounts(supabase, profile.id),
+    getUserCourses(supabase, profile.id),
     supabase
       .from("follows")
       .select("status")
@@ -90,8 +93,9 @@ export default async function PublicProfilePage({
         <FollowButton targetUserId={profile.id} initialStatus={myStatus} />
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 space-y-3">
         <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />
+        <CourseChips courses={courses} />
       </div>
 
       <div className="mt-6 flex gap-6 text-sm">

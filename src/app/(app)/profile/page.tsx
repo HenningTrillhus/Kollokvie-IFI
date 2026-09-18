@@ -11,7 +11,9 @@ import FollowRequestsInbox, {
 } from "@/components/follow-requests-inbox";
 import ProfileList from "@/components/profile-list";
 import ProfileLinks from "@/components/profile-links";
+import CourseChips from "@/components/course-chips";
 import SignOutButton from "@/components/sign-out-button";
+import { getUserCourses } from "@/lib/courses";
 
 export default async function OwnProfilePage() {
   const supabase = await createClient();
@@ -25,11 +27,13 @@ export default async function OwnProfilePage() {
 
   const [
     counts,
+    courses,
     { data: followingRows },
     { data: followerRows },
     { data: pendingRows },
   ] = await Promise.all([
     getFollowCounts(supabase, user.id),
+    getUserCourses(supabase, user.id),
     supabase
       .from("follows")
       .select("followee_id")
@@ -92,8 +96,9 @@ export default async function OwnProfilePage() {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 space-y-3">
         <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />
+        <CourseChips courses={courses} />
       </div>
 
       <div className="mt-6 flex gap-6 text-sm">

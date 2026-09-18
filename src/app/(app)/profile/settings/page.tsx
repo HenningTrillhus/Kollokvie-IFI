@@ -4,6 +4,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ACCENT_COLORS, STUDY_PROGRAMS, avatarStyle, sanitizeExternalUrl } from "@/lib/profiles";
+import { getUserCourses, type Course } from "@/lib/courses";
+import StudyProgramSelect from "@/components/study-program-select";
+import CourseMultiSelect from "@/components/course-multi-select";
 
 const STUDY_YEARS = [1, 2, 3, 4, 5];
 
@@ -17,6 +20,7 @@ export default function SettingsPage() {
   const [studyProgram, setStudyProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
   const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -48,6 +52,8 @@ export default function SettingsPage() {
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
         setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
       }
+
+      setCourses(await getUserCourses(supabase, user.id));
       setLoading(false);
     })();
   }, []);
@@ -93,6 +99,13 @@ export default function SettingsPage() {
     await supabase.auth.updateUser({
       data: { full_name: trimmedName, username: trimmedUsername },
     });
+
+    await supabase.from("user_courses").delete().eq("user_id", user.id);
+    if (courses.length > 0) {
+      await supabase
+        .from("user_courses")
+        .insert(courses.map((c) => ({ user_id: user.id, course_code: c.code })));
+    }
 
     setSaving(false);
     setSaved(true);
@@ -204,22 +217,12 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label htmlFor="studyProgram" className="mb-1.5 block text-sm font-medium">
-            Linje
-          </label>
-          <select
-            id="studyProgram"
+          <label className="mb-1.5 block text-sm font-medium">Linje</label>
+          <StudyProgramSelect
             value={studyProgram}
-            onChange={(e) => setStudyProgram(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          >
-            <option value="">Ikke valgt</option>
-            {STUDY_PROGRAMS.map((program) => (
-              <option key={program} value={program}>
-                {program}
-              </option>
-            ))}
-          </select>
+            onChange={setStudyProgram}
+            options={STUDY_PROGRAMS}
+          />
         </div>
 
         <div>
@@ -239,6 +242,15 @@ export default function SettingsPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium">Emner</label>
+          <CourseMultiSelect selected={courses} onChange={setCourses} />
+          <p className="mt-1 text-xs text-muted">
+            Velg så mange emner du vil. Finner du ikke faget, kan du legge det
+            til selv.
+          </p>
         </div>
 
         <div>

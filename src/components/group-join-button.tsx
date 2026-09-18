@@ -1,0 +1,86 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+export default function GroupJoinButton({
+  groupId,
+  isMember,
+  isFull,
+  canJoin,
+}: {
+  groupId: string;
+  isMember: boolean;
+  isFull: boolean;
+  canJoin: boolean;
+}) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  async function join() {
+    setBusy(true);
+    setErrorMessage("");
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("group_members")
+      .insert({ group_id: groupId, user_id: user.id });
+
+    setBusy(false);
+    if (error) {
+      setErrorMessage("Du kan ikke bli med i denne gruppa.");
+      return;
+    }
+    router.refresh();
+  }
+
+  async function leave() {
+    setBusy(true);
+    setErrorMessage("");
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", user.id);
+
+    setBusy(false);
+    router.refresh();
+  }
+
+  if (isMember) {
+    return (
+      <button
+        onClick={leave}
+        disabled={busy}
+        className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
+      >
+        {busy ? "…" : "Forlat gruppe"}
+      </button>
+    );
+  }
+
+  return (
+    <div className="text-right">
+      <button
+        onClick={join}
+        disabled={busy || isFull || !canJoin}
+        className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
+      >
+        {isFull ? "Fullt" : busy ? "…" : "Bli med"}
+      </button>
+      {errorMessage && <p className="mt-1 text-xs text-red-500">{errorMessage}</p>}
+    </div>
+  );
+}
