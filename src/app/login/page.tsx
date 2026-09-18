@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { credentialsForIfiUsername } from "@/lib/ifi-auth";
+import { emailForIfiUsername } from "@/lib/ifi-auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [ifiUsername, setIfiUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -18,17 +19,14 @@ export default function LoginPage() {
     setErrorMessage("");
 
     const supabase = createClient();
-    const { email, password } = credentialsForIfiUsername(ifiUsername);
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: emailForIfiUsername(ifiUsername),
       password,
     });
 
     if (error) {
       setLoading(false);
-      setErrorMessage(
-        "Fant ingen bruker med dette IFI-brukernavnet. Har du ikke registrert deg ennå?"
-      );
+      setErrorMessage("Feil IFI-brukernavn eller passord.");
       return;
     }
 
@@ -78,6 +76,24 @@ export default function LoginPage() {
                 placeholder="olan"
                 value={ifiUsername}
                 onChange={(e) => setIfiUsername(e.target.value)}
+                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-1.5 block text-sm font-medium"
+              >
+                Passord
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
             </div>

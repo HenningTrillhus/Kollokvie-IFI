@@ -1,12 +1,14 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
+  avatarStyle,
   getFollowCounts,
   getProfileByUsername,
   getProfilesByIds,
 } from "@/lib/profiles";
 import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
+import ProfileLinks from "@/components/profile-links";
 
 export default async function PublicProfilePage({
   params,
@@ -24,14 +26,15 @@ export default async function PublicProfilePage({
   if (!profile) notFound();
   if (profile.id === user.id) redirect("/profile");
 
-  const counts = await getFollowCounts(supabase, profile.id);
-
-  const { data: myFollowRow } = await supabase
-    .from("follows")
-    .select("status")
-    .eq("follower_id", user.id)
-    .eq("followee_id", profile.id)
-    .maybeSingle();
+  const [counts, { data: myFollowRow }] = await Promise.all([
+    getFollowCounts(supabase, profile.id),
+    supabase
+      .from("follows")
+      .select("status")
+      .eq("follower_id", user.id)
+      .eq("followee_id", profile.id)
+      .maybeSingle(),
+  ]);
   const myStatus = (myFollowRow?.status as "pending" | "accepted" | undefined) ?? "none";
   const iFollowThem = myStatus === "accepted";
 
@@ -67,15 +70,28 @@ export default async function PublicProfilePage({
     <div className="mx-auto w-full max-w-lg px-6 py-10">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-xl font-semibold text-accent">
+          <div
+            style={avatarStyle(profile.accent_color)}
+            className="flex h-14 w-14 items-center justify-center rounded-full text-xl font-semibold"
+          >
             {initial}
           </div>
           <div>
             <h1 className="text-lg font-semibold">{profile.full_name}</h1>
             <p className="text-sm text-muted">@{profile.username}</p>
+            {profile.study_program && (
+              <p className="mt-1 text-xs text-muted">
+                {profile.study_program}
+                {profile.study_year ? ` · ${profile.study_year}. år` : ""}
+              </p>
+            )}
           </div>
         </div>
         <FollowButton targetUserId={profile.id} initialStatus={myStatus} />
+      </div>
+
+      <div className="mt-4">
+        <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />
       </div>
 
       <div className="mt-6 flex gap-6 text-sm">

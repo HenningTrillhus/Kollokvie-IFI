@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import FollowButton from "@/components/follow-button";
-import type { Profile } from "@/lib/profiles";
+import { avatarStyle, type Profile } from "@/lib/profiles";
+
+type FollowStatus = "none" | "pending" | "accepted";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
+  const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
   const [loading, setLoading] = useState(false);
   const [selfId, setSelfId] = useState<string | null>(null);
 
@@ -19,7 +22,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) return;
+    if (!trimmed || !selfId) return;
 
     const timeout = setTimeout(async () => {
       setLoading(true);
@@ -31,8 +34,28 @@ export default function SearchPage() {
 
       const merged = new Map<string, Profile>();
       [...(byUsername ?? []), ...(byName ?? [])].forEach((p) => merged.set(p.id, p));
+      const matches = Array.from(merged.values()).filter((p) => p.id !== selfId);
 
-      setResults(Array.from(merged.values()).filter((p) => p.id !== selfId));
+      // One batched lookup for every result's relationship status, instead
+      // of one query per row.
+      const { data: followRows } = matches.length
+        ? await supabase
+            .from("follows")
+            .select("followee_id, status")
+            .eq("follower_id", selfId)
+            .in(
+              "followee_id",
+              matches.map((p) => p.id)
+            )
+        : { data: [] };
+
+      const statusMap: Record<string, FollowStatus> = {};
+      (followRows ?? []).forEach((row) => {
+        statusMap[row.followee_id] = row.status as FollowStatus;
+      });
+
+      setResults(matches);
+      setStatuses(statusMap);
       setLoading(false);
     }, 300);
 
@@ -59,18 +82,33 @@ export default function SearchPage() {
         {!loading && trimmedQuery && results.length === 0 && (
           <p className="text-sm text-muted">Fant ingen brukere.</p>
         )}
-        {trimmedQuery && results.map((profile) => (
-          <div
-            key={profile.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-4 py-2.5"
-          >
-            <Link href={`/profile/${profile.username}`} className="min-w-0">
-              <p className="truncate text-sm font-medium">{profile.full_name}</p>
-              <p className="truncate text-xs text-muted">@{profile.username}</p>
-            </Link>
-            <FollowButton targetUserId={profile.id} />
-          </div>
-        ))}
+        {trimmedQuery &&
+          results.map((profile) => (
+            <div
+              key={profile.id}
+              className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-4 py-2.5 transition hover:border-accent/40"
+            >
+              <Link
+                href={`/profile/${profile.username}`}
+                className="flex min-w-0 items-center gap-3"
+              >
+                <div
+                  style={avatarStyle(profile.accent_color)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                >
+                  {(profile.full_name || profile.username).charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{profile.full_name}</p>
+                  <p className="truncate text-xs text-muted">@{profile.username}</p>
+                </div>
+              </Link>
+              <FollowButton
+                targetUserId={profile.id}
+                initialStatus={statuses[profile.id] ?? "none"}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

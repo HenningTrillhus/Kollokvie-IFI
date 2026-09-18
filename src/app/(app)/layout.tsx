@@ -17,17 +17,19 @@ export default async function AppLayout({
     redirect("/login");
   }
 
-  const profile = await getProfileById(supabase, user.id);
-  const { count: pendingRequestCount } = await supabase
-    .from("follows")
-    .select("*", { count: "exact", head: true })
-    .eq("followee_id", user.id)
-    .eq("status", "pending");
+  const [profile, { count: pendingRequestCount }] = await Promise.all([
+    getProfileById(supabase, user.id),
+    supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("followee_id", user.id)
+      .eq("status", "pending"),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-1 flex-col">
       <TopNav profile={profile} pendingRequestCount={pendingRequestCount ?? 0} />
-      <main className="flex flex-1 flex-col">{children}</main>
+      <main className="flex flex-1 flex-col animate-fade-in">{children}</main>
     </div>
   );
 }

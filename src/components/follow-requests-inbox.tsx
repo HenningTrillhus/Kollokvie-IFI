@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { Profile } from "@/lib/profiles";
+import { avatarStyle, type Profile } from "@/lib/profiles";
 
 export type PendingRequest = {
   followerId: string;
@@ -58,13 +58,26 @@ export default function FollowRequestsInbox({
       {requests.map((r) => (
         <li
           key={r.followerId}
-          className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-4 py-2.5"
+          className={`flex items-center justify-between gap-3 rounded-xl border border-card-border px-4 py-2.5 transition-opacity ${
+            busyId === r.followerId ? "opacity-50" : ""
+          }`}
         >
-          <Link href={`/profile/${r.profile.username}`} className="min-w-0">
-            <p className="truncate text-sm font-medium">
-              {r.profile.full_name}
-            </p>
-            <p className="truncate text-xs text-muted">@{r.profile.username}</p>
+          <Link
+            href={`/profile/${r.profile.username}`}
+            className="flex min-w-0 items-center gap-3"
+          >
+            <div
+              style={avatarStyle(r.profile.accent_color)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+            >
+              {(r.profile.full_name || r.profile.username).charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">
+                {r.profile.full_name}
+              </p>
+              <p className="truncate text-xs text-muted">@{r.profile.username}</p>
+            </div>
           </Link>
           <div className="flex shrink-0 gap-2">
             <button

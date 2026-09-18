@@ -4,25 +4,37 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { credentialsForIfiUsername } from "@/lib/ifi-auth";
+import { emailForIfiUsername } from "@/lib/ifi-auth";
+
+const MIN_PASSWORD_LENGTH = 6;
 
 export default function SignupPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [ifiUsername, setIfiUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setLoading(true);
     setErrorMessage("");
 
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setErrorMessage(`Passordet må være minst ${MIN_PASSWORD_LENGTH} tegn.`);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage("Passordene er ikke like.");
+      return;
+    }
+
+    setLoading(true);
     const supabase = createClient();
-    const { email, password } = credentialsForIfiUsername(ifiUsername);
     const { error } = await supabase.auth.signUp({
-      email,
+      email: emailForIfiUsername(ifiUsername),
       password,
       options: {
         data: {
@@ -133,9 +145,44 @@ export default function SignupPage() {
               />
               <p className="mt-1 text-xs text-muted">
                 Brukernavnet ditt på IFI, f.eks. det du logger inn med på
-                ifi-maskinene. Dette er det du bruker for å logge inn i
-                appen.
+                ifi-maskinene.
               </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-1.5 block text-sm font-medium"
+              >
+                Passord
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-1.5 block text-sm font-medium"
+              >
+                Bekreft passord
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                required
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+              />
             </div>
 
             {errorMessage && (
