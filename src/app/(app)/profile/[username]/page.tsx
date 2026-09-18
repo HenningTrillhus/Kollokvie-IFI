@@ -75,10 +75,10 @@ export default async function PublicProfilePage({
       <BackButton />
 
       <div className="mt-4 flex items-start justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div
             style={avatarStyle(profile.accent_color)}
-            className="flex h-14 w-14 items-center justify-center rounded-full text-xl font-semibold"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold"
           >
             {initial}
           </div>

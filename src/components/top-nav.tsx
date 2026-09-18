@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { avatarStyle, type Profile } from "@/lib/profiles";
+import { HomeIcon, GroupsIcon, CalendarIcon, SearchIcon } from "./nav-icons";
 
 const LINKS = [
-  { href: "/dashboard", label: "Hjem" },
-  { href: "/groups", label: "Mine kollokviegrupper" },
-  { href: "/calendar", label: "Kalender" },
-  { href: "/search", label: "Søk" },
+  { href: "/dashboard", label: "Hjem", Icon: HomeIcon },
+  { href: "/groups", label: "Mine kollokviegrupper", Icon: GroupsIcon },
+  { href: "/calendar", label: "Kalender", Icon: CalendarIcon },
+  { href: "/search", label: "Søk", Icon: SearchIcon },
 ];
 
 export default function TopNav({
@@ -24,7 +25,7 @@ export default function TopNav({
     .toUpperCase();
 
   return (
-    <header className="flex items-center gap-3 border-b border-card-border px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
+    <header className="flex items-center gap-2 border-b border-card-border px-3 py-2.5 sm:gap-6 sm:px-6 sm:py-4">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">
           K
@@ -34,20 +35,22 @@ export default function TopNav({
         </span>
       </Link>
 
-      <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {LINKS.map((link) => {
-          const isActive = pathname.startsWith(link.href);
+      <nav className="flex min-w-0 flex-1 items-center justify-around gap-1 sm:justify-start">
+        {LINKS.map(({ href, label, Icon }) => {
+          const isActive = pathname.startsWith(href);
           return (
             <Link
-              key={link.href}
-              href={link.href}
-              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              key={href}
+              href={href}
+              aria-label={label}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium transition sm:px-3 ${
                 isActive
                   ? "bg-accent-soft text-accent"
                   : "text-muted hover:text-foreground"
               }`}
             >
-              {link.label}
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className="hidden whitespace-nowrap sm:inline">{label}</span>
             </Link>
           );
         })}

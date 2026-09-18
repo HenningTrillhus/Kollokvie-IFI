@@ -35,19 +35,21 @@ export default function GroupCard({
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
-        <span>
-          {memberCount}
-          {group.max_members ? ` / ${group.max_members}` : ""} medlemmer
-        </span>
-        {group.location && <span>· {group.location}</span>}
-        {dateLabel && (
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
           <span>
-            · {dateLabel}
-            {group.event_time ? ` ${group.event_time.slice(0, 5)}` : ""}
+            {memberCount}
+            {group.max_members ? ` / ${group.max_members}` : ""} medlemmer
           </span>
-        )}
-        <span className="ml-auto rounded-md border border-card-border px-1.5 py-0.5">
+          {group.location && <span>· {group.location}</span>}
+          {dateLabel && (
+            <span>
+              · {dateLabel}
+              {group.event_time ? ` ${group.event_time.slice(0, 5)}` : ""}
+            </span>
+          )}
+        </div>
+        <span className="shrink-0 rounded-md border border-card-border px-1.5 py-0.5 text-xs text-muted">
           {group.visibility === "public" ? "Offentlig" : "Privat"}
         </span>
       </div>
