@@ -26,15 +26,17 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=din-anon-key
 ```
 
-### 3. Slå på e-post-innlogging (magic link)
+### 3. Slå på e-post-innlogging med 6-sifret kode
 
-Dette er som regel skrudd på som standard i Supabase, men sjekk:
+Appen bruker Supabase sin OTP-innlogging: brukeren får en 6-sifret kode på e-post og skriver den inn i appen (ingen lenke å klikke).
 
-1. I Supabase-dashbordet: **Authentication → Sign In / Providers → Email**.
-2. Sørg for at **Email** er aktivert. "Confirm email" kan stå på — det er selve lenken brukeren klikker.
-3. Under **Authentication → URL Configuration**, legg til nettadressen appen kjører på i **Redirect URLs**, f.eks.:
-   - `http://localhost:3000/auth/confirm` (lokal utvikling)
-   - `https://dittdomene.no/auth/confirm` (produksjon)
+1. I Supabase-dashbordet: **Authentication → Sign In / Providers → Email**, og sørg for at **Email** er aktivert.
+2. Gå til **Authentication → Email Templates → Magic Link**. Standardmalen viser bare en lenke — legg til `{{ .Token }}` i malen, f.eks.:
+   ```html
+   <h2>Din innloggingskode</h2>
+   <p>Skriv inn denne koden i appen: <strong>{{ .Token }}</strong></p>
+   ```
+3. (Valgfritt) Under **Authentication → Rate Limits** kan du justere hvor ofte en bruker kan be om ny kode.
 
 ### 4. Kjør appen
 

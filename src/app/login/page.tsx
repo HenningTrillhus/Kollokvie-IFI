@@ -1,35 +1,67 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import OtpInput from "./otp-input";
+
+type Step = "email" | "code";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">(
-    "idle"
-  );
+  const [step, setStep] = useState<Step>("email");
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSendCode(event: FormEvent) {
     event.preventDefault();
-    setStatus("loading");
+    setLoading(true);
     setErrorMessage("");
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
-    });
+    const { error } = await supabase.auth.signInWithOtp({ email });
+
+    setLoading(false);
 
     if (error) {
-      setStatus("error");
       setErrorMessage(error.message);
       return;
     }
 
-    setStatus("sent");
+    setStep("code");
+  }
+
+  async function handleVerifyCode(code: string) {
+    setLoading(true);
+    setErrorMessage("");
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: "email",
+    });
+
+    if (error) {
+      setLoading(false);
+      setErrorMessage("Feil kode. Sjekk e-posten og prøv igjen.");
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  async function handleResend() {
+    setLoading(true);
+    setErrorMessage("");
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({ email });
+
+    setLoading(false);
+    if (error) setErrorMessage(error.message);
   }
 
   return (
@@ -57,39 +89,44 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-card-border bg-card p-8 shadow-sm">
-          {status === "sent" ? (
+          {step === "code" ? (
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-accent">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-base font-medium">Sjekk innboksen din</h2>
+              <h2 className="text-base font-medium">Bekreft e-posten din</h2>
               <p className="mt-2 text-sm text-muted">
-                Vi har sendt en innloggingslenke til{" "}
-                <span className="font-medium text-foreground">{email}</span>.
-                Klikk på lenken for å logge inn.
+                Vi har sendt en 6-sifret kode til{" "}
+                <span className="font-medium text-foreground">{email}</span>
               </p>
-              <button
-                onClick={() => setStatus("idle")}
-                className="mt-6 text-sm font-medium text-accent hover:text-accent-hover"
-              >
-                Bruk en annen e-post
-              </button>
+
+              <div className="mt-6">
+                <OtpInput disabled={loading} onSubmit={handleVerifyCode} />
+              </div>
+
+              {errorMessage && (
+                <p className="mt-4 text-sm text-red-500">{errorMessage}</p>
+              )}
+
+              <div className="mt-6 flex items-center justify-center gap-4 text-sm">
+                <button
+                  onClick={() => {
+                    setStep("email");
+                    setErrorMessage("");
+                  }}
+                  className="font-medium text-muted hover:text-foreground"
+                >
+                  Bruk en annen e-post
+                </button>
+                <span className="text-card-border">·</span>
+                <button
+                  onClick={handleResend}
+                  disabled={loading}
+                  className="font-medium text-accent hover:text-accent-hover disabled:opacity-60"
+                >
+                  Send kode på nytt
+                </button>
+              </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSendCode} className="space-y-4">
               <div>
                 <label
                   htmlFor="email"
@@ -110,16 +147,16 @@ export default function LoginPage() {
                 />
               </div>
 
-              {status === "error" && (
+              {errorMessage && (
                 <p className="text-sm text-red-500">{errorMessage}</p>
               )}
 
               <button
                 type="submit"
-                disabled={status === "loading"}
+                disabled={loading}
                 className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
               >
-                {status === "loading" ? "Sender lenke…" : "Fortsett med e-post"}
+                {loading ? "Sender kode…" : "Fortsett med e-post"}
               </button>
 
               <p className="pt-1 text-center text-xs text-muted">
