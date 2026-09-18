@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import CourseSingleSelect from "@/components/course-single-select";
-import type { Visibility } from "@/lib/groups";
+import type { Group, Visibility } from "@/lib/groups";
 
 export default function NewGroupPage() {
   const router = useRouter();
@@ -41,25 +41,18 @@ export default function NewGroupPage() {
     setErrorMessage("");
 
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
 
     const { data: group, error } = await supabase
-      .from("groups")
-      .insert({
-        owner_id: user.id,
-        name: name.trim(),
-        description: description.trim() || null,
-        course_code: course?.code ?? null,
-        visibility,
-        location: location.trim() || null,
-        event_date: eventDate || null,
-        event_time: eventTime || null,
-        max_members: maxMembers ? Number(maxMembers) : null,
+      .rpc("create_group", {
+        p_name: name.trim(),
+        p_description: description.trim() || null,
+        p_course_code: course?.code ?? null,
+        p_visibility: visibility,
+        p_location: location.trim() || null,
+        p_event_date: eventDate || null,
+        p_event_time: eventTime || null,
+        p_max_members: maxMembers ? Number(maxMembers) : null,
       })
-      .select()
       .single();
 
     if (error || !group) {
@@ -68,11 +61,8 @@ export default function NewGroupPage() {
       return;
     }
 
-    await supabase
-      .from("group_members")
-      .insert({ group_id: group.id, user_id: user.id });
-
-    router.push(`/groups/${group.id}`);
+    const newGroup = group as Group;
+    router.push(`/groups/${newGroup.id}`);
     router.refresh();
   }
 
