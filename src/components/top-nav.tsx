@@ -2,16 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import SignOutButton from "./sign-out-button";
+import type { Profile } from "@/lib/profiles";
 
 const LINKS = [
   { href: "/dashboard", label: "Hjem" },
   { href: "/groups", label: "Mine grupper" },
   { href: "/calendar", label: "Kalender" },
+  { href: "/search", label: "Søk" },
 ];
 
-export default function TopNav() {
+export default function TopNav({
+  profile,
+  pendingRequestCount,
+}: {
+  profile: Profile | null;
+  pendingRequestCount: number;
+}) {
   const pathname = usePathname();
+  const initial = (profile?.full_name || profile?.username || "?")
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <header className="flex items-center justify-between border-b border-card-border px-6 py-4">
@@ -45,7 +55,16 @@ export default function TopNav() {
         </nav>
       </div>
 
-      <SignOutButton />
+      <Link
+        href="/profile"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent transition hover:opacity-80"
+        aria-label="Din profil"
+      >
+        {initial}
+        {pendingRequestCount > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 ring-2 ring-background" />
+        )}
+      </Link>
     </header>
   );
 }
