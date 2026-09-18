@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   daysInMonth,
@@ -11,6 +12,7 @@ import {
   type CalendarEvent,
   type EventType,
 } from "@/lib/events";
+import type { Group } from "@/lib/groups";
 
 const WEEKDAY_LABELS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 const MONTH_LABELS = [
@@ -27,35 +29,49 @@ const MONTH_LABELS = [
   "November",
   "Desember",
 ];
+const GROUP_SESSION_COLOR = "#3f6f5e";
 
 const today = new Date();
 const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
-export default function MonthCalendar() {
+export default function MonthCalendar({ currentUserId }: { currentUserId: string }) {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [groupSessions, setGroupSessions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<EventType>("exam");
   const [saving, setSaving] = useState(false);
 
+  // Kollokviegruppene dine endrer seg sjelden, så denne hentes én gang, ikke
+  // på nytt for hver måned du blar til.
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("group_members")
+        .select("groups(*)")
+        .eq("user_id", currentUserId);
+
+      const groups = (data ?? [])
+        .map((row) => (row as unknown as { groups: Group | null }).groups)
+        .filter((g): g is Group => g !== null && g.event_date !== null);
+      setGroupSessions(groups);
+    })();
+  }, [currentUserId]);
+
   useEffect(() => {
     (async () => {
       setLoading(true);
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
       const start = toDateKey(year, month, 1);
       const end = toDateKey(year, month, daysInMonth(year, month));
       const { data } = await supabase
         .from("events")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", currentUserId)
         .gte("event_date", start)
         .lte("event_date", end)
         .order("event_date", { ascending: true });
@@ -63,7 +79,7 @@ export default function MonthCalendar() {
       setEvents((data ?? []) as CalendarEvent[]);
       setLoading(false);
     })();
-  }, [year, month]);
+  }, [year, month, currentUserId]);
 
   function changeMonth(delta: number) {
     let nextMonth = month + delta;
@@ -87,14 +103,9 @@ export default function MonthCalendar() {
 
     setSaving(true);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     const { data, error } = await supabase
       .from("events")
-      .insert({ user_id: user.id, title, event_date: selectedDate, type: newType })
+      .insert({ user_id: currentUserId, title, event_date: selectedDate, type: newType })
       .select()
       .single();
 
@@ -130,7 +141,16 @@ export default function MonthCalendar() {
     eventsByDate.set(e.event_date, list);
   });
 
+  const sessionsByDate = new Map<string, Group[]>();
+  groupSessions.forEach((g) => {
+    if (!g.event_date) return;
+    const list = sessionsByDate.get(g.event_date) ?? [];
+    list.push(g);
+    sessionsByDate.set(g.event_date, list);
+  });
+
   const selectedEvents = selectedDate ? eventsByDate.get(selectedDate) ?? [] : [];
+  const selectedSessions = selectedDate ? sessionsByDate.get(selectedDate) ?? [] : [];
 
   return (
     <div className="mx-auto w-full max-w-2xl px-6 py-10">
@@ -169,6 +189,7 @@ export default function MonthCalendar() {
           if (day === null) return <div key={index} />;
           const dateKey = toDateKey(year, month, day);
           const dayEvents = eventsByDate.get(dateKey) ?? [];
+          const daySessions = sessionsByDate.get(dateKey) ?? [];
           const isToday = dateKey === todayKey;
           const isSelected = dateKey === selectedDate;
 
@@ -190,6 +211,13 @@ export default function MonthCalendar() {
                 {day}
               </span>
               <div className="flex flex-wrap justify-center gap-0.5">
+                {daySessions.slice(0, 1).map((g) => (
+                  <span
+                    key={g.id}
+                    style={{ backgroundColor: GROUP_SESSION_COLOR }}
+                    className="h-1.5 w-1.5 rounded-full"
+                  />
+                ))}
                 {dayEvents.slice(0, 3).map((e) => (
                   <span
                     key={e.id}
@@ -210,8 +238,28 @@ export default function MonthCalendar() {
               {Number(selectedDate.split("-")[2])}. {MONTH_LABELS[month].toLowerCase()}
             </h2>
 
-            {selectedEvents.length > 0 && (
+            {(selectedSessions.length > 0 || selectedEvents.length > 0) && (
               <ul className="mt-3 space-y-2">
+                {selectedSessions.map((g) => (
+                  <li key={g.id}>
+                    <Link
+                      href={`/groups/${g.id}`}
+                      className="flex items-center gap-3 rounded-xl border border-card-border px-3 py-2 transition hover:bg-accent-soft"
+                    >
+                      <span
+                        style={{ backgroundColor: GROUP_SESSION_COLOR }}
+                        className="h-2 w-2 shrink-0 rounded-full"
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{g.name}</p>
+                        <p className="text-xs text-muted">
+                          Kollokviegruppe
+                          {g.event_time ? ` · ${g.event_time.slice(0, 5)}` : ""}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
                 {selectedEvents.map((e) => (
                   <li
                     key={e.id}
@@ -268,7 +316,7 @@ export default function MonthCalendar() {
         ) : (
           <p className="text-sm text-muted">
             Klikk på en dag for å se eller legge til hendelser, som eksamener og
-            innleveringer.
+            innleveringer. Kollokviegruppene dine dukker automatisk opp på sin dato.
           </p>
         )}
       </section>

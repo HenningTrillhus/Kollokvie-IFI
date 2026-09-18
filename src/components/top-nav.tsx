@@ -6,7 +6,7 @@ import { avatarStyle, type Profile } from "@/lib/profiles";
 
 const LINKS = [
   { href: "/dashboard", label: "Hjem" },
-  { href: "/groups", label: "Mine grupper" },
+  { href: "/groups", label: "Mine kollokviegrupper" },
   { href: "/calendar", label: "Kalender" },
   { href: "/search", label: "Søk" },
 ];

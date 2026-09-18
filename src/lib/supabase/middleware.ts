@@ -28,9 +28,12 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() verifies the JWT locally against the project's cached public
+  // signing key instead of round-tripping to the Auth server like getUser()
+  // does on every single request — this ran on every navigation, so it was
+  // the single biggest contributor to the app feeling slow to click around.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
   const isPublicPath =

@@ -6,11 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function GroupJoinButton({
   groupId,
+  currentUserId,
   isMember,
   isFull,
   canJoin,
 }: {
   groupId: string;
+  currentUserId: string;
   isMember: boolean;
   isFull: boolean;
   canJoin: boolean;
@@ -23,18 +25,13 @@ export default function GroupJoinButton({
     setBusy(true);
     setErrorMessage("");
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     const { error } = await supabase
       .from("group_members")
-      .insert({ group_id: groupId, user_id: user.id });
+      .insert({ group_id: groupId, user_id: currentUserId });
 
     setBusy(false);
     if (error) {
-      setErrorMessage("Du kan ikke bli med i denne gruppa.");
+      setErrorMessage("Du kan ikke bli med i denne kollokviegruppa.");
       return;
     }
     router.refresh();
@@ -44,16 +41,11 @@ export default function GroupJoinButton({
     setBusy(true);
     setErrorMessage("");
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     await supabase
       .from("group_members")
       .delete()
       .eq("group_id", groupId)
-      .eq("user_id", user.id);
+      .eq("user_id", currentUserId);
 
     setBusy(false);
     router.refresh();
@@ -66,7 +58,7 @@ export default function GroupJoinButton({
         disabled={busy}
         className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
       >
-        {busy ? "…" : "Forlat gruppe"}
+        {busy ? "…" : "Forlat kollokviegruppe"}
       </button>
     );
   }

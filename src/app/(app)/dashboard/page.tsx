@@ -1,21 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/get-user";
+import { getProfileById } from "@/lib/profiles";
 import { getGroupMemberCount, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   // Guaranteed by the (app) layout, which redirects unauthenticated requests.
   if (!user) return null;
 
-  const { data: publicGroups } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("visibility", "public")
-    .order("created_at", { ascending: false })
-    .limit(20);
+  const supabase = await createClient();
+
+  const [profile, { data: publicGroups }] = await Promise.all([
+    getProfileById(supabase, user.id),
+    supabase
+      .from("groups")
+      .select("*")
+      .eq("visibility", "public")
+      .order("created_at", { ascending: false })
+      .limit(20),
+  ]);
 
   const groups = (publicGroups ?? []) as Group[];
   const counts = await Promise.all(
@@ -26,12 +30,10 @@ export default async function DashboardPage() {
     <div className="mx-auto w-full max-w-lg px-6 py-10">
       <div className="text-center">
         <h1 className="text-xl font-semibold">
-          Velkommen, {user.user_metadata.full_name ?? user.email}
+          Velkommen, {profile?.full_name ?? user.email}
         </h1>
-        {user.user_metadata.username && (
-          <p className="mt-1 text-sm text-muted">
-            @{user.user_metadata.username}
-          </p>
+        {profile?.username && (
+          <p className="mt-1 text-sm text-muted">@{profile.username}</p>
         )}
       </div>
 
@@ -41,8 +43,8 @@ export default async function DashboardPage() {
         </h2>
         {groups.length === 0 ? (
           <p className="text-sm text-muted">
-            Ingen offentlige grupper ennå — lag den første under &quot;Mine
-            grupper&quot;.
+            Ingen offentlige kollokviegrupper ennå — lag den første under
+            &quot;Mine kollokviegrupper&quot;.
           </p>
         ) : (
           <div className="space-y-2">

@@ -8,9 +8,11 @@ type Status = "none" | "pending" | "accepted" | "loading";
 
 export default function FollowButton({
   targetUserId,
+  currentUserId,
   initialStatus,
 }: {
   targetUserId: string;
+  currentUserId: string;
   initialStatus?: "none" | "pending" | "accepted";
 }) {
   const router = useRouter();
@@ -23,15 +25,10 @@ export default function FollowButton({
 
     (async () => {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
       const { data } = await supabase
         .from("follows")
         .select("status")
-        .eq("follower_id", user.id)
+        .eq("follower_id", currentUserId)
         .eq("followee_id", targetUserId)
         .maybeSingle();
 
@@ -41,19 +38,14 @@ export default function FollowButton({
     return () => {
       cancelled = true;
     };
-  }, [targetUserId, initialStatus]);
+  }, [targetUserId, currentUserId, initialStatus]);
 
   async function follow() {
     setBusy(true);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     const { error } = await supabase
       .from("follows")
-      .insert({ follower_id: user.id, followee_id: targetUserId });
+      .insert({ follower_id: currentUserId, followee_id: targetUserId });
 
     setBusy(false);
     if (!error) {
@@ -65,15 +57,10 @@ export default function FollowButton({
   async function unfollow() {
     setBusy(true);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     await supabase
       .from("follows")
       .delete()
-      .eq("follower_id", user.id)
+      .eq("follower_id", currentUserId)
       .eq("followee_id", targetUserId);
 
     setBusy(false);

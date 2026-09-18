@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import CourseSingleSelect from "@/components/course-single-select";
 import type { Group, Visibility } from "@/lib/groups";
 
-export default function NewGroupPage() {
+export default function GroupSettingsPage() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const groupId = params.id;
+
+  const [loading, setLoading] = useState(true);
+  const [notOwner, setNotOwner] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [course, setCourse] = useState<Course | null>(null);
@@ -20,6 +25,7 @@ export default function NewGroupPage() {
   const [eventTime, setEventTime] = useState("");
   const [maxMembers, setMaxMembers] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -29,10 +35,42 @@ export default function NewGroupPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+
+      const { data: group } = await supabase
+        .from("groups")
+        .select("*")
+        .eq("id", groupId)
+        .maybeSingle();
+
+      if (!group || (group as Group).owner_id !== user.id) {
+        setNotOwner(true);
+        setLoading(false);
+        return;
+      }
+
+      const g = group as Group;
+      setName(g.name);
+      setDescription(g.description ?? "");
+      setVisibility(g.visibility);
+      setLocation(g.location ?? "");
+      setEventDate(g.event_date ?? "");
+      setEventTime(g.event_time ?? "");
+      setMaxMembers(g.max_members ? String(g.max_members) : "");
+
+      if (g.course_code) {
+        const { data: courseRow } = await supabase
+          .from("courses")
+          .select("*")
+          .eq("code", g.course_code)
+          .maybeSingle();
+        setCourse(courseRow as Course | null);
+      }
+
       const myCourses = await getUserCourses(supabase, user.id);
       setPriorityCodes(myCourses.map((c) => c.code));
+      setLoading(false);
     })();
-  }, []);
+  }, [groupId]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -40,43 +78,67 @@ export default function NewGroupPage() {
 
     setSaving(true);
     setErrorMessage("");
+    setSaved(false);
 
     const supabase = createClient();
+    const { error } = await supabase.rpc("update_group", {
+      gid: groupId,
+      p_name: name.trim(),
+      p_description: description.trim() || null,
+      p_course_code: course?.code ?? null,
+      p_visibility: visibility,
+      p_location: location.trim() || null,
+      p_event_date: eventDate || null,
+      p_event_time: eventTime || null,
+      p_max_members: maxMembers ? Number(maxMembers) : null,
+    });
 
-    const { data: group, error } = await supabase
-      .rpc("create_group", {
-        p_name: name.trim(),
-        p_description: description.trim() || null,
-        p_course_code: course?.code ?? null,
-        p_visibility: visibility,
-        p_location: location.trim() || null,
-        p_event_date: eventDate || null,
-        p_event_time: eventTime || null,
-        p_max_members: maxMembers ? Number(maxMembers) : null,
-      })
-      .single();
-
-    if (error || !group) {
-      setSaving(false);
-      setErrorMessage(error?.message ?? "Noe gikk galt.");
+    setSaving(false);
+    if (error) {
+      setErrorMessage(error.message);
       return;
     }
 
-    const newGroup = group as Group;
-    router.push(`/groups/${newGroup.id}`);
+    setSaved(true);
     router.refresh();
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto w-full max-w-sm px-6 py-10 text-sm text-muted">
+        Laster…
+      </div>
+    );
+  }
+
+  if (notOwner) {
+    return (
+      <div className="mx-auto w-full max-w-sm px-6 py-10">
+        <p className="text-sm text-muted">
+          Bare den som lagde kollokviegruppa kan endre innstillingene.
+        </p>
+        <Link
+          href={`/groups/${groupId}`}
+          className="mt-4 inline-block text-sm font-medium text-accent hover:text-accent-hover"
+        >
+          ← Tilbake til gruppa
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="mx-auto w-full max-w-sm px-6 py-10">
       <Link
-        href="/groups"
+        href={`/groups/${groupId}`}
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Mine kollokviegrupper
+        ← Tilbake til gruppa
       </Link>
 
-      <h1 className="mt-4 text-xl font-semibold">Lag kollokviegruppe</h1>
+      <h1 className="mt-4 text-xl font-semibold">
+        Innstillinger for kollokviegruppa
+      </h1>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
@@ -87,8 +149,6 @@ export default function NewGroupPage() {
             id="name"
             type="text"
             required
-            autoFocus
-            placeholder="Kollokvie i algoritmer"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -114,7 +174,6 @@ export default function NewGroupPage() {
           <textarea
             id="description"
             rows={3}
-            placeholder="Hva skal dere gjøre sammen?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full resize-none rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -147,11 +206,6 @@ export default function NewGroupPage() {
               Privat
             </button>
           </div>
-          <p className="mt-1 text-xs text-muted">
-            {visibility === "public"
-              ? "Alle kan se og bli med i kollokviegruppa. Vises på hjem-skjermen."
-              : "Bare folk du følger eller som følger deg kan bli med."}
-          </p>
         </div>
 
         <div>
@@ -161,7 +215,6 @@ export default function NewGroupPage() {
           <input
             id="location"
             type="text"
-            placeholder="Ada Lovelaces hus, rom 2439"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -214,13 +267,14 @@ export default function NewGroupPage() {
         </div>
 
         {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
+        {saved && <p className="text-sm text-accent">Lagret.</p>}
 
         <button
           type="submit"
           disabled={saving || !name.trim()}
           className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
         >
-          {saving ? "Oppretter…" : "Opprett kollokviegruppe"}
+          {saving ? "Lagrer…" : "Lagre"}
         </button>
       </form>
     </div>

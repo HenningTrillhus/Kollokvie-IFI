@@ -13,8 +13,10 @@ export type PendingRequest = {
 
 export default function FollowRequestsInbox({
   initialRequests,
+  currentUserId,
 }: {
   initialRequests: PendingRequest[];
+  currentUserId: string;
 }) {
   const router = useRouter();
   const [requests, setRequests] = useState(initialRequests);
@@ -23,23 +25,19 @@ export default function FollowRequestsInbox({
   async function respond(followerId: string, action: "accept" | "decline") {
     setBusyId(followerId);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
 
     if (action === "accept") {
       await supabase
         .from("follows")
         .update({ status: "accepted" })
         .eq("follower_id", followerId)
-        .eq("followee_id", user.id);
+        .eq("followee_id", currentUserId);
     } else {
       await supabase
         .from("follows")
         .delete()
         .eq("follower_id", followerId)
-        .eq("followee_id", user.id);
+        .eq("followee_id", currentUserId);
     }
 
     setRequests((prev) => prev.filter((r) => r.followerId !== followerId));

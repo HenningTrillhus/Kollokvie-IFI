@@ -12,7 +12,7 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
   async function handleDelete() {
     setDeleting(true);
     const supabase = createClient();
-    await supabase.from("groups").delete().eq("id", groupId);
+    await supabase.rpc("delete_group", { gid: groupId });
     router.push("/groups");
     router.refresh();
   }
@@ -25,7 +25,7 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
           disabled={deleting}
           className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
         >
-          {deleting ? "Sletter…" : "Ja, slett gruppa"}
+          {deleting ? "Sletter…" : "Ja, slett kollokviegruppa"}
         </button>
         <button
           onClick={() => setConfirming(false)}
@@ -43,7 +43,7 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
       onClick={() => setConfirming(true)}
       className="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10"
     >
-      Slett gruppe
+      Slett kollokviegruppe
     </button>
   );
 }

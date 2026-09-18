@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   avatarStyle,
   getFollowCounts,
@@ -10,6 +11,7 @@ import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
+import BackButton from "@/components/back-button";
 import { getUserCourses } from "@/lib/courses";
 
 export default async function PublicProfilePage({
@@ -18,11 +20,10 @@ export default async function PublicProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
+
+  const supabase = await createClient();
 
   const profile = await getProfileByUsername(supabase, username);
   if (!profile) notFound();
@@ -71,7 +72,9 @@ export default async function PublicProfilePage({
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="flex items-start justify-between">
+      <BackButton />
+
+      <div className="mt-4 flex items-start justify-between">
         <div className="flex items-center gap-4">
           <div
             style={avatarStyle(profile.accent_color)}
@@ -90,7 +93,11 @@ export default async function PublicProfilePage({
             )}
           </div>
         </div>
-        <FollowButton targetUserId={profile.id} initialStatus={myStatus} />
+        <FollowButton
+          targetUserId={profile.id}
+          currentUserId={user.id}
+          initialStatus={myStatus}
+        />
       </div>
 
       <div className="mt-4 space-y-3">

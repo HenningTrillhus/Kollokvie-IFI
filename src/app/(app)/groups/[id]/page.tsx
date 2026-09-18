@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfilesByIds } from "@/lib/profiles";
 import { getGroupMemberCount, type Group } from "@/lib/groups";
 import ProfileList from "@/components/profile-list";
 import GroupJoinButton from "@/components/group-join-button";
 import DeleteGroupButton from "@/components/delete-group-button";
+import GroupInvitePanel from "@/components/group-invite-panel";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return null;
@@ -18,12 +21,10 @@ export default async function GroupDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
+  const supabase = await createClient();
   const { data: group } = await supabase
     .from("groups")
     .select("*")
@@ -48,18 +49,36 @@ export default async function GroupDetailPage({
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="flex items-start justify-between gap-3">
+      <Link
+        href="/groups"
+        className="text-sm font-medium text-muted transition hover:text-foreground"
+      >
+        ← Mine kollokviegrupper
+      </Link>
+
+      <div className="mt-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-semibold">{typedGroup.name}</h1>
           {typedGroup.description && (
             <p className="mt-1 text-sm text-muted">{typedGroup.description}</p>
           )}
         </div>
-        {typedGroup.course_code && (
-          <span className="shrink-0 rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
-            {typedGroup.course_code}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {typedGroup.course_code && (
+            <span className="rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
+              {typedGroup.course_code}
+            </span>
+          )}
+          {isOwner && (
+            <Link
+              href={`/groups/${typedGroup.id}/settings`}
+              aria-label="Innstillinger for gruppa"
+              className="rounded-lg border border-card-border px-2.5 py-1 text-xs font-medium transition hover:bg-accent-soft"
+            >
+              ⚙︎
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted">
@@ -85,6 +104,7 @@ export default async function GroupDetailPage({
         ) : (
           <GroupJoinButton
             groupId={typedGroup.id}
+            currentUserId={user.id}
             isMember={isMember}
             isFull={isFull && !isMember}
             canJoin={Boolean(canJoinData)}
@@ -92,10 +112,16 @@ export default async function GroupDetailPage({
         )}
         {!isOwner && !isMember && !canJoinData && (
           <p className="text-xs text-muted">
-            Du må følge eieren for å bli med i denne private gruppa.
+            Du må følge eieren for å bli med i denne private kollokviegruppa.
           </p>
         )}
       </div>
+
+      {isMember && (
+        <div className="mt-4">
+          <GroupInvitePanel groupId={typedGroup.id} excludeIds={memberIds} />
+        </div>
+      )}
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold text-muted">Medlemmer</h2>
@@ -103,7 +129,7 @@ export default async function GroupDetailPage({
           profiles={members}
           emptyLabel={
             memberCount > 0 && !isMember
-              ? "Medlemslisten vises når du er med i gruppa."
+              ? "Medlemslisten vises når du er med i kollokviegruppa."
               : "Ingen medlemmer ennå."
           }
         />

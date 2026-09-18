@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ACCENT_COLORS, STUDY_PROGRAMS, avatarStyle, sanitizeExternalUrl } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
@@ -138,7 +139,14 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-sm px-6 py-10">
-      <h1 className="text-xl font-semibold">Innstillinger</h1>
+      <Link
+        href="/profile"
+        className="text-sm font-medium text-muted transition hover:text-foreground"
+      >
+        ← Tilbake til profilen
+      </Link>
+
+      <h1 className="mt-4 text-xl font-semibold">Innstillinger</h1>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>

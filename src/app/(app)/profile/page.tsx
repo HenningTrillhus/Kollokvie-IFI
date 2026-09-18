@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   avatarStyle,
   getFollowCounts,
   getProfileById,
   getProfilesByIds,
 } from "@/lib/profiles";
-import FollowRequestsInbox, {
-  type PendingRequest,
-} from "@/components/follow-requests-inbox";
+import { getPendingInviteCount } from "@/lib/group-invites";
 import ProfileList from "@/components/profile-list";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
@@ -16,24 +15,29 @@ import SignOutButton from "@/components/sign-out-button";
 import { getUserCourses } from "@/lib/courses";
 
 export default async function OwnProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const profile = await getProfileById(supabase, user.id);
   if (!profile) return null;
 
   const [
     counts,
     courses,
+    { count: pendingFollowCount },
+    pendingInviteCount,
     { data: followingRows },
     { data: followerRows },
-    { data: pendingRows },
   ] = await Promise.all([
     getFollowCounts(supabase, user.id),
     getUserCourses(supabase, user.id),
+    supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("followee_id", user.id)
+      .eq("status", "pending"),
+    getPendingInviteCount(supabase, user.id),
     supabase
       .from("follows")
       .select("followee_id")
@@ -44,23 +48,14 @@ export default async function OwnProfilePage() {
       .select("follower_id")
       .eq("followee_id", user.id)
       .eq("status", "accepted"),
-    supabase
-      .from("follows")
-      .select("follower_id")
-      .eq("followee_id", user.id)
-      .eq("status", "pending"),
   ]);
 
-  const [followingProfiles, followerProfiles, pendingProfiles] = await Promise.all([
+  const [followingProfiles, followerProfiles] = await Promise.all([
     getProfilesByIds(supabase, (followingRows ?? []).map((r) => r.followee_id)),
     getProfilesByIds(supabase, (followerRows ?? []).map((r) => r.follower_id)),
-    getProfilesByIds(supabase, (pendingRows ?? []).map((r) => r.follower_id)),
   ]);
-  const pendingRequests: PendingRequest[] = (pendingRows ?? []).flatMap((r) => {
-    const p = pendingProfiles.find((profile) => profile.id === r.follower_id);
-    return p ? [{ followerId: r.follower_id, profile: p }] : [];
-  });
 
+  const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
   const initial = (profile.full_name || profile.username).charAt(0).toUpperCase();
 
   return (
@@ -112,12 +107,19 @@ export default async function OwnProfilePage() {
         </span>
       </div>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold text-muted">
-          Følgeforespørsler
-        </h2>
-        <FollowRequestsInbox initialRequests={pendingRequests} />
-      </section>
+      <Link
+        href="/inbox"
+        className="mt-6 flex items-center justify-between rounded-xl border border-card-border px-4 py-3 transition hover:bg-accent-soft"
+      >
+        <span className="text-sm font-medium">Innboks</span>
+        {totalPending > 0 ? (
+          <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
+            {totalPending}
+          </span>
+        ) : (
+          <span className="text-xs text-muted">Ingenting nytt</span>
+        )}
+      </Link>
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold text-muted">Følgere</h2>
