@@ -2,7 +2,7 @@
 
 En enkel og lavmælt app for å finne og holde kontakt med kollokviegruppen din på IFI.
 
-Bygget med Next.js (App Router) + Supabase (autentisering via magisk lenke på e-post) + Tailwind CSS.
+Bygget med Next.js (App Router) + Supabase (autentisering via IFI-brukernavn) + Tailwind CSS.
 
 ## Kom i gang
 
@@ -26,17 +26,22 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=din-anon-key
 ```
 
-### 3. Slå på e-post-innlogging med 6-sifret kode
+### 3. Skru av e-postbekreftelse i Supabase
 
-Appen bruker Supabase sin OTP-innlogging: brukeren får en 6-sifret kode på e-post og skriver den inn i appen (ingen lenke å klikke).
+Appen ber aldri om e-post — man logger inn med kun et IFI-brukernavn. Internt bruker den
+Supabase sin e-post/passord-innlogging med en oppdiktet e-post/passord utledet fra
+brukernavnet (se `src/lib/ifi-auth.ts`), så Supabase må ikke kreve e-postbekreftelse:
 
-1. I Supabase-dashbordet: **Authentication → Sign In / Providers → Email**, og sørg for at **Email** er aktivert.
-2. Gå til **Authentication → Email Templates → Magic Link**. Standardmalen viser bare en lenke — legg til `{{ .Token }}` i malen, f.eks.:
-   ```html
-   <h2>Din innloggingskode</h2>
-   <p>Skriv inn denne koden i appen: <strong>{{ .Token }}</strong></p>
-   ```
-3. (Valgfritt) Under **Authentication → Rate Limits** kan du justere hvor ofte en bruker kan be om ny kode.
+1. Gå til **Authentication → Sign In / Providers → Email** i Supabase-dashbordet.
+2. Skru **av** "Confirm email".
+
+Uten dette steget vil registrering se ut til å henge, siden Supabase venter på en
+bekreftelse brukeren aldri får sendt.
+
+> **Merk:** Siden det ikke er noe passord synlig i appen, er det ingen reell hemmelighet
+> som beskytter kontoen — hvem som helst som taster inn et IFI-brukernavn kommer inn på
+> den kontoen. Helt greit for et lite, internt kollokvie-verktøy, men vit at det er slik
+> det fungerer.
 
 ### 4. Kjør appen
 
@@ -44,12 +49,17 @@ Appen bruker Supabase sin OTP-innlogging: brukeren får en 6-sifret kode på e-p
 npm run dev
 ```
 
-Åpne [http://localhost:3000](http://localhost:3000). Du blir sendt til `/login` — skriv inn en e-postadresse og du får tilsendt en innloggingslenke. Klikk den, og du havner på `/dashboard`.
+Åpne [http://localhost:3000](http://localhost:3000). Du blir sendt til en startside med
+**Logg inn** / **Registrer deg**. Registrering ber om fullt navn, brukernavn og
+IFI-brukernavn; innlogging ber bare om IFI-brukernavnet.
 
 ## Struktur
 
-- `src/app/login` – start-/innloggingsskjermen
-- `src/app/auth/confirm` – bekrefter magic-link-tokenet fra e-posten
-- `src/app/dashboard` – siden du havner på etter innlogging
+- `src/app/page.tsx` – startskjermen (logg inn / registrer deg)
+- `src/app/login`, `src/app/signup` – innloggings- og registreringssidene
+- `src/app/(app)` – alt som krever innlogging: delt toppbar (Hjem / Mine grupper /
+  Kalender) og sidene `dashboard`, `groups`, `calendar`
 - `src/lib/supabase` – Supabase-klienter for nettleser, server og middleware
-- `src/middleware.ts` – holder sesjonen oppdatert og styrer hvem som får se hva
+- `src/lib/ifi-auth.ts` – utleder e-post/passord fra IFI-brukernavnet
+- `src/proxy.ts` – holder sesjonen oppdatert og styrer hvem som får se hva
+- `supabase/migrations` – SQL som kjøres i Supabase sin SQL Editor
