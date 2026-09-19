@@ -1,11 +1,11 @@
-import { HomeIcon, GroupsIcon, CalendarIcon, SearchIcon } from "./nav-icons";
+import { ExploreIcon, GroupsIcon, CalendarIcon, SearchIcon } from "./nav-icons";
 
 export const NAV_ITEMS = [
-  { href: "/dashboard", label: "Hjem", shortLabel: "Hjem", Icon: HomeIcon },
+  { href: "/dashboard", label: "Utforsk", shortLabel: "Utforsk", Icon: ExploreIcon },
   {
     href: "/groups",
     label: "Mine kollokviegrupper",
-    shortLabel: "Grupper",
+    shortLabel: "Kollokvier",
     Icon: GroupsIcon,
   },
   { href: "/calendar", label: "Kalender", shortLabel: "Kalender", Icon: CalendarIcon },

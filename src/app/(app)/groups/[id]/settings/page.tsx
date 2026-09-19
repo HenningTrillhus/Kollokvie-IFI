@@ -121,7 +121,7 @@ export default function GroupSettingsPage() {
           href={`/groups/${groupId}`}
           className="mt-4 inline-block text-sm font-medium text-accent hover:text-accent-hover"
         >
-          ← Tilbake til gruppa
+          ← Tilbake til kollokviegruppa
         </Link>
       </div>
     );
@@ -133,7 +133,7 @@ export default function GroupSettingsPage() {
         href={`/groups/${groupId}`}
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Tilbake til gruppa
+        ← Tilbake til kollokviegruppa
       </Link>
 
       <h1 className="mt-4 text-xl font-semibold">

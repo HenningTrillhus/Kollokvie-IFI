@@ -37,7 +37,7 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
           placeholder="Søk i kollokviegrupper"
           className="min-w-0 flex-1 rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
         />
-        <RefreshButton label="Oppdater grupper" />
+        <RefreshButton label="Oppdater kollokviegrupper" />
       </div>
 
       {courses.length > 0 && (
@@ -62,7 +62,7 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
           <p className="py-6 text-center text-sm text-muted">
             {items.length === 0
               ? "Ingen offentlige kollokviegrupper ennå."
-              : "Ingen grupper matcher."}
+              : "Ingen kollokviegrupper matcher."}
           </p>
         ) : (
           visible.map(({ group, memberCount }) => (

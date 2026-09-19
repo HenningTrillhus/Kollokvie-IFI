@@ -1,10 +1,11 @@
 type IconProps = { className?: string };
 
-export function HomeIcon({ className }: IconProps) {
+export function ExploreIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className={className}>
+      <circle cx="12" cy="12" r="9" />
       <path
-        d="M3 11.5L12 4l9 7.5M5.25 10v9a1 1 0 001 1H9.5v-5.5a1 1 0 011-1h3a1 1 0 011 1V20h3.25a1 1 0 001-1v-9"
+        d="M15.5 8.5l-2 5-5 2 2-5 5-2z"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

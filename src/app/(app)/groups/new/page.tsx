@@ -149,7 +149,7 @@ export default function NewGroupPage() {
           </div>
           <p className="mt-1 text-xs text-muted">
             {visibility === "public"
-              ? "Alle kan se og bli med i kollokviegruppa. Vises på hjem-skjermen."
+              ? "Alle kan se og bli med i kollokviegruppa. Vises under Utforsk."
               : "Bare folk du følger eller som følger deg kan bli med."}
           </p>
         </div>

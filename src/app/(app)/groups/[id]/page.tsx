@@ -72,7 +72,7 @@ export default async function GroupDetailPage({
           {isOwner && (
             <Link
               href={`/groups/${typedGroup.id}/settings`}
-              aria-label="Innstillinger for gruppa"
+              aria-label="Innstillinger for kollokviegruppa"
               className="rounded-lg border border-card-border px-2.5 py-1 text-xs font-medium transition hover:bg-accent-soft"
             >
               ⚙︎
