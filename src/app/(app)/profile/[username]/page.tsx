@@ -9,6 +9,7 @@ import {
 } from "@/lib/profiles";
 import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
+import SwipeTabs from "@/components/swipe-tabs";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
 import BackButton from "@/components/back-button";
@@ -117,23 +118,32 @@ export default async function PublicProfilePage({
       </div>
 
       {iFollowThem ? (
-        <>
-          <section className="mt-8">
-            <h2 className="mb-3 text-sm font-semibold text-muted">Følgere</h2>
-            <ProfileList
-              profiles={followerProfiles}
-              emptyLabel="Ingen følgere ennå."
-            />
-          </section>
-
-          <section className="mt-8">
-            <h2 className="mb-3 text-sm font-semibold text-muted">Følger</h2>
-            <ProfileList
-              profiles={followingProfiles}
-              emptyLabel={`@${profile.username} følger ingen ennå.`}
-            />
-          </section>
-        </>
+        <div className="mt-8">
+          <SwipeTabs
+            tabs={[
+              {
+                label: "Følgere",
+                count: followerProfiles.length,
+                content: (
+                  <ProfileList
+                    profiles={followerProfiles}
+                    emptyLabel="Ingen følgere ennå."
+                  />
+                ),
+              },
+              {
+                label: "Følger",
+                count: followingProfiles.length,
+                content: (
+                  <ProfileList
+                    profiles={followingProfiles}
+                    emptyLabel={`@${profile.username} følger ingen ennå.`}
+                  />
+                ),
+              },
+            ]}
+          />
+        </div>
       ) : (
         <p className="mt-8 text-sm text-muted">
           Følg @{profile.username} for å se hvem de følger og blir fulgt av.

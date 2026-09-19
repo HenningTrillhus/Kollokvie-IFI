@@ -4,6 +4,8 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfileById } from "@/lib/profiles";
 import { getPendingInviteCount } from "@/lib/group-invites";
 import TopNav from "@/components/top-nav";
+import BottomNav from "@/components/bottom-nav";
+import AppShell from "@/components/app-shell";
 
 export default async function AppLayout({
   children,
@@ -30,9 +32,11 @@ export default async function AppLayout({
   const pendingRequestCount = (pendingFollowCount ?? 0) + pendingInviteCount;
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col">
-      <TopNav profile={profile} pendingRequestCount={pendingRequestCount} />
-      <main className="flex flex-1 flex-col animate-fade-in">{children}</main>
-    </div>
+    <AppShell
+      header={<TopNav profile={profile} pendingRequestCount={pendingRequestCount} />}
+      bottom={<BottomNav />}
+    >
+      {children}
+    </AppShell>
   );
 }

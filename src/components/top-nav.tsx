@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { avatarStyle, type Profile } from "@/lib/profiles";
-import { HomeIcon, GroupsIcon, CalendarIcon, SearchIcon } from "./nav-icons";
-
-const LINKS = [
-  { href: "/dashboard", label: "Hjem", Icon: HomeIcon },
-  { href: "/groups", label: "Mine kollokviegrupper", Icon: GroupsIcon },
-  { href: "/calendar", label: "Kalender", Icon: CalendarIcon },
-  { href: "/search", label: "Søk", Icon: SearchIcon },
-];
+import { NAV_ITEMS } from "./nav-items";
 
 export default function TopNav({
   profile,
@@ -25,32 +18,31 @@ export default function TopNav({
     .toUpperCase();
 
   return (
-    <header className="flex items-center gap-2 border-b border-card-border px-3 py-2.5 sm:gap-6 sm:px-6 sm:py-4">
+    <header className="flex shrink-0 items-center gap-6 border-b border-card-border bg-background px-4 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:px-6 sm:py-4">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">
           K
         </div>
-        <span className="hidden font-semibold tracking-tight sm:inline">
+        <span className="font-semibold tracking-tight">
           Kollokvie<span className="text-accent">@IFI</span>
         </span>
       </Link>
 
-      <nav className="flex min-w-0 flex-1 items-center justify-around gap-1 sm:justify-start">
-        {LINKS.map(({ href, label, Icon }) => {
+      <nav className="hidden min-w-0 flex-1 items-center gap-1 sm:flex">
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
           const isActive = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
-              aria-label={label}
-              className={`flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium transition sm:px-3 ${
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 isActive
                   ? "bg-accent-soft text-accent"
                   : "text-muted hover:text-foreground"
               }`}
             >
               <Icon className="h-5 w-5 shrink-0" />
-              <span className="hidden whitespace-nowrap sm:inline">{label}</span>
+              <span className="whitespace-nowrap">{label}</span>
             </Link>
           );
         })}
@@ -59,7 +51,7 @@ export default function TopNav({
       <Link
         href="/profile"
         style={avatarStyle(profile?.accent_color)}
-        className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition hover:opacity-80"
+        className="relative ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition active:scale-95 sm:ml-0"
         aria-label="Din profil"
       >
         {initial}

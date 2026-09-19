@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type TouchEvent } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -44,6 +44,24 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<EventType>("exam");
   const [saving, setSaving] = useState(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  function handleTouchStart(e: TouchEvent) {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      changeMonth(dx < 0 ? 1 : -1);
+    }
+  }
 
   // Kollokviegruppene dine endrer seg sjelden, så denne hentes én gang, ikke
   // på nytt for hver måned du blar til.
@@ -183,7 +201,9 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
       </div>
 
       <div
-        className={`grid grid-cols-7 gap-1.5 transition-opacity ${loading ? "opacity-50" : ""}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className={`grid touch-pan-y grid-cols-7 gap-1.5 transition-opacity ${loading ? "opacity-50" : ""}`}
       >
         {cells.map((day, index) => {
           if (day === null) return <div key={index} />;
@@ -239,7 +259,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
             </h2>
 
             {(selectedSessions.length > 0 || selectedEvents.length > 0) && (
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto overscroll-contain">
                 {selectedSessions.map((g) => (
                   <li key={g.id}>
                     <Link
