@@ -1,14 +1,13 @@
 export default function Loading() {
   return (
     <div
-      className="mx-auto w-full max-w-lg px-6 py-10"
+      className="mx-auto w-full max-w-lg px-6 py-6"
       role="status"
       aria-label="Laster"
     >
-      <div className="mx-auto h-6 w-48 animate-pulse rounded-lg bg-accent-soft" />
-      <div className="mx-auto mt-3 h-4 w-28 animate-pulse rounded-lg bg-accent-soft" />
+      <div className="h-10 animate-pulse rounded-xl bg-accent-soft" />
 
-      <div className="mt-10 space-y-3">
+      <div className="mt-5 space-y-3">
         {[0, 1, 2].map((i) => (
           <div
             key={i}

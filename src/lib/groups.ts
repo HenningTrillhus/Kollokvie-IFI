@@ -23,3 +23,16 @@ export async function getGroupMemberCount(
   const { data } = await supabase.rpc("group_member_count", { gid: groupId });
   return data ?? 0;
 }
+
+export function isGroupFull(group: Group, memberCount: number) {
+  return group.max_members !== null && memberCount >= group.max_members;
+}
+
+// Groups with room come first (newest first, as fetched), full ones go last.
+export function withFullGroupsLast<T extends { group: Group; memberCount: number }>(
+  items: T[]
+) {
+  const open = items.filter((i) => !isGroupFull(i.group, i.memberCount));
+  const full = items.filter((i) => isGroupFull(i.group, i.memberCount));
+  return [...open, ...full];
+}

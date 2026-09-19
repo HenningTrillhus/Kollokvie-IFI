@@ -61,14 +61,6 @@ export default function SignupPage() {
 
   return (
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-accent-soft blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-accent-soft blur-3xl"
-      />
 
       <div className="relative w-full max-w-sm">
         <div className="mb-10 text-center">

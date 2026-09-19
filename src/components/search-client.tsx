@@ -4,19 +4,25 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import FollowButton from "@/components/follow-button";
+import GroupCard from "@/components/group-card";
 import { avatarStyle, type Profile } from "@/lib/profiles";
+import { getGroupMemberCount, withFullGroupsLast, type Group } from "@/lib/groups";
 
 type FollowStatus = "none" | "pending" | "accepted";
+type Mode = "people" | "groups";
+type GroupResult = { group: Group; memberCount: number };
 
 export default function SearchClient({ currentUserId }: { currentUserId: string }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
   const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
+  const [mode, setMode] = useState<Mode>("people");
+  const [groupResults, setGroupResults] = useState<GroupResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) return;
+    if (!trimmed || mode !== "people") return;
 
     const timeout = setTimeout(async () => {
       setLoading(true);
@@ -54,29 +60,89 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [query, currentUserId]);
+  }, [query, currentUserId, mode]);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed || mode !== "groups") return;
+
+    const timeout = setTimeout(async () => {
+      setLoading(true);
+      const supabase = createClient();
+      // Commas and parentheses would break the PostgREST or-filter syntax.
+      const term = trimmed.replace(/[,()%*]/g, " ").trim();
+      const { data } = await supabase
+        .from("groups")
+        .select("*")
+        .or(
+          `name.ilike.%${term}%,description.ilike.%${term}%,course_code.ilike.%${term}%`
+        )
+        .order("created_at", { ascending: false })
+        .limit(30);
+
+      const groups = (data ?? []) as Group[];
+      const counts = await Promise.all(
+        groups.map((g) => getGroupMemberCount(supabase, g.id))
+      );
+      setGroupResults(
+        withFullGroupsLast(groups.map((group, i) => ({ group, memberCount: counts[i] })))
+      );
+      setLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query, mode]);
 
   const trimmedQuery = query.trim();
 
   return (
-    <div className="mx-auto w-full max-w-lg px-6 py-10">
-      <h1 className="text-xl font-semibold">Søk etter folk</h1>
+    <div className="mx-auto w-full max-w-lg px-6 py-6">
+      <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
+        {(
+          [
+            ["people", "Folk"],
+            ["groups", "Kollokviegrupper"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setMode(value)}
+            className={`rounded-lg px-3 py-1.5 transition ${
+              mode === value ? "bg-accent text-white" : "text-muted"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       <input
         type="text"
         autoFocus
-        placeholder="Navn eller brukernavn…"
+        placeholder={
+          mode === "people" ? "Navn eller brukernavn…" : "Navn, emnekode eller beskrivelse…"
+        }
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="mt-4 w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className="mt-3 w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
-      <div className="mt-6 space-y-2">
+      <div className="mt-5 space-y-2">
         {loading && trimmedQuery && <p className="text-sm text-muted">Søker…</p>}
-        {!loading && trimmedQuery && results.length === 0 && (
+        {!loading && trimmedQuery && mode === "people" && results.length === 0 && (
           <p className="text-sm text-muted">Fant ingen brukere.</p>
         )}
+        {!loading && trimmedQuery && mode === "groups" && groupResults.length === 0 && (
+          <p className="text-sm text-muted">Fant ingen kollokviegrupper.</p>
+        )}
         {trimmedQuery &&
+          mode === "groups" &&
+          groupResults.map(({ group, memberCount }) => (
+            <GroupCard key={group.id} group={group} memberCount={memberCount} />
+          ))}
+        {trimmedQuery &&
+          mode === "people" &&
           results.map((profile) => (
             <div
               key={profile.id}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Group } from "@/lib/groups";
+import { isGroupFull, type Group } from "@/lib/groups";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return null;
@@ -15,27 +15,49 @@ export default function GroupCard({
   memberCount: number;
 }) {
   const dateLabel = formatDate(group.event_date);
+  const full = isGroupFull(group, memberCount);
 
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="block rounded-xl border border-card-border p-4 transition hover:border-accent/40 hover:bg-accent-soft/60"
+      className={`relative block overflow-hidden rounded-xl border border-card-border p-4 transition hover:border-accent/40 hover:bg-accent-soft/60 ${
+        full ? "bg-accent-soft/30" : ""
+      }`}
     >
+      {full && (
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-1 bg-muted/40"
+        />
+      )}
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        <div className={`min-w-0 ${full ? "opacity-60" : ""}`}>
           <p className="truncate text-sm font-semibold">{group.name}</p>
           {group.description && (
             <p className="mt-0.5 truncate text-xs text-muted">{group.description}</p>
           )}
         </div>
-        {group.course_code && (
-          <span className="shrink-0 rounded-lg bg-accent-soft px-2 py-1 text-xs font-medium text-accent">
-            {group.course_code}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-1.5">
+          {full && (
+            <span className="rounded-lg bg-foreground px-2 py-1 text-xs font-medium text-background">
+              Full
+            </span>
+          )}
+          {group.course_code && (
+            <span
+              className={`rounded-lg bg-accent-soft px-2 py-1 text-xs font-medium text-accent ${
+                full ? "opacity-60" : ""
+              }`}
+            >
+              {group.course_code}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="mt-3 flex items-end justify-between gap-3">
+      <div
+        className={`mt-3 flex items-end justify-between gap-3 ${full ? "opacity-60" : ""}`}
+      >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
           <span>
             {memberCount}
