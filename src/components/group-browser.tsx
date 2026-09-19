@@ -12,6 +12,7 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [course, setCourse] = useState<string | null>(null);
+  const [visibility, setVisibility] = useState<"all" | "public" | "private">("all");
 
   const courses = Array.from(
     new Set(items.map((i) => i.group.course_code).filter((c): c is string => !!c))
@@ -22,6 +23,7 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
 
   const q = query.trim().toLowerCase();
   const visible = items.filter(({ group }) => {
+    if (visibility !== "all" && group.visibility !== visibility) return false;
     if (activeCourse && group.course_code !== activeCourse) return false;
     if (!q) return true;
     return [group.name, group.description, group.course_code, group.location]
@@ -40,6 +42,27 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
           className="min-w-0 flex-1 rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
         />
         <RefreshButton label={t("explore.refresh")} />
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 rounded-xl border border-card-border p-1 text-sm font-medium">
+        {(
+          [
+            ["all", t("explore.all")],
+            ["public", t("explore.onlyPublic")],
+            ["private", t("explore.onlyPrivate")],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setVisibility(value)}
+            className={`rounded-lg px-3 py-1.5 transition ${
+              visibility === value ? "bg-accent text-white" : "text-muted"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {courses.length > 0 && (
@@ -62,9 +85,11 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
       <div className="mt-4 space-y-2">
         {visible.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted">
-            {items.length === 0
-              ? t("explore.empty")
-              : t("explore.noMatch")}
+            {visibility === "private" && items.every((i) => i.group.visibility !== "private")
+              ? t("explore.noPrivate")
+              : items.length === 0
+                ? t("explore.empty")
+                : t("explore.noMatch")}
           </p>
         ) : (
           visible.map(({ group, memberCount }) => (

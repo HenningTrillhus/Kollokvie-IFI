@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type Visibility = "public" | "private";
+export type Visibility = "public" | "private" | "invite";
+
+export const VISIBILITY_KEYS = {
+  public: "common.public",
+  private: "common.private",
+  invite: "common.inviteOnly",
+} as const;
 
 export type Group = {
   id: string;

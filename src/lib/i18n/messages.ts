@@ -30,6 +30,7 @@ export const messages = {
   "common.decline": { no: "Avslå", en: "Decline" },
   "common.public": { no: "Offentlig", en: "Public" },
   "common.private": { no: "Privat", en: "Private" },
+  "common.inviteOnly": { no: "Kun invitasjon", en: "Invite only" },
   "common.searching": { no: "Søker…", en: "Searching…" },
   "common.refresh": { no: "Oppdater", en: "Refresh" },
 
@@ -87,6 +88,12 @@ export const messages = {
   "explore.searchPlaceholder": { no: "Søk i kollokviegrupper", en: "Search study groups" },
   "explore.refresh": { no: "Oppdater kollokviegrupper", en: "Refresh study groups" },
   "explore.all": { no: "Alle", en: "All" },
+  "explore.onlyPublic": { no: "Offentlige", en: "Public" },
+  "explore.onlyPrivate": { no: "Private", en: "Private" },
+  "explore.noPrivate": {
+    no: "Ingen private kollokviegrupper fra folk du følger ennå.",
+    en: "No private study groups from people you follow yet.",
+  },
   "explore.empty": {
     no: "Ingen offentlige kollokviegrupper ennå.",
     en: "No public study groups yet.",
@@ -122,6 +129,14 @@ export const messages = {
   "group.publicHint": {
     no: "Alle kan se og bli med i kollokviegruppa. Vises under Utforsk.",
     en: "Anyone can see and join the study group. Shown under Explore.",
+  },
+  "group.inviteHint": {
+    no: "Skjult for alle andre. Bare du kan invitere, og bare inviterte kan bli med.",
+    en: "Hidden from everyone else. Only you can invite, and only invited people can join.",
+  },
+  "group.mustBeInvited": {
+    no: "Du må bli invitert for å bli med i denne kollokviegruppa.",
+    en: "You need an invitation to join this study group.",
   },
   "group.privateHint": {
     no: "Bare folk du følger eller som følger deg kan bli med.",

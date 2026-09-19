@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const { data: publicGroups } = await supabase
     .from("groups")
     .select("*")
-    .eq("visibility", "public")
+    .in("visibility", ["public", "private"])
     .order("created_at", { ascending: false })
     .limit(100);
 

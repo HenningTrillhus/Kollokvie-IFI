@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/client";
 import { formatDate } from "@/lib/i18n";
-import { isGroupFull, type Group } from "@/lib/groups";
+import { isGroupFull, VISIBILITY_KEYS, type Group } from "@/lib/groups";
 
 export default function GroupCard({
   group,
@@ -72,7 +72,7 @@ export default function GroupCard({
           )}
         </div>
         <span className="shrink-0 rounded-md border border-card-border px-1.5 py-0.5 text-xs text-muted">
-          {group.visibility === "public" ? t("common.public") : t("common.private")}
+          {t(VISIBILITY_KEYS[group.visibility])}
         </span>
       </div>
     </Link>

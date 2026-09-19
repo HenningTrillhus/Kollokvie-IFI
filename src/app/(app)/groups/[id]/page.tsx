@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfilesByIds } from "@/lib/profiles";
-import { getGroupMemberCount, type Group } from "@/lib/groups";
+import { getGroupMemberCount, VISIBILITY_KEYS, type Group } from "@/lib/groups";
 import ProfileList from "@/components/profile-list";
 import GroupJoinButton from "@/components/group-join-button";
 import DeleteGroupButton from "@/components/delete-group-button";
@@ -94,7 +94,7 @@ export default async function GroupDetailPage({
           </span>
         )}
         <span className="rounded-md border border-card-border px-1.5 py-0.5 text-xs">
-          {typedGroup.visibility === "public" ? t("common.public") : t("common.private")}
+          {t(VISIBILITY_KEYS[typedGroup.visibility])}
         </span>
       </div>
 
@@ -111,11 +111,15 @@ export default async function GroupDetailPage({
           />
         )}
         {!isOwner && !isMember && !canJoinData && (
-          <p className="text-xs text-muted">{t("group.mustFollowOwner")}</p>
+          <p className="text-xs text-muted">
+            {typedGroup.visibility === "invite"
+              ? t("group.mustBeInvited")
+              : t("group.mustFollowOwner")}
+          </p>
         )}
       </div>
 
-      {isMember && (
+      {isMember && (typedGroup.visibility !== "invite" || isOwner) && (
         <div className="mt-4">
           <GroupInvitePanel groupId={typedGroup.id} excludeIds={memberIds} />
         </div>

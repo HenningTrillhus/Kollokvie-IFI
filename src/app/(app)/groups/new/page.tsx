@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import CourseSingleSelect from "@/components/course-single-select";
-import type { Group, Visibility } from "@/lib/groups";
+import { VISIBILITY_KEYS, type Group, type Visibility } from "@/lib/groups";
 import { useI18n } from "@/lib/i18n/client";
 
 export default function NewGroupPage() {
@@ -129,32 +129,28 @@ export default function NewGroupPage() {
           <label className="mb-1.5 block text-sm font-medium">
             {t("group.visibility")}
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setVisibility("public")}
-              className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                visibility === "public"
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-card-border hover:bg-accent-soft/60"
-              }`}
-            >
-              {t("common.public")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setVisibility("private")}
-              className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                visibility === "private"
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-card-border hover:bg-accent-soft/60"
-              }`}
-            >
-              {t("common.private")}
-            </button>
+          <div className="grid grid-cols-3 gap-2">
+            {(["public", "private", "invite"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setVisibility(value)}
+                className={`rounded-xl border px-2 py-2 text-sm font-medium transition ${
+                  visibility === value
+                    ? "border-accent bg-accent-soft text-accent"
+                    : "border-card-border hover:bg-accent-soft/60"
+                }`}
+              >
+                {t(VISIBILITY_KEYS[value])}
+              </button>
+            ))}
           </div>
           <p className="mt-1 text-xs text-muted">
-            {visibility === "public" ? t("group.publicHint") : t("group.privateHint")}
+            {visibility === "public"
+              ? t("group.publicHint")
+              : visibility === "private"
+                ? t("group.privateHint")
+                : t("group.inviteHint")}
           </p>
         </div>
 
