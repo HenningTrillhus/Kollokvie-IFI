@@ -56,6 +56,14 @@ export const messages = {
   },
   "auth.createUser": { no: "Opprett bruker", en: "Create account" },
   "auth.creating": { no: "Oppretter bruker…", en: "Creating account…" },
+  "auth.usernameInvalid": {
+    no: "Brukernavnet kan bare ha bokstaver, tall, punktum, understrek og bindestrek (2–24 tegn).",
+    en: "The username can only contain letters, numbers, dots, underscores and hyphens (2–24 characters).",
+  },
+  "auth.ifiInvalid": {
+    no: "IFI-brukernavnet kan bare ha bokstaver, tall, punktum, understrek og bindestrek.",
+    en: "The IFI username can only contain letters, numbers, dots, underscores and hyphens.",
+  },
   "auth.passwordShort": {
     no: "Passordet må være minst {min} tegn.",
     en: "The password must be at least {min} characters.",
@@ -134,6 +142,7 @@ export const messages = {
     no: "Skjult for alle andre. Bare du kan invitere, og bare inviterte kan bli med.",
     en: "Hidden from everyone else. Only you can invite, and only invited people can join.",
   },
+  "group.fullError": { no: "Kollokviegruppen er full.", en: "The study group is full." },
   "group.mustBeInvited": {
     no: "Du må bli invitert for å bli med i denne kollokviegruppa.",
     en: "You need an invitation to join this study group.",
@@ -245,6 +254,7 @@ export const messages = {
     no: "Kan ikke endres — det er dette du logger inn med.",
     en: "Can't be changed — it's what you log in with.",
   },
+  "settings.invalidLink": { no: "Ugyldig lenke: {field}", en: "Invalid link: {field}" },
   "settings.usernameTaken": { no: "Brukernavnet er allerede tatt.", en: "That username is already taken." },
   "settings.deleteTitle": { no: "Slett bruker", en: "Delete account" },
   "settings.deleteText": {
@@ -280,6 +290,10 @@ export const messages = {
   "course.customName": { no: "Navn på faget", en: "Course name" },
   "course.adding": { no: "Legger til…", en: "Adding…" },
   "course.addSubmit": { no: "Legg til fag", en: "Add course" },
+  "course.invalidCode": {
+    no: "Emnekoden kan bare ha bokstaver og tall (2–12 tegn).",
+    en: "The course code can only have letters and numbers (2–12 characters).",
+  },
   "course.remove": { no: "Fjern {code}", en: "Remove {code}" },
   "select.search": { no: "Søk…", en: "Search…" },
 
@@ -293,6 +307,7 @@ export const messages = {
   },
   "cal.dayHeading": { no: "{day}. {month}", en: "{month} {day}" },
   "cal.studyGroup": { no: "Kollokviegruppe", en: "Study group" },
+  "cal.saveError": { no: "Kunne ikke lagre hendelsen.", en: "Couldn't save the event." },
   "cal.deleteEvent": { no: "Slett hendelse", en: "Delete event" },
   "cal.newEvent": { no: "Ny hendelse…", en: "New event…" },
   "cal.exam": { no: "Eksamen", en: "Exam" },

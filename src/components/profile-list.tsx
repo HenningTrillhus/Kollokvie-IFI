@@ -17,7 +17,7 @@ export default function ProfileList({
       {profiles.map((profile) => (
         <li key={profile.id}>
           <Link
-            href={`/profile/${profile.username}`}
+            href={`/profile/${encodeURIComponent(profile.username)}`}
             className="flex items-center gap-3 rounded-xl border border-card-border px-4 py-2.5 transition hover:border-accent/40 hover:bg-accent-soft"
           >
             <div

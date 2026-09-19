@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { addCustomCourse, type Course } from "@/lib/courses";
+import { addCustomCourse, COURSE_CODE_PATTERN, type Course } from "@/lib/courses";
 import { useI18n } from "@/lib/i18n/client";
 
 export default function CourseMultiSelect({
@@ -137,7 +137,9 @@ export default function CourseMultiSelect({
 
           {trimmed && !exactMatch && (
             <div className="border-t border-card-border p-3">
-              {addingCustom ? (
+              {!COURSE_CODE_PATTERN.test(trimmed) ? (
+                <p className="text-xs text-muted">{t("course.invalidCode")}</p>
+              ) : addingCustom ? (
                 <div className="space-y-2">
                   <p className="text-xs text-muted">
                     {t("course.addHint", { code: trimmed.toUpperCase() })}

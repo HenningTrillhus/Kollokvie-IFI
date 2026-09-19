@@ -21,12 +21,15 @@ export async function getUserCourses(supabase: SupabaseClient, userId: string) {
     .filter((c): c is Course => c !== null);
 }
 
+export const COURSE_CODE_PATTERN = /^[A-Za-z0-9ÆØÅæøå_-]{2,12}$/;
+
 export async function addCustomCourse(
   supabase: SupabaseClient,
   code: string,
   name: string
 ) {
   const normalizedCode = code.trim().toUpperCase();
+  if (!COURSE_CODE_PATTERN.test(normalizedCode)) return null;
   await supabase
     .from("courses")
     .upsert(

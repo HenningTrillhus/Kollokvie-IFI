@@ -1,14 +1,11 @@
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/get-user";
 import { getT } from "@/lib/i18n/server";
 
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (user) {
     redirect("/dashboard");

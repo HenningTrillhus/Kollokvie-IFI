@@ -17,15 +17,15 @@ import { useI18n } from "@/lib/i18n/client";
 
 const GROUP_SESSION_COLOR = "#3f6f5e";
 
-const today = new Date();
-const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
-
 export default function MonthCalendar({ currentUserId }: { currentUserId: string }) {
   const { t, lang } = useI18n();
   const WEEKDAY_LABELS = t("cal.weekdays").split("|");
   const MONTH_LABELS = t("cal.months").split("|");
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
+  const today = new Date();
+  const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+  const [year, setYear] = useState(() => new Date().getFullYear());
+  const [month, setMonth] = useState(() => new Date().getMonth());
+  const [saveError, setSaveError] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [groupSessions, setGroupSessions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,6 +117,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
       .single();
 
     setSaving(false);
+    setSaveError(Boolean(error));
     if (!error && data) {
       setEvents((prev) =>
         [...prev, data as CalendarEvent].sort((a, b) =>
@@ -298,6 +299,8 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
                 ))}
               </ul>
             )}
+
+            {saveError && <p className="mt-3 text-sm text-red-500">{t("cal.saveError")}</p>}
 
             <form onSubmit={addEvent} className="mt-4 flex flex-wrap gap-2">
               <input

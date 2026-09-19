@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
-import { avatarStyle, type Profile } from "@/lib/profiles";
-import { getGroupMemberCount, withFullGroupsLast, type Group } from "@/lib/groups";
+import { avatarStyle, escapeLike, type Profile } from "@/lib/profiles";
+import { getGroupMemberCounts, withFullGroupsLast, type Group } from "@/lib/groups";
 
 type FollowStatus = "none" | "pending" | "accepted";
 type Mode = "people" | "groups";
@@ -26,12 +26,14 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
     const trimmed = query.trim();
     if (!trimmed || mode !== "people") return;
 
+    // A slower, older request must never overwrite a newer one's results.
+    let cancelled = false;
     const timeout = setTimeout(async () => {
       setLoading(true);
       const supabase = createClient();
       const [{ data: byUsername }, { data: byName }] = await Promise.all([
-        supabase.from("profiles").select("*").ilike("username", `%${trimmed}%`).limit(20),
-        supabase.from("profiles").select("*").ilike("full_name", `%${trimmed}%`).limit(20),
+        supabase.from("profiles").select("*").ilike("username", `%${escapeLike(trimmed)}%`).limit(20),
+        supabase.from("profiles").select("*").ilike("full_name", `%${escapeLike(trimmed)}%`).limit(20),
       ]);
 
       const merged = new Map<string, Profile>();
@@ -56,23 +58,32 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
         statusMap[row.followee_id] = row.status as FollowStatus;
       });
 
+      if (cancelled) return;
       setResults(matches);
       setStatuses(statusMap);
       setLoading(false);
     }, 300);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, [query, currentUserId, mode]);
 
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed || mode !== "groups") return;
 
+    let cancelled = false;
     const timeout = setTimeout(async () => {
+      // Commas and parentheses would break the PostgREST or-filter syntax.
+      const term = escapeLike(trimmed.replace(/[,()*]/g, " ").trim());
+      if (!term) {
+        setGroupResults([]);
+        return;
+      }
       setLoading(true);
       const supabase = createClient();
-      // Commas and parentheses would break the PostgREST or-filter syntax.
-      const term = trimmed.replace(/[,()%*]/g, " ").trim();
       const { data } = await supabase
         .from("groups")
         .select("*")
@@ -83,16 +94,21 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
         .limit(30);
 
       const groups = (data ?? []) as Group[];
-      const counts = await Promise.all(
-        groups.map((g) => getGroupMemberCount(supabase, g.id))
+      const counts = await getGroupMemberCounts(
+        supabase,
+        groups.map((g) => g.id)
       );
+      if (cancelled) return;
       setGroupResults(
         withFullGroupsLast(groups.map((group, i) => ({ group, memberCount: counts[i] })))
       );
       setLoading(false);
     }, 300);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, [query, mode]);
 
   const trimmedQuery = query.trim();
@@ -151,7 +167,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
               className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-4 py-2.5 transition hover:border-accent/40"
             >
               <Link
-                href={`/profile/${profile.username}`}
+                href={`/profile/${encodeURIComponent(profile.username)}`}
                 className="flex min-w-0 items-center gap-3"
               >
                 <div

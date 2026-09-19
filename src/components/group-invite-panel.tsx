@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
-import { avatarStyle, type Profile } from "@/lib/profiles";
+import { avatarStyle, escapeLike, type Profile } from "@/lib/profiles";
 
 export default function GroupInvitePanel({
   groupId,
@@ -19,29 +19,36 @@ export default function GroupInvitePanel({
   const [loading, setLoading] = useState(false);
   const [invited, setInvited] = useState<Set<string>>(new Set());
 
+  // A stable key: the array prop is a new object on every server refresh.
+  const excludeKey = excludeIds.join(",");
+
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) return;
 
+    let cancelled = false;
+    const excluded = new Set(excludeKey ? excludeKey.split(",") : []);
     const timeout = setTimeout(async () => {
       setLoading(true);
       const supabase = createClient();
       const [{ data: byUsername }, { data: byName }] = await Promise.all([
-        supabase.from("profiles").select("*").ilike("username", `%${trimmed}%`).limit(20),
-        supabase.from("profiles").select("*").ilike("full_name", `%${trimmed}%`).limit(20),
+        supabase.from("profiles").select("*").ilike("username", `%${escapeLike(trimmed)}%`).limit(20),
+        supabase.from("profiles").select("*").ilike("full_name", `%${escapeLike(trimmed)}%`).limit(20),
       ]);
 
       const merged = new Map<string, Profile>();
       [...(byUsername ?? []), ...(byName ?? [])].forEach((p) => merged.set(p.id, p));
 
-      setResults(
-        Array.from(merged.values()).filter((p) => !excludeIds.includes(p.id))
-      );
+      if (cancelled) return;
+      setResults(Array.from(merged.values()).filter((p) => !excluded.has(p.id)));
       setLoading(false);
     }, 300);
 
-    return () => clearTimeout(timeout);
-  }, [query, excludeIds]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [query, excludeKey]);
 
   async function invite(userId: string) {
     const supabase = createClient();

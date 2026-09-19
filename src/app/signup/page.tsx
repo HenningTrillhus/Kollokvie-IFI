@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { emailForIfiUsername } from "@/lib/ifi-auth";
+import { IFI_USERNAME_PATTERN, USERNAME_PATTERN } from "@/lib/profiles";
 import { useI18n } from "@/lib/i18n/client";
 
 const MIN_PASSWORD_LENGTH = 6;
@@ -25,6 +26,14 @@ export default function SignupPage() {
     event.preventDefault();
     setErrorMessage("");
 
+    if (!USERNAME_PATTERN.test(username.trim())) {
+      setErrorMessage(t("auth.usernameInvalid"));
+      return;
+    }
+    if (!IFI_USERNAME_PATTERN.test(ifiUsername.trim())) {
+      setErrorMessage(t("auth.ifiInvalid"));
+      return;
+    }
     if (password.length < MIN_PASSWORD_LENGTH) {
       setErrorMessage(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
       return;

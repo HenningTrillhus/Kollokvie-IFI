@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupMemberCount, withFullGroupsLast, type Group } from "@/lib/groups";
+import { getGroupMemberCounts, withFullGroupsLast, type Group } from "@/lib/groups";
 import GroupBrowser from "@/components/group-browser";
 
 export default async function DashboardPage() {
@@ -18,8 +18,9 @@ export default async function DashboardPage() {
     .limit(100);
 
   const groups = (publicGroups ?? []) as Group[];
-  const counts = await Promise.all(
-    groups.map((g) => getGroupMemberCount(supabase, g.id))
+  const counts = await getGroupMemberCounts(
+    supabase,
+    groups.map((g) => g.id)
   );
   const items = withFullGroupsLast(
     groups.map((group, i) => ({ group, memberCount: counts[i] }))

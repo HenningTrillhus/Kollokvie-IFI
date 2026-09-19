@@ -17,16 +17,24 @@ export default function GroupInvitesInbox({
   const { t } = useI18n();
   const [invites, setInvites] = useState(initialInvites);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function respond(groupId: string, action: "accept" | "decline") {
     setBusyId(groupId);
+    setErrorMessage("");
     const supabase = createClient();
-    await supabase.rpc(
+    const { error } = await supabase.rpc(
       action === "accept" ? "accept_group_invite" : "decline_group_invite",
       { gid: groupId }
     );
-    setInvites((prev) => prev.filter((i) => i.group.id !== groupId));
     setBusyId(null);
+    if (error) {
+      setErrorMessage(
+        error.message.includes("full") ? t("group.fullError") : t("common.somethingWrong")
+      );
+      return;
+    }
+    setInvites((prev) => prev.filter((i) => i.group.id !== groupId));
     router.refresh();
   }
 
@@ -35,6 +43,8 @@ export default function GroupInvitesInbox({
   }
 
   return (
+    <>
+      {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
     <ul className="space-y-2">
       {invites.map(({ group, inviter }) => (
         <li
@@ -80,5 +90,6 @@ export default function GroupInvitesInbox({
         </li>
       ))}
     </ul>
+    </>
   );
 }

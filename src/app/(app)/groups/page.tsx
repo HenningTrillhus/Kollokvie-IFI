@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupMemberCount, type Group } from "@/lib/groups";
+import { getGroupMemberCounts, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
 import { getT } from "@/lib/i18n/server";
 
@@ -21,8 +21,9 @@ export default async function GroupsPage() {
     .filter((g): g is Group => g !== null)
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
-  const counts = await Promise.all(
-    groups.map((g) => getGroupMemberCount(supabase, g.id))
+  const counts = await getGroupMemberCounts(
+    supabase,
+    groups.map((g) => g.id)
   );
 
   return (

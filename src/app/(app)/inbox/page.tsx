@@ -68,6 +68,7 @@ export default async function InboxPage() {
           {t("inbox.followRequests")}
         </h2>
         <FollowRequestsInbox
+          key={followRequests.map((r) => r.followerId).join(",")}
           initialRequests={followRequests}
           currentUserId={user.id}
         />
@@ -77,7 +78,10 @@ export default async function InboxPage() {
         <h2 className="mb-3 text-sm font-semibold text-muted">
           {t("inbox.groupInvites")}
         </h2>
-        <GroupInvitesInbox initialInvites={groupInvites} />
+        <GroupInvitesInbox
+          key={groupInvites.map((i) => i.group.id).join(",")}
+          initialInvites={groupInvites}
+        />
       </section>
     </div>
   );

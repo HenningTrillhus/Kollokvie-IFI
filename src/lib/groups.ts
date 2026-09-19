@@ -30,6 +30,26 @@ export async function getGroupMemberCount(
   return data ?? 0;
 }
 
+// Member counts for many groups in a single round trip. Falls back to one
+// call per group if the batch function isn't installed yet.
+export async function getGroupMemberCounts(
+  supabase: SupabaseClient,
+  groupIds: string[]
+): Promise<number[]> {
+  if (groupIds.length === 0) return [];
+  const { data, error } = await supabase.rpc("group_member_counts", { gids: groupIds });
+  if (error || !data) {
+    return Promise.all(groupIds.map((id) => getGroupMemberCount(supabase, id)));
+  }
+  const byId = new Map<string, number>(
+    (data as { group_id: string; member_count: number }[]).map((r) => [
+      r.group_id,
+      r.member_count,
+    ])
+  );
+  return groupIds.map((id) => byId.get(id) ?? 0);
+}
+
 export function isGroupFull(group: Group, memberCount: number) {
   return group.max_members !== null && memberCount >= group.max_members;
 }

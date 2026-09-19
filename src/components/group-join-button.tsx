@@ -11,12 +11,15 @@ export default function GroupJoinButton({
   isMember,
   isFull,
   canJoin,
+  leaveGoesToList,
 }: {
   groupId: string;
   currentUserId: string;
   isMember: boolean;
   isFull: boolean;
   canJoin: boolean;
+  // Private / invite-only groups vanish for you once you leave.
+  leaveGoesToList: boolean;
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -33,7 +36,9 @@ export default function GroupJoinButton({
 
     setBusy(false);
     if (error) {
-      setErrorMessage(t("group.joinError"));
+      setErrorMessage(
+        error.message.includes("full") ? t("group.fullError") : t("group.joinError")
+      );
       return;
     }
     router.refresh();
@@ -50,6 +55,7 @@ export default function GroupJoinButton({
       .eq("user_id", currentUserId);
 
     setBusy(false);
+    if (leaveGoesToList) router.push("/groups");
     router.refresh();
   }
 

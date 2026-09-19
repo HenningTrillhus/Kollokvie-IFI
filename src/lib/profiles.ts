@@ -67,6 +67,15 @@ export function sanitizeExternalUrl(value: string): string | null {
   }
 }
 
+// Escape LIKE wildcards so user input like "%" or "_" matches literally.
+export function escapeLike(value: string) {
+  return value.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
+
+// Letters, digits, dot, underscore and hyphen: safe in URLs and unambiguous.
+export const USERNAME_PATTERN = /^[A-Za-z0-9._-]{2,24}$/;
+export const IFI_USERNAME_PATTERN = /^[A-Za-z0-9._-]{1,32}$/;
+
 export async function getProfileByUsername(
   supabase: SupabaseClient,
   username: string
@@ -74,7 +83,7 @@ export async function getProfileByUsername(
   const { data } = await supabase
     .from("profiles")
     .select("*")
-    .ilike("username", username)
+    .ilike("username", escapeLike(username))
     .maybeSingle();
   return data as Profile | null;
 }

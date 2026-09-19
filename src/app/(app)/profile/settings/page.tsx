@@ -4,7 +4,13 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ACCENT_COLORS, STUDY_PROGRAMS, avatarStyle, sanitizeExternalUrl } from "@/lib/profiles";
+import {
+  ACCENT_COLORS,
+  STUDY_PROGRAMS,
+  USERNAME_PATTERN,
+  avatarStyle,
+  sanitizeExternalUrl,
+} from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
 import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
@@ -25,6 +31,8 @@ export default function SettingsPage() {
   const [studyYear, setStudyYear] = useState("");
   const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [savedCourseCodes, setSavedCourseCodes] = useState<string[]>([]);
+  const [deleteError, setDeleteError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -57,33 +65,53 @@ export default function SettingsPage() {
         setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
       }
 
-      setCourses(await getUserCourses(supabase, user.id));
+      const userCourses = await getUserCourses(supabase, user.id);
+      setCourses(userCourses);
+      setSavedCourseCodes(userCourses.map((c) => c.code));
       setLoading(false);
     })();
   }, []);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setSaving(true);
     setSaved(false);
     setErrorMessage("");
 
+    const trimmedName = fullName.trim();
+    const trimmedUsername = username.trim();
+
+    if (!USERNAME_PATTERN.test(trimmedUsername)) {
+      setErrorMessage(t("auth.usernameInvalid"));
+      return;
+    }
+    const github = githubUrl.trim() ? sanitizeExternalUrl(githubUrl) : null;
+    const linkedin = linkedinUrl.trim() ? sanitizeExternalUrl(linkedinUrl) : null;
+    if (githubUrl.trim() && !github) {
+      setErrorMessage(t("settings.invalidLink", { field: "GitHub" }));
+      return;
+    }
+    if (linkedinUrl.trim() && !linkedin) {
+      setErrorMessage(t("settings.invalidLink", { field: "LinkedIn" }));
+      return;
+    }
+
+    setSaving(true);
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const trimmedName = fullName.trim();
-    const trimmedUsername = username.trim();
+    if (!user) {
+      setSaving(false);
+      return;
+    }
 
     const { error } = await supabase
       .from("profiles")
       .update({
         full_name: trimmedName,
         username: trimmedUsername,
-        github_url: sanitizeExternalUrl(githubUrl),
-        linkedin_url: sanitizeExternalUrl(linkedinUrl),
+        github_url: github,
+        linkedin_url: linkedin,
         study_program: studyProgram || null,
         study_year: studyYear ? Number(studyYear) : null,
         accent_color: accentColor,
@@ -104,12 +132,33 @@ export default function SettingsPage() {
       data: { full_name: trimmedName, username: trimmedUsername },
     });
 
-    await supabase.from("user_courses").delete().eq("user_id", user.id);
-    if (courses.length > 0) {
-      await supabase
+    // Only touch what changed, so a failed insert can't wipe the whole list.
+    const currentCodes = courses.map((c) => c.code);
+    const removed = savedCourseCodes.filter((code) => !currentCodes.includes(code));
+    const added = currentCodes.filter((code) => !savedCourseCodes.includes(code));
+    if (removed.length > 0) {
+      const { error: removeError } = await supabase
         .from("user_courses")
-        .insert(courses.map((c) => ({ user_id: user.id, course_code: c.code })));
+        .delete()
+        .eq("user_id", user.id)
+        .in("course_code", removed);
+      if (removeError) {
+        setSaving(false);
+        setErrorMessage(removeError.message);
+        return;
+      }
     }
+    if (added.length > 0) {
+      const { error: addError } = await supabase
+        .from("user_courses")
+        .insert(added.map((code) => ({ user_id: user.id, course_code: code })));
+      if (addError) {
+        setSaving(false);
+        setErrorMessage(addError.message);
+        return;
+      }
+    }
+    setSavedCourseCodes(currentCodes);
 
     setSaving(false);
     setSaved(true);
@@ -118,12 +167,13 @@ export default function SettingsPage() {
 
   async function handleDeleteAccount() {
     setDeleting(true);
+    setDeleteError("");
     const supabase = createClient();
     const { error } = await supabase.rpc("delete_own_account");
 
     if (error) {
       setDeleting(false);
-      setErrorMessage(error.message);
+      setDeleteError(error.message);
       return;
     }
 
@@ -316,6 +366,7 @@ export default function SettingsPage() {
           {t("settings.deleteTitle")}
         </h2>
         <p className="mt-1 text-xs text-muted">{t("settings.deleteText")}</p>
+        {deleteError && <p className="mt-2 text-xs text-red-500">{deleteError}</p>}
 
         {confirmingDelete ? (
           <div className="mt-3 flex gap-2">

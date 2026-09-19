@@ -108,6 +108,7 @@ export default async function GroupDetailPage({
             isMember={isMember}
             isFull={isFull && !isMember}
             canJoin={Boolean(canJoinData)}
+            leaveGoesToList={typedGroup.visibility !== "public"}
           />
         )}
         {!isOwner && !isMember && !canJoinData && (

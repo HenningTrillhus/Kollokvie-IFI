@@ -22,7 +22,13 @@ export default async function PublicProfilePage({
 }: {
   params: Promise<{ username: string }>;
 }) {
-  const { username } = await params;
+  const { username: rawUsername } = await params;
+  let username = rawUsername;
+  try {
+    username = decodeURIComponent(rawUsername);
+  } catch {
+    // already decoded / malformed: use as-is
+  }
   const { t, lang } = await getT();
   const user = await getAuthUser();
   if (!user) redirect("/login");
@@ -100,6 +106,7 @@ export default async function PublicProfilePage({
           </div>
         </div>
         <FollowButton
+          key={myStatus}
           targetUserId={profile.id}
           currentUserId={user.id}
           initialStatus={myStatus}

@@ -23,27 +23,32 @@ export default function FollowRequestsInbox({
   const { t } = useI18n();
   const [requests, setRequests] = useState(initialRequests);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function respond(followerId: string, action: "accept" | "decline") {
     setBusyId(followerId);
+    setErrorMessage("");
     const supabase = createClient();
 
-    if (action === "accept") {
-      await supabase
-        .from("follows")
-        .update({ status: "accepted" })
-        .eq("follower_id", followerId)
-        .eq("followee_id", currentUserId);
-    } else {
-      await supabase
-        .from("follows")
-        .delete()
-        .eq("follower_id", followerId)
-        .eq("followee_id", currentUserId);
-    }
+    const { error } =
+      action === "accept"
+        ? await supabase
+            .from("follows")
+            .update({ status: "accepted" })
+            .eq("follower_id", followerId)
+            .eq("followee_id", currentUserId)
+        : await supabase
+            .from("follows")
+            .delete()
+            .eq("follower_id", followerId)
+            .eq("followee_id", currentUserId);
 
-    setRequests((prev) => prev.filter((r) => r.followerId !== followerId));
     setBusyId(null);
+    if (error) {
+      setErrorMessage(t("common.somethingWrong"));
+      return;
+    }
+    setRequests((prev) => prev.filter((r) => r.followerId !== followerId));
     router.refresh();
   }
 
@@ -54,6 +59,8 @@ export default function FollowRequestsInbox({
   }
 
   return (
+    <>
+      {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
     <ul className="space-y-2">
       {requests.map((r) => (
         <li
@@ -63,7 +70,7 @@ export default function FollowRequestsInbox({
           }`}
         >
           <Link
-            href={`/profile/${r.profile.username}`}
+            href={`/profile/${encodeURIComponent(r.profile.username)}`}
             className="flex min-w-0 items-center gap-3"
           >
             <div
@@ -98,5 +105,6 @@ export default function FollowRequestsInbox({
         </li>
       ))}
     </ul>
+    </>
   );
 }
