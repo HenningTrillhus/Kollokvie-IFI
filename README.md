@@ -21,7 +21,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
-  blant 21 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
+  blant 30 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med månedsvisning, egne hendelser (eksamen, innlevering, annet) og
@@ -69,7 +69,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0010`–`0015` | Kollokviegrupper, medlemmer, invitasjoner og RLS-policyer |
 | `0016` | Synlighetsnivået «kun invitasjon» |
 | `0017` | Herding: godkjenning av følgere, kapasitet i databasen, kolonnerettigheter |
-| `0018` | Profilbilder: `profiles.avatar` og lagringsbøtten `avatars` |
+| `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 30 ikonene |
 
 ### 4. Skru av e-postbekreftelse
 

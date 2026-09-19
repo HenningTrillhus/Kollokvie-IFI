@@ -1,7 +1,7 @@
 // A profile's `avatar` column is null (show the initial on the accent color),
 // "preset:NN" (one of the built-in icons) or "upload:<version>" (own picture).
 
-export const PRESET_COUNT = 21;
+export const PRESET_COUNT = 30;
 
 export const PRESET_AVATARS = Array.from(
   { length: PRESET_COUNT },
