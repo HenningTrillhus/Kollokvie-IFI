@@ -14,6 +14,7 @@ import {
 } from "@/lib/events";
 import type { Group } from "@/lib/groups";
 import { useI18n } from "@/lib/i18n/client";
+import { Page, cardClass } from "@/components/form-ui";
 
 const GROUP_SESSION_COLOR = "#3f6f5e";
 
@@ -161,12 +162,13 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
   const selectedSessions = selectedDate ? sessionsByDate.get(selectedDate) ?? [] : [];
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-6 py-10">
-      <div className="mb-6 flex items-center justify-between">
+    <Page width="max-w-xl">
+      <div className={`p-4 ${cardClass}`}>
+      <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => changeMonth(-1)}
           aria-label={t("cal.prevMonth")}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition hover:bg-accent-soft hover:text-foreground"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90"
         >
           ‹
         </button>
@@ -176,7 +178,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
         <button
           onClick={() => changeMonth(1)}
           aria-label={t("cal.nextMonth")}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition hover:bg-accent-soft hover:text-foreground"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90"
         >
           ›
         </button>
@@ -240,8 +242,9 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
           );
         })}
       </div>
+      </div>
 
-      <section className="mt-8 rounded-2xl border border-card-border p-5">
+      <section className={`p-4 ${cardClass}`}>
         {selectedDate ? (
           <>
             <h2 className="text-sm font-semibold">
@@ -332,6 +335,6 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
           <p className="text-sm text-muted">{t("cal.hint")}</p>
         )}
       </section>
-    </div>
+    </Page>
   );
 }

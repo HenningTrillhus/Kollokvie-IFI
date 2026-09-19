@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getGroupCardData, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
+import { EmptyCard, Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
 
 export default async function GroupsPage() {
@@ -24,30 +25,32 @@ export default async function GroupsPage() {
   const items = await getGroupCardData(supabase, groups);
 
   return (
-    <div className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="flex items-center justify-between">
+    <Page>
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{t("nav.myGroups")}</h1>
         <Link
           href="/groups/new"
-          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover"
+          className="rounded-xl bg-accent px-3.5 py-2 text-sm font-medium text-white transition hover:bg-accent-hover active:scale-95"
         >
           {t("group.create")}
         </Link>
       </div>
 
-      <div className="mt-6 space-y-2">
-        {groups.length === 0 && (
-          <p className="text-sm text-muted">{t("group.none")}</p>
-        )}
-        {items.map(({ group, memberCount, members }) => (
-          <GroupCard
-            key={group.id}
-            group={group}
-            memberCount={memberCount}
-            members={members}
-          />
-        ))}
-      </div>
-    </div>
+      {items.length === 0 ? (
+        <EmptyCard>{t("group.none")}</EmptyCard>
+      ) : (
+        <div className="space-y-3">
+          {items.map(({ group, memberCount, members }, i) => (
+            <GroupCard
+              key={group.id}
+              group={group}
+              memberCount={memberCount}
+              members={members}
+              index={i}
+            />
+          ))}
+        </div>
+      )}
+    </Page>
   );
 }

@@ -126,8 +126,15 @@ input[type="time"]::-webkit-date-and-time-value {
   animation: fade-in 0.2s ease-out;
 }
 
+/* List items rise in one after another (set --i per item). */
+.animate-rise {
+  animation: fade-in 0.28s ease-out both;
+  animation-delay: calc(min(var(--i, 0), 8) * 35ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-rise {
     animation: none;
   }
 }

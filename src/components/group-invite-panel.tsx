@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import { escapeLike, type Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
+import { Card, inputClass } from "@/components/form-ui";
 
 export default function GroupInvitePanel({
   groupId,
@@ -66,7 +67,7 @@ export default function GroupInvitePanel({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:bg-accent-soft"
+        className="flex h-11 w-full items-center justify-center rounded-2xl border border-card-border bg-card text-sm font-medium transition hover:bg-accent-soft active:scale-[0.99]"
       >
         {t("invite.button")}
       </button>
@@ -74,12 +75,12 @@ export default function GroupInvitePanel({
   }
 
   return (
-    <div className="rounded-xl border border-card-border p-4">
+    <Card>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">{t("invite.title")}</h3>
+        <h3 className="text-sm font-semibold">{t("invite.title")}</h3>
         <button
           onClick={() => setOpen(false)}
-          className="text-xs text-muted hover:text-foreground"
+          className="text-xs text-muted transition hover:text-foreground"
         >
           {t("common.close")}
         </button>
@@ -91,36 +92,37 @@ export default function GroupInvitePanel({
         placeholder={t("search.peoplePlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="mt-3 w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className={inputClass}
       />
 
-      <div className="mt-3 space-y-2">
-        {loading && query.trim() && <p className="text-sm text-muted">{t("common.searching")}</p>}
-        {!loading && query.trim() && results.length === 0 && (
-          <p className="text-sm text-muted">{t("search.noUsers")}</p>
-        )}
-        {query.trim() && results.map((profile) => (
-          <div
-            key={profile.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-3 py-2"
-          >
-            <div className="flex min-w-0 items-center gap-2.5">
-              <Avatar profile={profile} className="h-8 w-8 text-xs" />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{profile.full_name}</p>
-                <p className="truncate text-xs text-muted">@{profile.username}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => invite(profile.id)}
-              disabled={invited.has(profile.id)}
-              className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
-            >
-              {invited.has(profile.id) ? t("invite.invited") : t("invite.button")}
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+      {query.trim() && (
+        <div>
+          {loading && <p className="text-sm text-muted">{t("common.searching")}</p>}
+          {!loading && results.length === 0 && (
+            <p className="text-sm text-muted">{t("search.noUsers")}</p>
+          )}
+          <ul className="divide-y divide-card-border">
+            {results.map((profile) => (
+              <li key={profile.id} className="flex items-center justify-between gap-3 py-2.5">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar profile={profile} className="h-9 w-9 text-sm" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{profile.full_name}</p>
+                    <p className="truncate text-xs text-muted">@{profile.username}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => invite(profile.id)}
+                  disabled={invited.has(profile.id)}
+                  className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover active:scale-95 disabled:opacity-60"
+                >
+                  {invited.has(profile.id) ? t("invite.invited") : t("invite.button")}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </Card>
   );
 }

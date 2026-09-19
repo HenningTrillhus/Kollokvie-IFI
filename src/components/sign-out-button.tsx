@@ -18,7 +18,7 @@ export default function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="text-sm font-medium text-muted transition hover:text-foreground"
+      className="h-10 rounded-xl border border-card-border px-4 text-sm font-medium text-muted transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 active:scale-[0.99]"
     >
       {t("auth.signOut")}
     </button>

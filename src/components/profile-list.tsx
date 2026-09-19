@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
 
+// Rows of people, separated by hairlines. Meant to sit inside a card.
 export default function ProfileList({
   profiles,
   emptyLabel,
@@ -10,18 +11,18 @@ export default function ProfileList({
   emptyLabel: string;
 }) {
   if (profiles.length === 0) {
-    return <p className="text-sm text-muted">{emptyLabel}</p>;
+    return <p className="px-2 py-4 text-sm text-muted">{emptyLabel}</p>;
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="divide-y divide-card-border">
       {profiles.map((profile) => (
         <li key={profile.id}>
           <Link
             href={`/profile/${encodeURIComponent(profile.username)}`}
-            className="flex items-center gap-3 rounded-xl border border-card-border px-4 py-2.5 transition hover:border-accent/40 hover:bg-accent-soft"
+            className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent-soft active:bg-accent-soft"
           >
-            <Avatar profile={profile} className="h-8 w-8 text-xs" />
+            <Avatar profile={profile} className="h-9 w-9 text-sm" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{profile.full_name}</p>
               <p className="truncate text-xs text-muted">@{profile.username}</p>

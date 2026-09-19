@@ -48,39 +48,44 @@ export default function GroupJoinButton({
     setBusy(true);
     setErrorMessage("");
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("group_members")
       .delete()
       .eq("group_id", groupId)
       .eq("user_id", currentUserId);
 
     setBusy(false);
+    if (error) {
+      setErrorMessage(t("common.somethingWrong"));
+      return;
+    }
     if (leaveGoesToList) router.push("/groups");
     router.refresh();
   }
 
-  if (isMember) {
-    return (
-      <button
-        onClick={leave}
-        disabled={busy}
-        className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
-      >
-        {busy ? "…" : t("group.leave")}
-      </button>
-    );
-  }
+  const base =
+    "h-11 w-full rounded-xl text-sm font-medium transition active:scale-[0.99] disabled:opacity-60";
 
   return (
-    <div className="text-right">
-      <button
-        onClick={join}
-        disabled={busy || isFull || !canJoin}
-        className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
-      >
-        {isFull ? t("group.joinFull") : busy ? "…" : t("group.join")}
-      </button>
-      {errorMessage && <p className="mt-1 text-xs text-red-500">{errorMessage}</p>}
+    <div className="w-full">
+      {isMember ? (
+        <button
+          onClick={leave}
+          disabled={busy}
+          className={`${base} border border-card-border hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500`}
+        >
+          {busy ? "…" : t("group.leave")}
+        </button>
+      ) : (
+        <button
+          onClick={join}
+          disabled={busy || isFull || !canJoin}
+          className={`${base} bg-accent text-white hover:bg-accent-hover`}
+        >
+          {isFull ? t("group.joinFull") : busy ? "…" : t("group.join")}
+        </button>
+      )}
+      {errorMessage && <p className="mt-2 text-xs text-red-500">{errorMessage}</p>}
     </div>
   );
 }

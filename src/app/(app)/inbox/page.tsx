@@ -8,6 +8,7 @@ import FollowRequestsInbox, {
   type PendingRequest,
 } from "@/components/follow-requests-inbox";
 import GroupInvitesInbox from "@/components/group-invites-inbox";
+import { Page, SectionTitle } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
 
 export default async function InboxPage() {
@@ -53,20 +54,18 @@ export default async function InboxPage() {
     .filter((i): i is PendingGroupInvite => i !== null);
 
   return (
-    <div className="mx-auto w-full max-w-lg px-6 py-10">
+    <Page>
       <Link
         href="/profile"
-        className="text-sm font-medium text-muted transition hover:text-foreground"
+        className="inline-block text-sm font-medium text-muted transition hover:text-foreground"
       >
         {t("profile.backToProfile")}
       </Link>
 
-      <h1 className="mt-4 text-xl font-semibold">{t("inbox.title")}</h1>
+      <h1 className="text-xl font-semibold">{t("inbox.title")}</h1>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold text-muted">
-          {t("inbox.followRequests")}
-        </h2>
+      <section>
+        <SectionTitle>{t("inbox.followRequests")}</SectionTitle>
         <FollowRequestsInbox
           key={followRequests.map((r) => r.followerId).join(",")}
           initialRequests={followRequests}
@@ -74,15 +73,13 @@ export default async function InboxPage() {
         />
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold text-muted">
-          {t("inbox.groupInvites")}
-        </h2>
+      <section>
+        <SectionTitle>{t("inbox.groupInvites")}</SectionTitle>
         <GroupInvitesInbox
           key={groupInvites.map((i) => i.group.id).join(",")}
           initialInvites={groupInvites}
         />
       </section>
-    </div>
+    </Page>
   );
 }

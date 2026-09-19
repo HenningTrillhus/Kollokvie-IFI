@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getGroupCardData, withFullGroupsLast, type Group } from "@/lib/groups";
 import GroupBrowser from "@/components/group-browser";
+import { Page } from "@/components/form-ui";
 
 export default async function DashboardPage() {
   const user = await getAuthUser();
@@ -21,8 +22,8 @@ export default async function DashboardPage() {
   const items = withFullGroupsLast(await getGroupCardData(supabase, groups));
 
   return (
-    <div className="mx-auto w-full max-w-lg px-6 py-6">
+    <Page>
       <GroupBrowser items={items} />
-    </div>
+    </Page>
   );
 }
