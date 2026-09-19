@@ -9,11 +9,13 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "portrait",
     lang: "no",
-    background_color: "#16181a",
-    theme_color: "#16181a",
+    // Matches the icon's navy for the launch splash.
+    background_color: "#202743",
+    theme_color: "#f3f8fe",
     icons: [
-      { src: "/icon", sizes: "512x512", type: "image/png" },
-      { src: "/apple-icon", sizes: "180x180", type: "image/png" },
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }
