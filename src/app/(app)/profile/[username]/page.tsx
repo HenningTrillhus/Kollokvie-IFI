@@ -52,6 +52,17 @@ export default async function PublicProfilePage({
   const myStatus = (myFollowRow?.status as "pending" | "accepted" | undefined) ?? "none";
   const iFollowThem = myStatus === "accepted";
 
+  // Only people who follow this user can read their bio (also enforced by RLS).
+  let bio: string | null = null;
+  if (iFollowThem) {
+    const { data: bioRow } = await supabase
+      .from("profile_bios")
+      .select("bio")
+      .eq("user_id", profile.id)
+      .maybeSingle();
+    bio = bioRow?.bio ?? null;
+  }
+
   let followingProfiles: Awaited<ReturnType<typeof getProfilesByIds>> = [];
   let followerProfiles: Awaited<ReturnType<typeof getProfilesByIds>> = [];
 
@@ -106,6 +117,8 @@ export default async function PublicProfilePage({
           initialStatus={myStatus}
         />
       </div>
+
+      {bio && <p className="mt-4 whitespace-pre-line break-words text-sm">{bio}</p>}
 
       <div className="mt-4 space-y-3">
         <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />

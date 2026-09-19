@@ -3,12 +3,10 @@
 import { useState } from "react";
 import GroupCard from "@/components/group-card";
 import RefreshButton from "@/components/refresh-button";
-import type { Group } from "@/lib/groups";
+import type { GroupCardData } from "@/lib/groups";
 import { useI18n } from "@/lib/i18n/client";
 
-export type GroupItem = { group: Group; memberCount: number };
-
-export default function GroupBrowser({ items }: { items: GroupItem[] }) {
+export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [course, setCourse] = useState<string | null>(null);
@@ -92,8 +90,13 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
                 : t("explore.noMatch")}
           </p>
         ) : (
-          visible.map(({ group, memberCount }) => (
-            <GroupCard key={group.id} group={group} memberCount={memberCount} />
+          visible.map(({ group, memberCount, members }) => (
+            <GroupCard
+              key={group.id}
+              group={group}
+              memberCount={memberCount}
+              members={members}
+            />
           ))
         )}
       </div>

@@ -33,6 +33,7 @@ export default async function OwnProfilePage() {
     pendingInviteCount,
     { data: followingRows },
     { data: followerRows },
+    { data: bioRow },
   ] = await Promise.all([
     getFollowCounts(supabase, user.id),
     getUserCourses(supabase, user.id),
@@ -52,6 +53,7 @@ export default async function OwnProfilePage() {
       .select("follower_id")
       .eq("followee_id", user.id)
       .eq("status", "accepted"),
+    supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
   ]);
 
   const [followingProfiles, followerProfiles] = await Promise.all([
@@ -92,6 +94,10 @@ export default async function OwnProfilePage() {
           <SignOutButton />
         </div>
       </div>
+
+      {bioRow?.bio && (
+        <p className="mt-4 whitespace-pre-line break-words text-sm">{bioRow.bio}</p>
+      )}
 
       <div className="mt-4 space-y-3">
         <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />

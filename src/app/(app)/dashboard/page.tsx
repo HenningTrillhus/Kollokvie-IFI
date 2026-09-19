@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupMemberCounts, withFullGroupsLast, type Group } from "@/lib/groups";
+import { getGroupCardData, withFullGroupsLast, type Group } from "@/lib/groups";
 import GroupBrowser from "@/components/group-browser";
 
 export default async function DashboardPage() {
@@ -18,13 +18,7 @@ export default async function DashboardPage() {
     .limit(100);
 
   const groups = (publicGroups ?? []) as Group[];
-  const counts = await getGroupMemberCounts(
-    supabase,
-    groups.map((g) => g.id)
-  );
-  const items = withFullGroupsLast(
-    groups.map((group, i) => ({ group, memberCount: counts[i] }))
-  );
+  const items = withFullGroupsLast(await getGroupCardData(supabase, groups));
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-6">

@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/client";
 import { formatDate } from "@/lib/i18n";
-import { isGroupFull, VISIBILITY_KEYS, type Group } from "@/lib/groups";
+import Avatar from "@/components/avatar";
+import { isGroupFull, VISIBILITY_KEYS, type Group, type MemberPreview } from "@/lib/groups";
 
 export default function GroupCard({
   group,
   memberCount,
+  members = [],
 }: {
   group: Group;
   memberCount: number;
+  members?: MemberPreview[];
 }) {
   const { t, lang } = useI18n();
   const dateLabel = formatDate(group.event_date, lang);
@@ -53,6 +56,26 @@ export default function GroupCard({
           )}
         </div>
       </div>
+
+      {members.length > 0 && (
+        <div className={`mt-3 flex items-center ${full ? "opacity-60" : ""}`}>
+          {/* Half-overlapping, like a stack of faces */}
+          <div className="flex -space-x-3.5">
+            {members.map((m) => (
+              <Avatar
+                key={m.id}
+                profile={m}
+                className="h-7 w-7 text-xs ring-2 ring-background"
+              />
+            ))}
+          </div>
+          {memberCount > members.length && (
+            <span className="ml-2 text-xs font-medium text-muted">
+              +{memberCount - members.length}
+            </span>
+          )}
+        </div>
+      )}
 
       <div
         className={`mt-3 flex items-end justify-between gap-3 ${full ? "opacity-60" : ""}`}

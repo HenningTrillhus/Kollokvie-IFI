@@ -14,7 +14,8 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Innlogging med IFI-brukernavn og passord.** Ingen e-post. Registrering ber om fullt
   navn, brukernavn, IFI-brukernavn og passord (skrevet to ganger).
 - **Utforsk.** Alle kollokviegrupper du kan se, med søk, emnefilter og filter for
-  offentlige/private. Fulle kollokviegrupper legges bakerst og merkes «Full».
+  offentlige/private. Fulle kollokviegrupper legges bakerst og merkes «Full». Kortene viser profilbildene til de
+  fire første medlemmene.
 - **Kollokviegrupper.** Lag, rediger, bli med, forlat og slett. Synlighet er *offentlig*,
   *privat* (bare folk du følger eller som følger deg) eller *kun invitasjon*. Emne, rom,
   dato, tid (i kvarter) og maks antall deltakere kan settes. Medlemmer kan invitere.
@@ -22,6 +23,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
   blant 30 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
+  En kort bio (160 tegn) er bare synlig for de som følger deg.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med månedsvisning, egne hendelser (eksamen, innlevering, annet) og
@@ -70,6 +72,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0016` | Synlighetsnivået «kun invitasjon» |
 | `0017` | Herding: godkjenning av følgere, kapasitet i databasen, kolonnerettigheter |
 | `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 30 ikonene |
+| `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
 
 ### 4. Skru av e-postbekreftelse
 

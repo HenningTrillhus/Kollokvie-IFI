@@ -12,7 +12,7 @@ export default function BottomNav() {
   return (
     <nav
       aria-label={t("nav.main")}
-      className="flex shrink-0 border-t border-card-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"
+      className="flex shrink-0 border-t border-card-border bg-background pb-[calc(env(safe-area-inset-bottom)*0.4)] sm:hidden"
     >
       {NAV_ITEMS.map(({ href, shortKey, labelKey, Icon }) => {
         const isActive = pathname.startsWith(href);
@@ -22,16 +22,16 @@ export default function BottomNav() {
             href={href}
             aria-label={t(labelKey)}
             aria-current={isActive ? "page" : undefined}
-            className={`flex flex-1 flex-col items-center gap-0.5 pb-1.5 pt-2 text-[10px] font-medium transition active:scale-90 ${
+            className={`flex flex-1 flex-col items-center pb-1 pt-1.5 text-[10px] leading-tight font-medium transition active:scale-90 ${
               isActive ? "text-accent" : "text-muted"
             }`}
           >
             <span
-              className={`flex h-7 w-12 items-center justify-center rounded-full transition ${
+              className={`mb-px flex h-6 w-11 items-center justify-center rounded-full transition ${
                 isActive ? "bg-accent-soft" : ""
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-[18px] w-[18px]" />
             </span>
             {t(shortKey)}
           </Link>

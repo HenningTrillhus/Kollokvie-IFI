@@ -231,8 +231,8 @@ export const messages = {
     en: "@{username} isn't following anyone yet.",
   },
   "profile.followToSee": {
-    no: "Følg @{username} for å se hvem de følger og blir fulgt av.",
-    en: "Follow @{username} to see who they follow and who follows them.",
+    no: "Følg @{username} for å se bio, hvem de følger og blir fulgt av.",
+    en: "Follow @{username} to see their bio and who they follow and who follows them.",
   },
   "follow.follow": { no: "Følg", en: "Follow" },
   "follow.following": { no: "Følger", en: "Following" },
@@ -252,6 +252,9 @@ export const messages = {
     no: "Kunne ikke bruke bildet. Prøv et annet.",
     en: "Couldn't use that picture. Try another one.",
   },
+  "settings.bio": { no: "Bio", en: "Bio" },
+  "settings.bioPlaceholder": { no: "Fortell litt om deg selv…", en: "Tell people a bit about yourself…" },
+  "settings.bioHint": { no: "Bare folk som følger deg kan se bioen din.", en: "Only people who follow you can see your bio." },
   "settings.nameRequired": { no: "Navn kan ikke være tomt.", en: "Name can't be empty." },
   "settings.iconLabel": { no: "Ikon {n}", en: "Icon {n}" },
   "settings.colorHint": {

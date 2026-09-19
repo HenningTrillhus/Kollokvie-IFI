@@ -8,11 +8,10 @@ import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
 import { escapeLike, type Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
-import { getGroupMemberCounts, withFullGroupsLast, type Group } from "@/lib/groups";
+import { getGroupCardData, withFullGroupsLast, type Group, type GroupCardData } from "@/lib/groups";
 
 type FollowStatus = "none" | "pending" | "accepted";
 type Mode = "people" | "groups";
-type GroupResult = { group: Group; memberCount: number };
 
 export default function SearchClient({ currentUserId }: { currentUserId: string }) {
   const { t } = useI18n();
@@ -20,7 +19,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
   const [results, setResults] = useState<Profile[]>([]);
   const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
   const [mode, setMode] = useState<Mode>("people");
-  const [groupResults, setGroupResults] = useState<GroupResult[]>([]);
+  const [groupResults, setGroupResults] = useState<GroupCardData[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -95,14 +94,9 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
         .limit(30);
 
       const groups = (data ?? []) as Group[];
-      const counts = await getGroupMemberCounts(
-        supabase,
-        groups.map((g) => g.id)
-      );
+      const cards = await getGroupCardData(supabase, groups);
       if (cancelled) return;
-      setGroupResults(
-        withFullGroupsLast(groups.map((group, i) => ({ group, memberCount: counts[i] })))
-      );
+      setGroupResults(withFullGroupsLast(cards));
       setLoading(false);
     }, 300);
 
@@ -157,8 +151,13 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
         )}
         {trimmedQuery &&
           mode === "groups" &&
-          groupResults.map(({ group, memberCount }) => (
-            <GroupCard key={group.id} group={group} memberCount={memberCount} />
+          groupResults.map(({ group, memberCount, members }) => (
+            <GroupCard
+              key={group.id}
+              group={group}
+              memberCount={memberCount}
+              members={members}
+            />
           ))}
         {trimmedQuery &&
           mode === "people" &&

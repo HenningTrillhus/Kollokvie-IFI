@@ -19,9 +19,12 @@ import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/client";
 
+const BIO_MAX = 160;
+
 const STUDY_YEARS = [1, 2, 3, 4, 5];
 
 type Fields = {
+  bio: string;
   fullName: string;
   username: string;
   githubUrl: string;
@@ -40,6 +43,7 @@ export default function SettingsPage() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
 
+  const [bio, setBio] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
@@ -74,6 +78,12 @@ export default function SettingsPage() {
         .single();
 
       const userCourses = await getUserCourses(supabase, user.id);
+      const { data: bioRow } = await supabase
+        .from("profile_bios")
+        .select("bio")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const savedBio = bioRow?.bio ?? "";
 
       setUserId(user.id);
       if (profile) {
@@ -88,7 +98,9 @@ export default function SettingsPage() {
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
       }
       setCourses(userCourses);
+      setBio(savedBio);
       setSaved({
+        bio: savedBio,
         fullName: profile?.full_name ?? "",
         username: profile?.username ?? "",
         githubUrl: profile?.github_url ?? "",
@@ -102,6 +114,7 @@ export default function SettingsPage() {
   }, []);
 
   const current: Fields = {
+    bio,
     fullName,
     username,
     githubUrl,
@@ -175,6 +188,23 @@ export default function SettingsPage() {
       data: { full_name: trimmedName, username: trimmedUsername },
     });
 
+    const trimmedBio = bio.trim();
+    if (trimmedBio !== saved.bio.trim()) {
+      const { error: bioError } = trimmedBio
+        ? await supabase
+            .from("profile_bios")
+            .upsert(
+              { user_id: userId, bio: trimmedBio, updated_at: new Date().toISOString() },
+              { onConflict: "user_id" }
+            )
+        : await supabase.from("profile_bios").delete().eq("user_id", userId);
+      if (bioError) {
+        setSaving(false);
+        setErrorMessage(bioError.message);
+        return;
+      }
+    }
+
     // Only touch what changed, so a failed insert can't wipe the whole list.
     const currentCodes = current.courseCodes;
     const removed = saved.courseCodes.filter((code) => !currentCodes.includes(code));
@@ -204,11 +234,13 @@ export default function SettingsPage() {
 
     setSaved({
       ...current,
+      bio: trimmedBio,
       fullName: trimmedName,
       username: trimmedUsername,
       githubUrl: github ?? "",
       linkedinUrl: linkedin ?? "",
     });
+    setBio(trimmedBio);
     setFullName(trimmedName);
     setUsername(trimmedUsername);
     setGithubUrl(github ?? "");
@@ -311,6 +343,21 @@ export default function SettingsPage() {
               onChange={(e) => edit(setUsername)(e.target.value)}
               className={inputClass}
             />
+          </Field>
+
+          <Field label={t("settings.bio")} htmlFor="bio" hint={t("settings.bioHint")}>
+            <textarea
+              id="bio"
+              rows={3}
+              maxLength={BIO_MAX}
+              placeholder={t("settings.bioPlaceholder")}
+              value={bio}
+              onChange={(e) => edit(setBio)(e.target.value)}
+              className="block w-full min-w-0 resize-none rounded-xl border border-card-border bg-transparent px-3.5 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+            />
+            <p className="mt-1 text-right text-xs text-muted">
+              {bio.length}/{BIO_MAX}
+            </p>
           </Field>
 
           <Field

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupMemberCounts, type Group } from "@/lib/groups";
+import { getGroupCardData, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
 import { getT } from "@/lib/i18n/server";
 
@@ -21,10 +21,7 @@ export default async function GroupsPage() {
     .filter((g): g is Group => g !== null)
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
-  const counts = await getGroupMemberCounts(
-    supabase,
-    groups.map((g) => g.id)
-  );
+  const items = await getGroupCardData(supabase, groups);
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
@@ -42,8 +39,13 @@ export default async function GroupsPage() {
         {groups.length === 0 && (
           <p className="text-sm text-muted">{t("group.none")}</p>
         )}
-        {groups.map((group, i) => (
-          <GroupCard key={group.id} group={group} memberCount={counts[i]} />
+        {items.map(({ group, memberCount, members }) => (
+          <GroupCard
+            key={group.id}
+            group={group}
+            memberCount={memberCount}
+            members={members}
+          />
         ))}
       </div>
     </div>
