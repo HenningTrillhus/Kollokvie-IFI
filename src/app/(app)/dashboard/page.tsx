@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfileById } from "@/lib/profiles";
 import { getGroupMemberCount, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
+import RefreshButton from "@/components/refresh-button";
 
 export default async function DashboardPage() {
   const user = await getAuthUser();
@@ -38,9 +39,12 @@ export default async function DashboardPage() {
       </div>
 
       <section className="mt-10">
-        <h2 className="mb-3 text-sm font-semibold text-muted">
-          Offentlige kollokviegrupper
-        </h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-muted">
+            Offentlige kollokviegrupper
+          </h2>
+          <RefreshButton label="Oppdater grupper" />
+        </div>
         {groups.length === 0 ? (
           <p className="text-sm text-muted">
             Ingen offentlige kollokviegrupper ennå — lag den første under

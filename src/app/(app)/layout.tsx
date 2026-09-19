@@ -6,6 +6,7 @@ import { getPendingInviteCount } from "@/lib/group-invites";
 import TopNav from "@/components/top-nav";
 import BottomNav from "@/components/bottom-nav";
 import AppShell from "@/components/app-shell";
+import AutoRefresh from "@/components/auto-refresh";
 
 export default async function AppLayout({
   children,
@@ -36,6 +37,7 @@ export default async function AppLayout({
       header={<TopNav profile={profile} pendingRequestCount={pendingRequestCount} />}
       bottom={<BottomNav />}
     >
+      <AutoRefresh />
       {children}
     </AppShell>
   );
