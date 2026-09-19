@@ -48,6 +48,19 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Inside the app shell the document itself must never scroll: header and tab
+   bar stay pinned and only designated scroll boxes move. */
+html:has(.app-shell),
+html:has(.app-shell) body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.app-shell {
+  overscroll-behavior: none;
+}
+
 /* Controls behave like app UI, not selectable page text. */
 button,
 [role="tab"],

@@ -23,7 +23,7 @@ export default function AppShell({
   }, [pathname]);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
+    <div className="app-shell fixed inset-0 flex flex-col overflow-hidden">
       {header}
       <main
         ref={scroller}
