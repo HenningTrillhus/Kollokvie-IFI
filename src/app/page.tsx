@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
+import Logo from "@/components/logo";
 import { redirect } from "next/navigation";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getT } from "@/lib/i18n/server";
@@ -19,9 +20,7 @@ export default async function Home() {
 
       <div className="relative w-full max-w-sm text-center">
         <div className="mb-10">
-          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-lg font-semibold text-white">
-            K
-          </div>
+          <Logo className="mb-4 inline-block h-16 w-16" />
           <h1 className="text-2xl font-semibold tracking-tight">
             Kollokvie<span className="text-accent">@IFI</span>
           </h1>

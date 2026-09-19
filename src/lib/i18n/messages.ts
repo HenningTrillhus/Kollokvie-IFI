@@ -252,6 +252,7 @@ export const messages = {
     no: "Kunne ikke bruke bildet. Prøv et annet.",
     en: "Couldn't use that picture. Try another one.",
   },
+  "settings.nameRequired": { no: "Navn kan ikke være tomt.", en: "Name can't be empty." },
   "settings.iconLabel": { no: "Ikon {n}", en: "Icon {n}" },
   "settings.colorHint": {
     no: "Fargen brukes når du ikke har profilbilde.",

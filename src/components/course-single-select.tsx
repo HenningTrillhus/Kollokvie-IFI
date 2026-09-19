@@ -87,7 +87,7 @@ export default function CourseSingleSelect({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent h-11 px-3.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       >
         <span className={value ? "" : "text-muted"}>
           {value ? `${value.code} – ${value.name}` : t("course.choose")}

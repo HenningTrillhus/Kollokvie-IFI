@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
+import Logo from "@/components/logo";
 import { NAV_ITEMS } from "./nav-items";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -19,9 +20,7 @@ export default function TopNav({
   return (
     <header className="flex shrink-0 items-center gap-6 border-b border-card-border bg-background px-4 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:px-6 sm:py-4">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-white">
-          K
-        </div>
+        <Logo className="h-8 w-8" />
         <span className="font-semibold tracking-tight">
           Kollokvie<span className="text-accent">@IFI</span>
         </span>

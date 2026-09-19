@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import CourseSingleSelect from "@/components/course-single-select";
 import { useI18n } from "@/lib/i18n/client";
+import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import type { Course } from "@/lib/courses";
 import { VISIBILITY_KEYS, type Visibility } from "@/lib/groups";
 
@@ -33,9 +34,6 @@ const HINT_KEYS = {
   private: "group.privateHint",
   invite: "group.inviteHint",
 } as const;
-
-const inputClass =
-  "block h-11 w-full min-w-0 rounded-xl border border-card-border bg-transparent px-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft";
 
 // Shared by "create" and "settings": same fields, same layout. The page
 // supplies the initial values and what happens on submit (return an error
@@ -201,7 +199,7 @@ export default function GroupForm({
       {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       {showSaved && saved && <p className="text-sm text-accent">{t("common.saved")}</p>}
 
-      <div className="sticky bottom-0 z-20 -mx-6 border-t border-card-border bg-background/95 px-6 py-3 backdrop-blur">
+      <StickyBar>
         <button
           type="submit"
           disabled={saving || !values.name.trim()}
@@ -209,7 +207,7 @@ export default function GroupForm({
         >
           {saving ? savingLabel : submitLabel}
         </button>
-      </div>
+      </StickyBar>
     </form>
   );
 }
@@ -266,33 +264,6 @@ function QuarterTimePicker({
           </option>
         ))}
       </select>
-    </div>
-  );
-}
-
-function Card({ children }: { children: ReactNode }) {
-  return (
-    <div className="space-y-4 rounded-2xl border border-card-border bg-card p-4">
-      {children}
-    </div>
-  );
-}
-
-function Field({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string;
-  htmlFor?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="min-w-0">
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium">
-        {label}
-      </label>
-      {children}
     </div>
   );
 }

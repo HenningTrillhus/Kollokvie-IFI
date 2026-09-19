@@ -8,7 +8,6 @@ import {
   ACCENT_COLORS,
   STUDY_PROGRAMS,
   USERNAME_PATTERN,
-  avatarStyle,
   sanitizeExternalUrl,
 } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
@@ -16,33 +15,49 @@ import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
 import AvatarPicker from "@/components/avatar-picker";
+import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/client";
 
 const STUDY_YEARS = [1, 2, 3, 4, 5];
 
+type Fields = {
+  fullName: string;
+  username: string;
+  githubUrl: string;
+  linkedinUrl: string;
+  studyProgram: string;
+  studyYear: string;
+  courseCodes: string[];
+};
+
 export default function SettingsPage() {
   const router = useRouter();
   const { t } = useI18n();
+
+  const [userId, setUserId] = useState("");
+  const [ifiUsername, setIfiUsername] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
+
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
-  const [ifiUsername, setIfiUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
-  const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
-  const [userId, setUserId] = useState("");
-  const [avatar, setAvatar] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [savedCourseCodes, setSavedCourseCodes] = useState<string[]>([]);
-  const [deleteError, setDeleteError] = useState("");
+
+  // What's saved in the database, so Save is only active when something changed.
+  const [saved, setSaved] = useState<Fields | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -58,34 +73,66 @@ export default function SettingsPage() {
         .eq("id", user.id)
         .single();
 
+      const userCourses = await getUserCourses(supabase, user.id);
+
       setUserId(user.id);
       if (profile) {
         setAvatar(profile.avatar ?? null);
+        setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
+        setIfiUsername(profile.ifi_username);
         setFullName(profile.full_name);
         setUsername(profile.username);
-        setIfiUsername(profile.ifi_username);
         setGithubUrl(profile.github_url ?? "");
         setLinkedinUrl(profile.linkedin_url ?? "");
         setStudyProgram(profile.study_program ?? "");
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
-        setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
       }
-
-      const userCourses = await getUserCourses(supabase, user.id);
       setCourses(userCourses);
-      setSavedCourseCodes(userCourses.map((c) => c.code));
+      setSaved({
+        fullName: profile?.full_name ?? "",
+        username: profile?.username ?? "",
+        githubUrl: profile?.github_url ?? "",
+        linkedinUrl: profile?.linkedin_url ?? "",
+        studyProgram: profile?.study_program ?? "",
+        studyYear: profile?.study_year ? String(profile.study_year) : "",
+        courseCodes: userCourses.map((c) => c.code),
+      });
       setLoading(false);
     })();
   }, []);
 
+  const current: Fields = {
+    fullName,
+    username,
+    githubUrl,
+    linkedinUrl,
+    studyProgram,
+    studyYear,
+    courseCodes: courses.map((c) => c.code),
+  };
+  const dirty = saved !== null && JSON.stringify(current) !== JSON.stringify(saved);
+
+  // Any edit clears the "Saved" note.
+  function edit<T>(setter: (value: T) => void) {
+    return (value: T) => {
+      setter(value);
+      setJustSaved(false);
+    };
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setSaved(false);
+    if (!dirty || !saved) return;
+    setJustSaved(false);
     setErrorMessage("");
 
     const trimmedName = fullName.trim();
     const trimmedUsername = username.trim();
 
+    if (!trimmedName) {
+      setErrorMessage(t("settings.nameRequired"));
+      return;
+    }
     if (!USERNAME_PATTERN.test(trimmedUsername)) {
       setErrorMessage(t("auth.usernameInvalid"));
       return;
@@ -103,13 +150,6 @@ export default function SettingsPage() {
 
     setSaving(true);
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setSaving(false);
-      return;
-    }
 
     const { error } = await supabase
       .from("profiles")
@@ -120,16 +160,13 @@ export default function SettingsPage() {
         linkedin_url: linkedin,
         study_program: studyProgram || null,
         study_year: studyYear ? Number(studyYear) : null,
-        accent_color: accentColor,
       })
-      .eq("id", user.id);
+      .eq("id", userId);
 
     if (error) {
       setSaving(false);
       setErrorMessage(
-        error.message.includes("duplicate")
-          ? t("settings.usernameTaken")
-          : error.message
+        error.message.includes("duplicate") ? t("settings.usernameTaken") : error.message
       );
       return;
     }
@@ -139,14 +176,14 @@ export default function SettingsPage() {
     });
 
     // Only touch what changed, so a failed insert can't wipe the whole list.
-    const currentCodes = courses.map((c) => c.code);
-    const removed = savedCourseCodes.filter((code) => !currentCodes.includes(code));
-    const added = currentCodes.filter((code) => !savedCourseCodes.includes(code));
+    const currentCodes = current.courseCodes;
+    const removed = saved.courseCodes.filter((code) => !currentCodes.includes(code));
+    const added = currentCodes.filter((code) => !saved.courseCodes.includes(code));
     if (removed.length > 0) {
       const { error: removeError } = await supabase
         .from("user_courses")
         .delete()
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .in("course_code", removed);
       if (removeError) {
         setSaving(false);
@@ -157,17 +194,27 @@ export default function SettingsPage() {
     if (added.length > 0) {
       const { error: addError } = await supabase
         .from("user_courses")
-        .insert(added.map((code) => ({ user_id: user.id, course_code: code })));
+        .insert(added.map((code) => ({ user_id: userId, course_code: code })));
       if (addError) {
         setSaving(false);
         setErrorMessage(addError.message);
         return;
       }
     }
-    setSavedCourseCodes(currentCodes);
 
+    setSaved({
+      ...current,
+      fullName: trimmedName,
+      username: trimmedUsername,
+      githubUrl: github ?? "",
+      linkedinUrl: linkedin ?? "",
+    });
+    setFullName(trimmedName);
+    setUsername(trimmedUsername);
+    setGithubUrl(github ?? "");
+    setLinkedinUrl(linkedin ?? "");
     setSaving(false);
-    setSaved(true);
+    setJustSaved(true);
     router.refresh();
   }
 
@@ -194,14 +241,28 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-sm px-6 py-10 text-sm text-muted">
-        {t("common.loading")}
+      <div
+        className="mx-auto w-full max-w-md px-6 pt-5"
+        role="status"
+        aria-label={t("common.loadingAria")}
+      >
+        <div className="h-5 w-32 animate-pulse rounded-lg bg-accent-soft" />
+        <div className="mb-5 mt-4 h-7 w-40 animate-pulse rounded-lg bg-accent-soft" />
+        <div className="space-y-4">
+          {[176, 208, 256, 152].map((h) => (
+            <div
+              key={h}
+              style={{ height: h }}
+              className="animate-pulse rounded-2xl border border-card-border bg-accent-soft/40"
+            />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm px-6 py-10">
+    <div className="mx-auto w-full max-w-md px-6 pt-5">
       <Link
         href="/profile"
         className="text-sm font-medium text-muted transition hover:text-foreground"
@@ -209,13 +270,10 @@ export default function SettingsPage() {
         {t("profile.backToProfile")}
       </Link>
 
-      <h1 className="mt-4 text-xl font-semibold">{t("settings.title")}</h1>
+      <h1 className="mb-5 mt-3 text-xl font-semibold">{t("settings.title")}</h1>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium">
-            {t("settings.photo")}
-          </label>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Card>
           <AvatarPicker
             profile={{
               id: userId,
@@ -225,174 +283,132 @@ export default function SettingsPage() {
             }}
             value={avatar}
             onChange={setAvatar}
+            onColorChange={setAccentColor}
           />
-          <p className="mt-2 text-xs text-muted">{t("settings.photoHint")}</p>
-        </div>
+        </Card>
 
-        <div>
-          <label className="mb-1.5 block text-sm font-medium">
-            {t("settings.color")}
-          </label>
-          <div className="flex flex-wrap items-center gap-2">
-            <div
-              style={avatarStyle(accentColor)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold"
-            >
-              {(fullName || username || "?").charAt(0).toUpperCase()}
-            </div>
-            <div className="h-6 w-px bg-card-border" />
-            {ACCENT_COLORS.map((color) => (
-              <button
-                key={color.value}
-                type="button"
-                onClick={() => setAccentColor(color.value)}
-                title={t(color.key)}
-                aria-label={t(color.key)}
-                style={{ backgroundColor: color.value }}
-                className={`h-7 w-7 rounded-full transition ${
-                  accentColor === color.value
-                    ? "ring-2 ring-foreground ring-offset-2 ring-offset-card"
-                    : "hover:scale-110"
-                }`}
-              />
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-muted">{t("settings.colorHint")}</p>
-        </div>
+        <Card>
+          <Field label={t("auth.fullName")} htmlFor="fullName">
+            <input
+              id="fullName"
+              type="text"
+              required
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => edit(setFullName)(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <div>
-          <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium">
-            {t("auth.fullName")}
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          />
-        </div>
+          <Field label={t("auth.username")} htmlFor="username">
+            <input
+              id="username"
+              type="text"
+              required
+              autoCapitalize="none"
+              autoCorrect="off"
+              value={username}
+              onChange={(e) => edit(setUsername)(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <div>
-          <label htmlFor="username" className="mb-1.5 block text-sm font-medium">
-            {t("auth.username")}
-          </label>
-          <input
-            id="username"
-            type="text"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          />
-        </div>
-
-        <div>
-          <label
+          <Field
+            label={t("auth.ifiUsername")}
             htmlFor="ifiUsername"
-            className="mb-1.5 block text-sm font-medium text-muted"
+            hint={t("settings.ifiLocked")}
           >
-            {t("auth.ifiUsername")}
-          </label>
-          <input
-            id="ifiUsername"
-            type="text"
-            disabled
-            value={ifiUsername}
-            className="w-full cursor-not-allowed rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm text-muted opacity-70"
-          />
-          <p className="mt-1 text-xs text-muted">
-            {t("settings.ifiLocked")}
-          </p>
-        </div>
+            <input
+              id="ifiUsername"
+              type="text"
+              disabled
+              value={ifiUsername}
+              className={`${inputClass} cursor-not-allowed text-muted opacity-70`}
+            />
+          </Field>
+        </Card>
 
-        <div>
-          <label className="mb-1.5 block text-sm font-medium">
-            {t("settings.program")}
-          </label>
-          <StudyProgramSelect
-            value={studyProgram}
-            onChange={setStudyProgram}
-            options={STUDY_PROGRAMS}
-          />
-        </div>
+        <Card>
+          <Field label={t("settings.program")}>
+            <StudyProgramSelect
+              value={studyProgram}
+              onChange={edit(setStudyProgram)}
+              options={STUDY_PROGRAMS}
+            />
+          </Field>
 
-        <div>
-          <label htmlFor="studyYear" className="mb-1.5 block text-sm font-medium">
-            {t("settings.year")}
-          </label>
-          <select
-            id="studyYear"
-            value={studyYear}
-            onChange={(e) => setStudyYear(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          >
-            <option value="">{t("common.notSelected")}</option>
-            {STUDY_YEARS.map((year) => (
-              <option key={year} value={year}>
-                {t("profile.year", { n: year })}
-              </option>
-            ))}
-          </select>
-        </div>
+          <Field label={t("settings.year")} htmlFor="studyYear">
+            <select
+              id="studyYear"
+              value={studyYear}
+              onChange={(e) => edit(setStudyYear)(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">{t("common.notSelected")}</option>
+              {STUDY_YEARS.map((year) => (
+                <option key={year} value={year}>
+                  {t("profile.year", { n: year })}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-        <div>
-          <label className="mb-1.5 block text-sm font-medium">
-            {t("settings.courses")}
-          </label>
-          <CourseMultiSelect selected={courses} onChange={setCourses} />
-          <p className="mt-1 text-xs text-muted">
-            {t("settings.coursesHint")}
-          </p>
-        </div>
+          <Field label={t("settings.courses")} hint={t("settings.coursesHint")}>
+            <CourseMultiSelect selected={courses} onChange={edit(setCourses)} />
+          </Field>
+        </Card>
 
-        <div>
-          <label htmlFor="githubUrl" className="mb-1.5 block text-sm font-medium">
-            {t("settings.github")}
-          </label>
-          <input
-            id="githubUrl"
-            type="text"
-            placeholder="github.com/brukernavn"
-            value={githubUrl}
-            onChange={(e) => setGithubUrl(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          />
-        </div>
+        <Card>
+          <Field label={t("settings.github")} htmlFor="githubUrl">
+            <input
+              id="githubUrl"
+              type="text"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder="github.com/brukernavn"
+              value={githubUrl}
+              onChange={(e) => edit(setGithubUrl)(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <div>
-          <label htmlFor="linkedinUrl" className="mb-1.5 block text-sm font-medium">
-            {t("settings.linkedin")}
-          </label>
-          <input
-            id="linkedinUrl"
-            type="text"
-            placeholder="linkedin.com/in/brukernavn"
-            value={linkedinUrl}
-            onChange={(e) => setLinkedinUrl(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-          />
-        </div>
+          <Field label={t("settings.linkedin")} htmlFor="linkedinUrl">
+            <input
+              id="linkedinUrl"
+              type="text"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder="linkedin.com/in/brukernavn"
+              value={linkedinUrl}
+              onChange={(e) => edit(setLinkedinUrl)(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+        </Card>
 
         {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
-        {saved && <p className="text-sm text-accent">{t("common.saved")}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
-        >
-          {saving ? t("common.saving") : t("common.save")}
-        </button>
+        <StickyBar>
+          <button
+            type="submit"
+            disabled={saving || !dirty}
+            className="h-11 w-full rounded-xl bg-accent px-4 text-sm font-medium text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50"
+          >
+            {saving
+              ? t("common.saving")
+              : justSaved && !dirty
+                ? `✓ ${t("common.saved")}`
+                : t("common.save")}
+          </button>
+        </StickyBar>
       </form>
 
       <AppearanceSettings />
 
-      <div className="mt-6 rounded-xl border border-red-500/30 p-4">
-        <h2 className="text-sm font-semibold text-red-500">
-          {t("settings.deleteTitle")}
-        </h2>
+      <div className="mb-6 mt-6 rounded-xl border border-red-500/30 p-4">
+        <h2 className="text-sm font-semibold text-red-500">{t("settings.deleteTitle")}</h2>
         <p className="mt-1 text-xs text-muted">{t("settings.deleteText")}</p>
         {deleteError && <p className="mt-2 text-xs text-red-500">{deleteError}</p>}
 

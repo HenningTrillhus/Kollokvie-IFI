@@ -114,7 +114,7 @@ export default function CourseMultiSelect({
         }}
         onFocus={() => setOpen(true)}
         placeholder={t("course.searchPlaceholder")}
-        className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className="w-full rounded-xl border border-card-border bg-transparent h-11 px-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
       {open && (

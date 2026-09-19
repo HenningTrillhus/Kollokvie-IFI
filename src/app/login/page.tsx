@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
+import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -43,11 +44,8 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-sm">
         <div className="mb-10 text-center">
-          <Link
-            href="/"
-            className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-lg font-semibold text-white"
-          >
-            K
+          <Link href="/" className="mb-4 inline-block">
+            <Logo className="h-16 w-16" />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">
             {t("auth.login")}

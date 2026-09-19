@@ -12,7 +12,7 @@ import {
   prepareAvatarImage,
   uploadedAvatarPath,
 } from "@/lib/avatars";
-import type { Profile } from "@/lib/profiles";
+import { ACCENT_COLORS, type Profile } from "@/lib/profiles";
 
 type PickerProfile = Pick<Profile, "id" | "full_name" | "username" | "accent_color">;
 
@@ -21,10 +21,12 @@ export default function AvatarPicker({
   profile,
   value,
   onChange,
+  onColorChange,
 }: {
   profile: PickerProfile;
   value: string | null;
   onChange: (value: string | null) => void;
+  onColorChange: (color: string) => void;
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -54,6 +56,23 @@ export default function AvatarPicker({
     } finally {
       setBusy(false);
     }
+  }
+
+  function chooseColor(color: string) {
+    const previous = profile.accent_color;
+    onColorChange(color); // instant preview
+    return run(async () => {
+      const supabase = createClient();
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ accent_color: color })
+        .eq("id", profile.id);
+      if (updateError) {
+        onColorChange(previous);
+        throw updateError;
+      }
+      router.refresh();
+    });
   }
 
   function choosePreset(preset: string) {
@@ -172,6 +191,31 @@ export default function AvatarPicker({
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* The color only matters for the initial, so hide it behind a picture. */}
+      {!value && (
+        <div className="mt-4 border-t border-card-border pt-4">
+          <p className="mb-2 text-sm font-medium">{t("settings.color")}</p>
+          <div className="flex flex-wrap gap-2.5">
+            {ACCENT_COLORS.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                onClick={() => chooseColor(color.value)}
+                title={t(color.key)}
+                aria-label={t(color.key)}
+                aria-pressed={profile.accent_color === color.value}
+                style={{ backgroundColor: color.value }}
+                className={`h-8 w-8 rounded-full transition active:scale-90 ${
+                  profile.accent_color === color.value
+                    ? "ring-2 ring-foreground ring-offset-2 ring-offset-card"
+                    : "hover:scale-110"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       )}
 

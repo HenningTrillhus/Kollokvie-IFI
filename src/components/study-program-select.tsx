@@ -37,7 +37,7 @@ export default function StudyProgramSelect({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent h-11 px-3.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       >
         <span className={value ? "" : "text-muted"}>{value ? programLabel(lang, value) : t("common.notSelected")}</span>
         <span className="text-muted">⌄</span>
