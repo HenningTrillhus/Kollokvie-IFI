@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
-import { avatarStyle, escapeLike, type Profile } from "@/lib/profiles";
+import { escapeLike, type Profile } from "@/lib/profiles";
+import Avatar from "@/components/avatar";
 import { getGroupMemberCounts, withFullGroupsLast, type Group } from "@/lib/groups";
 
 type FollowStatus = "none" | "pending" | "accepted";
@@ -170,12 +171,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
                 href={`/profile/${encodeURIComponent(profile.username)}`}
                 className="flex min-w-0 items-center gap-3"
               >
-                <div
-                  style={avatarStyle(profile.accent_color)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-                >
-                  {(profile.full_name || profile.username).charAt(0).toUpperCase()}
-                </div>
+                <Avatar profile={profile} className="h-9 w-9 text-sm" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{profile.full_name}</p>
                   <p className="truncate text-xs text-muted">@{profile.username}</p>

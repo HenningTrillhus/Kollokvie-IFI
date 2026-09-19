@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
-import { avatarStyle, escapeLike, type Profile } from "@/lib/profiles";
+import { escapeLike, type Profile } from "@/lib/profiles";
+import Avatar from "@/components/avatar";
 
 export default function GroupInvitePanel({
   groupId,
@@ -104,12 +105,7 @@ export default function GroupInvitePanel({
             className="flex items-center justify-between gap-3 rounded-xl border border-card-border px-3 py-2"
           >
             <div className="flex min-w-0 items-center gap-2.5">
-              <div
-                style={avatarStyle(profile.accent_color)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-              >
-                {(profile.full_name || profile.username).charAt(0).toUpperCase()}
-              </div>
+              <Avatar profile={profile} className="h-8 w-8 text-xs" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{profile.full_name}</p>
                 <p className="truncate text-xs text-muted">@{profile.username}</p>

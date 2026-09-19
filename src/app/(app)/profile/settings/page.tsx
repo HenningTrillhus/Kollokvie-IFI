@@ -15,6 +15,8 @@ import { getUserCourses, type Course } from "@/lib/courses";
 import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
+import AvatarPicker from "@/components/avatar-picker";
+import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/client";
 
 const STUDY_YEARS = [1, 2, 3, 4, 5];
@@ -30,6 +32,8 @@ export default function SettingsPage() {
   const [studyProgram, setStudyProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
   const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
+  const [userId, setUserId] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [savedCourseCodes, setSavedCourseCodes] = useState<string[]>([]);
   const [deleteError, setDeleteError] = useState("");
@@ -54,7 +58,9 @@ export default function SettingsPage() {
         .eq("id", user.id)
         .single();
 
+      setUserId(user.id);
       if (profile) {
+        setAvatar(profile.avatar ?? null);
         setFullName(profile.full_name);
         setUsername(profile.username);
         setIfiUsername(profile.ifi_username);
@@ -169,6 +175,10 @@ export default function SettingsPage() {
     setDeleting(true);
     setDeleteError("");
     const supabase = createClient();
+    // Best effort: don't leave an uploaded picture behind.
+    if (userId) {
+      await supabase.storage.from(AVATAR_BUCKET).remove([uploadedAvatarPath(userId)]);
+    }
     const { error } = await supabase.rpc("delete_own_account");
 
     if (error) {
@@ -204,6 +214,23 @@ export default function SettingsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium">
+            {t("settings.photo")}
+          </label>
+          <AvatarPicker
+            profile={{
+              id: userId,
+              full_name: fullName,
+              username,
+              accent_color: accentColor,
+            }}
+            value={avatar}
+            onChange={setAvatar}
+          />
+          <p className="mt-2 text-xs text-muted">{t("settings.photoHint")}</p>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium">
             {t("settings.color")}
           </label>
           <div className="flex flex-wrap items-center gap-2">
@@ -230,6 +257,7 @@ export default function SettingsPage() {
               />
             ))}
           </div>
+          <p className="mt-2 text-xs text-muted">{t("settings.colorHint")}</p>
         </div>
 
         <div>

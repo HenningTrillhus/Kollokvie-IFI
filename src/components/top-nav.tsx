@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { avatarStyle, type Profile } from "@/lib/profiles";
+import type { Profile } from "@/lib/profiles";
+import Avatar from "@/components/avatar";
 import { NAV_ITEMS } from "./nav-items";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -15,10 +16,6 @@ export default function TopNav({
 }) {
   const pathname = usePathname();
   const { t } = useI18n();
-  const initial = (profile?.full_name || profile?.username || "?")
-    .charAt(0)
-    .toUpperCase();
-
   return (
     <header className="flex shrink-0 items-center gap-6 border-b border-card-border bg-background px-4 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:px-6 sm:py-4">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5">
@@ -52,11 +49,10 @@ export default function TopNav({
 
       <Link
         href="/profile"
-        style={avatarStyle(profile?.accent_color)}
-        className="relative ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition active:scale-95 sm:ml-0"
+        className="relative ml-auto flex h-9 w-9 shrink-0 rounded-full transition active:scale-95 sm:ml-0"
         aria-label={t("nav.yourProfile")}
       >
-        {initial}
+        <Avatar profile={profile} className="h-9 w-9 text-sm" />
         {pendingRequestCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 ring-2 ring-background" />
         )}

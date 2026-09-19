@@ -19,8 +19,9 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   *privat* (bare folk du følger eller som følger deg) eller *kun invitasjon*. Emne, rom,
   dato, tid (i kvarter) og maks antall deltakere kan settes. Medlemmer kan invitere.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
-  låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn, og en
-  egen aksentfarge.
+  låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
+  Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
+  blant 21 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med månedsvisning, egne hendelser (eksamen, innlevering, annet) og
@@ -68,6 +69,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0010`–`0015` | Kollokviegrupper, medlemmer, invitasjoner og RLS-policyer |
 | `0016` | Synlighetsnivået «kun invitasjon» |
 | `0017` | Herding: godkjenning av følgere, kapasitet i databasen, kolonnerettigheter |
+| `0018` | Profilbilder: `profiles.avatar` og lagringsbøtten `avatars` |
 
 ### 4. Skru av e-postbekreftelse
 
@@ -108,6 +110,7 @@ src/
   lib/
     supabase/                     Klienter for nettleser, server og proxy
     i18n/                         Oversettelser (messages.ts), server-/klienthjelpere
+    avatars.ts                    Profilbilder: ikoner, URL-er og bildeklargjøring
     groups.ts, profiles.ts,       Typer og databasehjelpere
     courses.ts, events.ts
   proxy.ts                        Holder sesjonen oppdatert og beskytter sidene

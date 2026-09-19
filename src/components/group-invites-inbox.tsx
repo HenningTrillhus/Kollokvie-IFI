@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
-import { avatarStyle } from "@/lib/profiles";
+import Avatar from "@/components/avatar";
 import type { PendingGroupInvite } from "@/lib/group-invites";
 
 export default function GroupInvitesInbox({
@@ -54,14 +54,7 @@ export default function GroupInvitesInbox({
           }`}
         >
           <Link href={`/groups/${group.id}`} className="flex min-w-0 items-center gap-3">
-            {inviter && (
-              <div
-                style={avatarStyle(inviter.accent_color)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-              >
-                {(inviter.full_name || inviter.username).charAt(0).toUpperCase()}
-              </div>
-            )}
+            {inviter && <Avatar profile={inviter} className="h-9 w-9 text-sm" />}
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{group.name}</p>
               <p className="truncate text-xs text-muted">

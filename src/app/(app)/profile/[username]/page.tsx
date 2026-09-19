@@ -2,13 +2,13 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import {
-  avatarStyle,
   getFollowCounts,
   getProfileByUsername,
   getProfilesByIds,
 } from "@/lib/profiles";
 import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
+import Avatar from "@/components/avatar";
 import SwipeTabs from "@/components/swipe-tabs";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
@@ -78,7 +78,6 @@ export default async function PublicProfilePage({
     );
   }
 
-  const initial = (profile.full_name || profile.username).charAt(0).toUpperCase();
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
@@ -86,12 +85,7 @@ export default async function PublicProfilePage({
 
       <div className="mt-4 flex items-start justify-between">
         <div className="flex items-start gap-4">
-          <div
-            style={avatarStyle(profile.accent_color)}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold"
-          >
-            {initial}
-          </div>
+          <Avatar profile={profile} className="h-14 w-14 text-xl" />
           <div>
             <h1 className="text-lg font-semibold">{profile.full_name}</h1>
             <p className="text-sm text-muted">@{profile.username}</p>

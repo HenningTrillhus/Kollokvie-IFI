@@ -240,6 +240,23 @@ export const messages = {
 
   // ---- settings
   "settings.title": { no: "Innstillinger", en: "Settings" },
+  "settings.photo": { no: "Profilbilde", en: "Profile picture" },
+  "settings.photoUpload": { no: "Last opp bilde", en: "Upload photo" },
+  "settings.photoChoose": { no: "Velg ikon", en: "Choose an icon" },
+  "settings.photoRemove": { no: "Bruk forbokstav", en: "Use initial" },
+  "settings.photoHint": {
+    no: "Last opp fra enheten eller bildegalleriet, eller velg et av ikonene.",
+    en: "Upload from your device or photo library, or pick one of the icons.",
+  },
+  "settings.photoError": {
+    no: "Kunne ikke bruke bildet. Prøv et annet.",
+    en: "Couldn't use that picture. Try another one.",
+  },
+  "settings.iconLabel": { no: "Ikon {n}", en: "Icon {n}" },
+  "settings.colorHint": {
+    no: "Fargen brukes når du ikke har profilbilde.",
+    en: "The color is used when you don't have a profile picture.",
+  },
   "settings.color": { no: "Farge", en: "Color" },
   "settings.program": { no: "Linje", en: "Study program" },
   "settings.year": { no: "År", en: "Year" },

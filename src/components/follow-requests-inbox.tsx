@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
-import { avatarStyle, type Profile } from "@/lib/profiles";
+import type { Profile } from "@/lib/profiles";
+import Avatar from "@/components/avatar";
 
 export type PendingRequest = {
   followerId: string;
@@ -73,12 +74,7 @@ export default function FollowRequestsInbox({
             href={`/profile/${encodeURIComponent(r.profile.username)}`}
             className="flex min-w-0 items-center gap-3"
           >
-            <div
-              style={avatarStyle(r.profile.accent_color)}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-            >
-              {(r.profile.full_name || r.profile.username).charAt(0).toUpperCase()}
-            </div>
+            <Avatar profile={r.profile} className="h-8 w-8 text-xs" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">
                 {r.profile.full_name}

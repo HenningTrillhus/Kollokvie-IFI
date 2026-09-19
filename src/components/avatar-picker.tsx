@@ -1,0 +1,181 @@
+"use client";
+
+import { useRef, useState, type ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import Avatar from "@/components/avatar";
+import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
+import {
+  AVATAR_BUCKET,
+  PRESET_AVATARS,
+  avatarSrc,
+  prepareAvatarImage,
+  uploadedAvatarPath,
+} from "@/lib/avatars";
+import type { Profile } from "@/lib/profiles";
+
+type PickerProfile = Pick<Profile, "id" | "full_name" | "username" | "accent_color">;
+
+// Changes are saved straight away (no need to press the form's Save button).
+export default function AvatarPicker({
+  profile,
+  value,
+  onChange,
+}: {
+  profile: PickerProfile;
+  value: string | null;
+  onChange: (value: string | null) => void;
+}) {
+  const { t } = useI18n();
+  const router = useRouter();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [showIcons, setShowIcons] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function save(next: string | null) {
+    const supabase = createClient();
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar: next })
+      .eq("id", profile.id);
+    if (updateError) throw updateError;
+    onChange(next);
+    router.refresh();
+  }
+
+  async function run(action: () => Promise<void>) {
+    setBusy(true);
+    setError("");
+    try {
+      await action();
+    } catch {
+      setError(t("settings.photoError"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function choosePreset(preset: string) {
+    setShowIcons(false);
+    return run(() => save(preset));
+  }
+
+  function removePhoto() {
+    return run(() => save(null));
+  }
+
+  async function handleFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = ""; // allow picking the same file again
+    if (!file) return;
+
+    await run(async () => {
+      const blob = await prepareAvatarImage(file);
+      const supabase = createClient();
+      const { error: uploadError } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .upload(uploadedAvatarPath(profile.id), blob, {
+          contentType: "image/jpeg",
+          upsert: true,
+          cacheControl: "31536000",
+        });
+      if (uploadError) throw uploadError;
+      setShowIcons(false);
+      await save(`upload:${Date.now()}`);
+    });
+  }
+
+  const buttonClass =
+    "rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft disabled:opacity-60";
+
+  return (
+    <div>
+      <div className="flex items-center gap-4">
+        <Avatar
+          profile={{ ...profile, avatar: value }}
+          className={`h-16 w-16 text-2xl transition ${busy ? "opacity-50" : ""}`}
+        />
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => fileInput.current?.click()}
+            className={buttonClass}
+          >
+            {t("settings.photoUpload")}
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setShowIcons((v) => !v)}
+            aria-expanded={showIcons}
+            className={buttonClass}
+          >
+            {t("settings.photoChoose")}
+          </button>
+          {value && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={removePhoto}
+              className={`${buttonClass} text-muted`}
+            >
+              {t("settings.photoRemove")}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* accept="image/*" makes phones offer the photo library and the camera */}
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        className="hidden"
+      />
+
+      {showIcons && (
+        <div
+          role="listbox"
+          aria-label={t("settings.photoChoose")}
+          className="mt-3 grid grid-cols-5 gap-2.5 sm:grid-cols-7"
+        >
+          {PRESET_AVATARS.map((preset, i) => {
+            const selected = value === preset;
+            return (
+              <button
+                key={preset}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                aria-label={t("settings.iconLabel", { n: i + 1 })}
+                disabled={busy}
+                onClick={() => choosePreset(preset)}
+                className={`aspect-square overflow-hidden rounded-full transition active:scale-90 ${
+                  selected
+                    ? "ring-2 ring-accent ring-offset-2 ring-offset-background"
+                    : "hover:scale-105"
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- tiny local icons */}
+                <img
+                  src={avatarSrc(profile.id, preset) ?? ""}
+                  alt=""
+                  width={96}
+                  height={96}
+                  loading="lazy"
+                  draggable={false}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}

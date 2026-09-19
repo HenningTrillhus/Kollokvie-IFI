@@ -10,6 +10,8 @@ export type Profile = {
   study_program: string | null;
   study_year: number | null;
   accent_color: string;
+  // null = initial on the accent color; "preset:NN" or "upload:<v>", see lib/avatars
+  avatar: string | null;
   created_at: string;
 };
 
