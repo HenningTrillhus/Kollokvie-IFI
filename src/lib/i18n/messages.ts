@@ -239,7 +239,6 @@ export const messages = {
   "settings.deleteConfirm": { no: "Ja, slett kontoen min", en: "Yes, delete my account" },
   "settings.appearance": { no: "Utseende", en: "Appearance" },
   "settings.theme": { no: "Tema", en: "Theme" },
-  "settings.themeSystem": { no: "System", en: "System" },
   "settings.themeLight": { no: "Lys", en: "Light" },
   "settings.themeDark": { no: "Mørk", en: "Dark" },
   "settings.language": { no: "Språk", en: "Language" },

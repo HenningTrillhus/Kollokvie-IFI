@@ -151,8 +151,6 @@ export default function SettingsPage() {
 
       <h1 className="mt-4 text-xl font-semibold">{t("settings.title")}</h1>
 
-      <AppearanceSettings />
-
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium">
@@ -311,7 +309,9 @@ export default function SettingsPage() {
         </button>
       </form>
 
-      <div className="mt-10 rounded-xl border border-red-500/30 p-4">
+      <AppearanceSettings />
+
+      <div className="mt-6 rounded-xl border border-red-500/30 p-4">
         <h2 className="text-sm font-semibold text-red-500">
           {t("settings.deleteTitle")}
         </h2>

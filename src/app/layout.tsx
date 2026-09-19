@@ -37,15 +37,7 @@ export async function generateViewport(): Promise<Viewport> {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
-    themeColor:
-      theme === "light"
-        ? LIGHT_BG
-        : theme === "dark"
-          ? DARK_BG
-          : [
-              { media: "(prefers-color-scheme: light)", color: LIGHT_BG },
-              { media: "(prefers-color-scheme: dark)", color: DARK_BG },
-            ],
+    themeColor: theme === "dark" ? DARK_BG : LIGHT_BG,
   };
 }
 
@@ -55,7 +47,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={lang}
-      data-theme={theme === "system" ? undefined : theme}
+      data-theme={theme}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">

@@ -3,7 +3,7 @@ import { messages, PROGRAM_NAMES_EN } from "./messages";
 export const LANGS = ["no", "en"] as const;
 export type Lang = (typeof LANGS)[number];
 
-export const THEMES = ["system", "light", "dark"] as const;
+export const THEMES = ["light", "dark"] as const;
 export type Theme = (typeof THEMES)[number];
 
 export type MessageKey = keyof typeof messages;
@@ -18,7 +18,7 @@ export function parseLang(value: string | undefined | null): Lang {
 }
 
 export function parseTheme(value: string | undefined | null): Theme {
-  return value === "light" || value === "dark" ? value : "system";
+  return value === "dark" ? "dark" : "light";
 }
 
 export function translate(lang: Lang, key: MessageKey, vars?: Vars): string {

@@ -5,7 +5,7 @@ import { makeT, type Lang, type TFunction, type Theme } from "./index";
 
 type Prefs = { lang: Lang; theme: Theme };
 
-const PrefsContext = createContext<Prefs>({ lang: "no", theme: "system" });
+const PrefsContext = createContext<Prefs>({ lang: "no", theme: "light" });
 
 export function I18nProvider({
   lang,

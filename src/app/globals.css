@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Light: white and light blue. Dark: the original charcoal + sage.
-   No data-theme attribute = follow the system setting. */
+   The theme is chosen in settings and stored in a cookie. */
 :root {
   color-scheme: light;
   --background: #f3f8fe;
@@ -24,20 +24,6 @@
   --accent: #6fa08c;
   --accent-hover: #82b19d;
   --accent-soft: #24312c;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-    --background: #16181a;
-    --foreground: #eeece8;
-    --card: #1f2224;
-    --card-border: #2c3033;
-    --muted: #9a9691;
-    --accent: #6fa08c;
-    --accent-hover: #82b19d;
-    --accent-soft: #24312c;
-  }
 }
 
 @theme inline {

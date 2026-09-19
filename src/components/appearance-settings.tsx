@@ -10,9 +10,7 @@ const LANG_NAMES: Record<Lang, string> = { no: "Norsk", en: "English" };
 // Applies the theme to <html> straight away; the cookie (set by the server
 // action) makes it stick and lets the server render the right theme.
 function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  if (theme === "system") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", theme);
+  document.documentElement.setAttribute("data-theme", theme);
 }
 
 export default function AppearanceSettings() {
@@ -20,17 +18,13 @@ export default function AppearanceSettings() {
   const [pending, startTransition] = useTransition();
 
   const themeLabels: Record<Theme, string> = {
-    system: t("settings.themeSystem"),
     light: t("settings.themeLight"),
     dark: t("settings.themeDark"),
   };
 
   return (
-    <section className="mt-6 space-y-4 rounded-xl border border-card-border p-4">
-      <h2 className="text-sm font-semibold">{t("settings.appearance")}</h2>
-
-      <div>
-        <p className="mb-1.5 text-sm font-medium">{t("settings.theme")}</p>
+    <section className="mt-10 space-y-2.5 border-t border-card-border pt-4">
+      <Row label={t("settings.theme")}>
         <Segmented
           options={THEMES.map((value) => ({ value, label: themeLabels[value] }))}
           value={theme}
@@ -40,18 +34,25 @@ export default function AppearanceSettings() {
             startTransition(() => setTheme(value));
           }}
         />
-      </div>
-
-      <div>
-        <p className="mb-1.5 text-sm font-medium">{t("settings.language")}</p>
+      </Row>
+      <Row label={t("settings.language")}>
         <Segmented
           options={LANGS.map((value) => ({ value, label: LANG_NAMES[value] }))}
           value={lang}
           disabled={pending}
           onChange={(value) => startTransition(() => setLanguage(value))}
         />
-      </div>
+      </Row>
     </section>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-xs text-muted">{label}</span>
+      {children}
+    </div>
   );
 }
 
@@ -69,8 +70,7 @@ function Segmented<T extends string>({
   return (
     <div
       role="radiogroup"
-      className="grid rounded-xl border border-card-border p-1 text-sm font-medium"
-      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      className="flex rounded-lg border border-card-border p-0.5 text-xs font-medium"
     >
       {options.map((option) => (
         <button
@@ -80,8 +80,10 @@ function Segmented<T extends string>({
           aria-checked={value === option.value}
           disabled={disabled}
           onClick={() => onChange(option.value)}
-          className={`rounded-lg px-3 py-1.5 transition disabled:opacity-70 ${
-            value === option.value ? "bg-accent text-white" : "text-muted"
+          className={`rounded-md px-2.5 py-1 transition disabled:opacity-70 ${
+            value === option.value
+              ? "bg-accent-soft text-accent"
+              : "text-muted hover:text-foreground"
           }`}
         >
           {option.label}

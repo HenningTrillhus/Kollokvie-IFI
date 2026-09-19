@@ -14,9 +14,5 @@ export async function setLanguage(value: string) {
 export async function setTheme(value: string) {
   if (!(THEMES as readonly string[]).includes(value)) return;
   const store = await cookies();
-  if (value === "system") {
-    store.delete(THEME_COOKIE);
-  } else {
-    store.set(THEME_COOKIE, value, { path: "/", maxAge: ONE_YEAR, sameSite: "lax" });
-  }
+  store.set(THEME_COOKIE, value, { path: "/", maxAge: ONE_YEAR, sameSite: "lax" });
 }
