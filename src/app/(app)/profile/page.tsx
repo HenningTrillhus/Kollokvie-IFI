@@ -14,10 +14,13 @@ import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
 import SignOutButton from "@/components/sign-out-button";
 import { getUserCourses } from "@/lib/courses";
+import { programLabel } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export default async function OwnProfilePage() {
   const user = await getAuthUser();
   if (!user) return null;
+  const { t, lang } = await getT();
 
   const supabase = await createClient();
   const profile = await getProfileById(supabase, user.id);
@@ -72,11 +75,15 @@ export default async function OwnProfilePage() {
           <div>
             <h1 className="text-lg font-semibold">{profile.full_name}</h1>
             <p className="text-sm text-muted">@{profile.username}</p>
-            <p className="text-xs text-muted">IFI: {profile.ifi_username}</p>
+            <p className="text-xs text-muted">
+              {t("profile.ifi", { name: profile.ifi_username })}
+            </p>
             {profile.study_program && (
               <p className="mt-1 text-xs text-muted">
-                {profile.study_program}
-                {profile.study_year ? ` · ${profile.study_year}. år` : ""}
+                {programLabel(lang, profile.study_program)}
+                {profile.study_year
+                  ? ` · ${t("profile.year", { n: profile.study_year })}`
+                  : ""}
               </p>
             )}
           </div>
@@ -86,7 +93,7 @@ export default async function OwnProfilePage() {
             href="/profile/settings"
             className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:bg-accent-soft"
           >
-            Innstillinger
+            {t("profile.settings")}
           </Link>
           <SignOutButton />
         </div>
@@ -100,11 +107,11 @@ export default async function OwnProfilePage() {
       <div className="mt-6 flex gap-6 text-sm">
         <span>
           <span className="font-semibold">{counts.followers}</span>{" "}
-          <span className="text-muted">følgere</span>
+          <span className="text-muted">{t("profile.followers")}</span>
         </span>
         <span>
           <span className="font-semibold">{counts.following}</span>{" "}
-          <span className="text-muted">følger</span>
+          <span className="text-muted">{t("profile.following")}</span>
         </span>
       </div>
 
@@ -112,13 +119,13 @@ export default async function OwnProfilePage() {
         href="/inbox"
         className="mt-6 flex items-center justify-between rounded-xl border border-card-border px-4 py-3 transition hover:bg-accent-soft"
       >
-        <span className="text-sm font-medium">Innboks</span>
+        <span className="text-sm font-medium">{t("inbox.title")}</span>
         {totalPending > 0 ? (
           <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
             {totalPending}
           </span>
         ) : (
-          <span className="text-xs text-muted">Ingenting nytt</span>
+          <span className="text-xs text-muted">{t("inbox.nothingNew")}</span>
         )}
       </Link>
 
@@ -126,22 +133,22 @@ export default async function OwnProfilePage() {
         <SwipeTabs
           tabs={[
             {
-              label: "Følgere",
+              label: t("profile.tabFollowers"),
               count: followerProfiles.length,
               content: (
                 <ProfileList
                   profiles={followerProfiles}
-                  emptyLabel="Ingen følgere ennå."
+                  emptyLabel={t("profile.noFollowers")}
                 />
               ),
             },
             {
-              label: "Følger",
+              label: t("profile.tabFollowing"),
               count: followingProfiles.length,
               content: (
                 <ProfileList
                   profiles={followingProfiles}
-                  emptyLabel="Du følger ingen ennå."
+                  emptyLabel={t("profile.followNobody")}
                 />
               ),
             },

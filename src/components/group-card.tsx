@@ -1,11 +1,9 @@
-import Link from "next/link";
-import { isGroupFull, type Group } from "@/lib/groups";
+"use client";
 
-function formatDate(dateStr: string | null) {
-  if (!dateStr) return null;
-  const [year, month, day] = dateStr.split("-");
-  return `${day}.${month}.${year}`;
-}
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n/client";
+import { formatDate } from "@/lib/i18n";
+import { isGroupFull, type Group } from "@/lib/groups";
 
 export default function GroupCard({
   group,
@@ -14,7 +12,8 @@ export default function GroupCard({
   group: Group;
   memberCount: number;
 }) {
-  const dateLabel = formatDate(group.event_date);
+  const { t, lang } = useI18n();
+  const dateLabel = formatDate(group.event_date, lang);
   const full = isGroupFull(group, memberCount);
 
   return (
@@ -40,7 +39,7 @@ export default function GroupCard({
         <div className="flex shrink-0 items-center gap-1.5">
           {full && (
             <span className="rounded-lg bg-foreground px-2 py-1 text-xs font-medium text-background">
-              Full
+              {t("group.fullBadge")}
             </span>
           )}
           {group.course_code && (
@@ -60,8 +59,9 @@ export default function GroupCard({
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
           <span>
-            {memberCount}
-            {group.max_members ? ` / ${group.max_members}` : ""} medlemmer
+            {group.max_members
+              ? t("group.membersMax", { count: memberCount, max: group.max_members })
+              : t("group.members", { count: memberCount })}
           </span>
           {group.location && <span>· {group.location}</span>}
           {dateLabel && (
@@ -72,7 +72,7 @@ export default function GroupCard({
           )}
         </div>
         <span className="shrink-0 rounded-md border border-card-border px-1.5 py-0.5 text-xs text-muted">
-          {group.visibility === "public" ? "Offentlig" : "Privat"}
+          {group.visibility === "public" ? t("common.public") : t("common.private")}
         </span>
       </div>
     </Link>

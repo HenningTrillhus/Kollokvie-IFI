@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function GroupJoinButton({
   groupId,
@@ -18,6 +19,7 @@ export default function GroupJoinButton({
   canJoin: boolean;
 }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,7 +33,7 @@ export default function GroupJoinButton({
 
     setBusy(false);
     if (error) {
-      setErrorMessage("Du kan ikke bli med i denne kollokviegruppa.");
+      setErrorMessage(t("group.joinError"));
       return;
     }
     router.refresh();
@@ -58,7 +60,7 @@ export default function GroupJoinButton({
         disabled={busy}
         className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
       >
-        {busy ? "…" : "Forlat kollokviegruppe"}
+        {busy ? "…" : t("group.leave")}
       </button>
     );
   }
@@ -70,7 +72,7 @@ export default function GroupJoinButton({
         disabled={busy || isFull || !canJoin}
         className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
       >
-        {isFull ? "Fullt" : busy ? "…" : "Bli med"}
+        {isFull ? t("group.joinFull") : busy ? "…" : t("group.join")}
       </button>
       {errorMessage && <p className="mt-1 text-xs text-red-500">{errorMessage}</p>}
     </div>

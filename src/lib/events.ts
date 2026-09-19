@@ -9,11 +9,11 @@ export type CalendarEvent = {
   created_at: string;
 };
 
-export const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  exam: "Eksamen",
-  deadline: "Innlevering",
-  other: "Annet",
-};
+export const EVENT_TYPE_KEYS = {
+  exam: "cal.exam",
+  deadline: "cal.deadline",
+  other: "cal.other",
+} as const;
 
 export const EVENT_TYPE_COLORS: Record<EventType, string> = {
   exam: "#dc2626",

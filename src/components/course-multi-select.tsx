@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { addCustomCourse, type Course } from "@/lib/courses";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function CourseMultiSelect({
   selected,
@@ -11,6 +12,7 @@ export default function CourseMultiSelect({
   selected: Course[];
   onChange: (courses: Course[]) => void;
 }) {
+  const { t } = useI18n();
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -92,7 +94,7 @@ export default function CourseMultiSelect({
               <button
                 type="button"
                 onClick={() => removeCourse(c.code)}
-                aria-label={`Fjern ${c.code}`}
+                aria-label={t("course.remove", { code: c.code })}
                 className="text-accent/70 hover:text-accent"
               >
                 ×
@@ -111,7 +113,7 @@ export default function CourseMultiSelect({
           setAddingCustom(false);
         }}
         onFocus={() => setOpen(true)}
-        placeholder="Søk emnekode eller navn…"
+        placeholder={t("course.searchPlaceholder")}
         className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
@@ -130,7 +132,7 @@ export default function CourseMultiSelect({
           ))}
 
           {filtered.length === 0 && !trimmed && (
-            <p className="px-4 py-3 text-sm text-muted">Skriv for å søke…</p>
+            <p className="px-4 py-3 text-sm text-muted">{t("course.typeToSearch")}</p>
           )}
 
           {trimmed && !exactMatch && (
@@ -138,16 +140,12 @@ export default function CourseMultiSelect({
               {addingCustom ? (
                 <div className="space-y-2">
                   <p className="text-xs text-muted">
-                    Legg til{" "}
-                    <span className="font-medium text-foreground">
-                      {trimmed.toUpperCase()}
-                    </span>{" "}
-                    som eget fag
+                    {t("course.addHint", { code: trimmed.toUpperCase() })}
                   </p>
                   <input
                     type="text"
                     autoFocus
-                    placeholder="Navn på faget"
+                    placeholder={t("course.customName")}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     className="w-full rounded-lg border border-card-border bg-transparent px-3 py-1.5 text-sm outline-none focus:border-accent"
@@ -158,7 +156,7 @@ export default function CourseMultiSelect({
                     disabled={saving || !customName.trim()}
                     className="w-full rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
                   >
-                    {saving ? "Legger til…" : "Legg til fag"}
+                    {saving ? t("course.adding") : t("course.addSubmit")}
                   </button>
                 </div>
               ) : (
@@ -167,7 +165,7 @@ export default function CourseMultiSelect({
                   onClick={() => setAddingCustom(true)}
                   className="text-sm font-medium text-accent hover:text-accent-hover"
                 >
-                  + Legg til «{trimmed.toUpperCase()}» som eget fag
+                  {t("course.addLink", { code: trimmed.toUpperCase() })}
                 </button>
               )}
             </div>

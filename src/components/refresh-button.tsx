@@ -2,9 +2,12 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n/client";
 
-export default function RefreshButton({ label = "Oppdater" }: { label?: string }) {
+export default function RefreshButton({ label }: { label?: string }) {
   const router = useRouter();
+  const { t } = useI18n();
+  const text = label ?? t("common.refresh");
   const [pending, startTransition] = useTransition();
 
   return (
@@ -12,8 +15,8 @@ export default function RefreshButton({ label = "Oppdater" }: { label?: string }
       type="button"
       onClick={() => startTransition(() => router.refresh())}
       disabled={pending}
-      aria-label={label}
-      title={label}
+      aria-label={text}
+      title={text}
       className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90 disabled:opacity-70"
     >
       <svg

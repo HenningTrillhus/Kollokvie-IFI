@@ -1,9 +1,12 @@
-export default function Loading() {
+import { getT } from "@/lib/i18n/server";
+
+export default async function Loading() {
+  const { t } = await getT();
   return (
     <div
       className="mx-auto w-full max-w-lg px-6 py-6"
       role="status"
-      aria-label="Laster"
+      aria-label={t("common.loadingAria")}
     >
       <div className="h-10 animate-pulse rounded-xl bg-accent-soft" />
 

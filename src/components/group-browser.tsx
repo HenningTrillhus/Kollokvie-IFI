@@ -4,10 +4,12 @@ import { useState } from "react";
 import GroupCard from "@/components/group-card";
 import RefreshButton from "@/components/refresh-button";
 import type { Group } from "@/lib/groups";
+import { useI18n } from "@/lib/i18n/client";
 
 export type GroupItem = { group: Group; memberCount: number };
 
 export default function GroupBrowser({ items }: { items: GroupItem[] }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [course, setCourse] = useState<string | null>(null);
 
@@ -34,16 +36,16 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Søk i kollokviegrupper"
+          placeholder={t("explore.searchPlaceholder")}
           className="min-w-0 flex-1 rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
         />
-        <RefreshButton label="Oppdater kollokviegrupper" />
+        <RefreshButton label={t("explore.refresh")} />
       </div>
 
       {courses.length > 0 && (
         <div className="no-scrollbar -mx-6 mt-3 flex gap-2 overflow-x-auto px-6">
           <Chip active={activeCourse === null} onClick={() => setCourse(null)}>
-            Alle
+            {t("explore.all")}
           </Chip>
           {courses.map((code) => (
             <Chip
@@ -61,8 +63,8 @@ export default function GroupBrowser({ items }: { items: GroupItem[] }) {
         {visible.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted">
             {items.length === 0
-              ? "Ingen offentlige kollokviegrupper ennå."
-              : "Ingen kollokviegrupper matcher."}
+              ? t("explore.empty")
+              : t("explore.noMatch")}
           </p>
         ) : (
           visible.map(({ group, memberCount }) => (

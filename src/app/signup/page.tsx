@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import LanguageSwitch from "@/components/language-switch";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { emailForIfiUsername } from "@/lib/ifi-auth";
+import { useI18n } from "@/lib/i18n/client";
 
 const MIN_PASSWORD_LENGTH = 6;
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [ifiUsername, setIfiUsername] = useState("");
@@ -23,11 +26,11 @@ export default function SignupPage() {
     setErrorMessage("");
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(`Passordet må være minst ${MIN_PASSWORD_LENGTH} tegn.`);
+      setErrorMessage(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("Passordene er ikke like.");
+      setErrorMessage(t("auth.passwordMismatch"));
       return;
     }
 
@@ -49,7 +52,7 @@ export default function SignupPage() {
       setLoading(false);
       setErrorMessage(
         error.message.includes("already registered")
-          ? "Det finnes allerede en bruker med dette IFI-brukernavnet."
+          ? t("auth.alreadyRegistered")
           : error.message
       );
       return;
@@ -61,6 +64,7 @@ export default function SignupPage() {
 
   return (
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
+      <LanguageSwitch />
 
       <div className="relative w-full max-w-sm">
         <div className="mb-10 text-center">
@@ -71,7 +75,7 @@ export default function SignupPage() {
             K
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Registrer deg
+            {t("auth.signup")}
           </h1>
           <p className="mt-2 text-sm text-muted">
             Kollokvie<span className="text-accent">@IFI</span>
@@ -85,7 +89,7 @@ export default function SignupPage() {
                 htmlFor="fullName"
                 className="mb-1.5 block text-sm font-medium"
               >
-                Fullt navn
+                {t("auth.fullName")}
               </label>
               <input
                 id="fullName"
@@ -105,7 +109,7 @@ export default function SignupPage() {
                 htmlFor="username"
                 className="mb-1.5 block text-sm font-medium"
               >
-                Brukernavn
+                {t("auth.username")}
               </label>
               <input
                 id="username"
@@ -124,7 +128,7 @@ export default function SignupPage() {
                 htmlFor="ifiUsername"
                 className="mb-1.5 block text-sm font-medium"
               >
-                IFI-brukernavn
+                {t("auth.ifiUsername")}
               </label>
               <input
                 id="ifiUsername"
@@ -136,8 +140,7 @@ export default function SignupPage() {
                 className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
               <p className="mt-1 text-xs text-muted">
-                Brukernavnet ditt på IFI, f.eks. det du logger inn med på
-                ifi-maskinene.
+                {t("auth.ifiHint")}
               </p>
             </div>
 
@@ -146,7 +149,7 @@ export default function SignupPage() {
                 htmlFor="password"
                 className="mb-1.5 block text-sm font-medium"
               >
-                Passord
+                {t("auth.password")}
               </label>
               <input
                 id="password"
@@ -164,7 +167,7 @@ export default function SignupPage() {
                 htmlFor="confirmPassword"
                 className="mb-1.5 block text-sm font-medium"
               >
-                Bekreft passord
+                {t("auth.confirmPassword")}
               </label>
               <input
                 id="confirmPassword"
@@ -186,16 +189,16 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
             >
-              {loading ? "Oppretter bruker…" : "Opprett bruker"}
+              {loading ? t("auth.creating") : t("auth.createUser")}
             </button>
 
             <p className="pt-1 text-center text-xs text-muted">
-              Har du allerede bruker?{" "}
+              {t("auth.haveAccount")}{" "}
               <Link
                 href="/login"
                 className="font-medium text-accent hover:text-accent-hover"
               >
-                Logg inn
+                {t("auth.login")}
               </Link>
             </p>
           </form>

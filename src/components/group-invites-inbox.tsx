@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 import { avatarStyle } from "@/lib/profiles";
 import type { PendingGroupInvite } from "@/lib/group-invites";
 
@@ -13,6 +14,7 @@ export default function GroupInvitesInbox({
   initialInvites: PendingGroupInvite[];
 }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [invites, setInvites] = useState(initialInvites);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -29,7 +31,7 @@ export default function GroupInvitesInbox({
   }
 
   if (invites.length === 0) {
-    return <p className="text-sm text-muted">Ingen nye gruppeinvitasjoner.</p>;
+    return <p className="text-sm text-muted">{t("inbox.noInvites")}</p>;
   }
 
   return (
@@ -53,7 +55,9 @@ export default function GroupInvitesInbox({
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{group.name}</p>
               <p className="truncate text-xs text-muted">
-                {inviter ? `Invitert av ${inviter.full_name}` : "Invitasjon"}
+                {inviter
+                  ? t("inbox.invitedBy", { name: inviter.full_name })
+                  : t("inbox.invitation")}
               </p>
             </div>
           </Link>
@@ -63,14 +67,14 @@ export default function GroupInvitesInbox({
               disabled={busyId === group.id}
               className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
             >
-              Godta
+              {t("common.accept")}
             </button>
             <button
               onClick={() => respond(group.id, "decline")}
               disabled={busyId === group.id}
               className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft disabled:opacity-60"
             >
-              Avslå
+              {t("common.decline")}
             </button>
           </div>
         </li>

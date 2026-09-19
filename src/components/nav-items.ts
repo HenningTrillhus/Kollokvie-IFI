@@ -1,13 +1,20 @@
 import { ExploreIcon, GroupsIcon, CalendarIcon, SearchIcon } from "./nav-icons";
 
-export const NAV_ITEMS = [
-  { href: "/dashboard", label: "Utforsk", shortLabel: "Utforsk", Icon: ExploreIcon },
+import type { MessageKey } from "@/lib/i18n";
+
+export const NAV_ITEMS: {
+  href: string;
+  labelKey: MessageKey;
+  shortKey: MessageKey;
+  Icon: typeof ExploreIcon;
+}[] = [
+  { href: "/dashboard", labelKey: "nav.explore", shortKey: "nav.explore", Icon: ExploreIcon },
   {
     href: "/groups",
-    label: "Mine kollokviegrupper",
-    shortLabel: "Kollokvier",
+    labelKey: "nav.myGroups",
+    shortKey: "nav.myGroupsShort",
     Icon: GroupsIcon,
   },
-  { href: "/calendar", label: "Kalender", shortLabel: "Kalender", Icon: CalendarIcon },
-  { href: "/search", label: "Søk", shortLabel: "Søk", Icon: SearchIcon },
+  { href: "/calendar", labelKey: "nav.calendar", shortKey: "nav.calendar", Icon: CalendarIcon },
+  { href: "/search", labelKey: "nav.search", shortKey: "nav.search", Icon: SearchIcon },
 ];

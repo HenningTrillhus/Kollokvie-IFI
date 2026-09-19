@@ -14,15 +14,15 @@ export type Profile = {
 };
 
 export const ACCENT_COLORS = [
-  { name: "Salvie", value: "#3f6f5e" },
-  { name: "Blå", value: "#2563eb" },
-  { name: "Indigo", value: "#4f46e5" },
-  { name: "Lilla", value: "#7c3aed" },
-  { name: "Rosa", value: "#db2777" },
-  { name: "Oransje", value: "#ea580c" },
-  { name: "Rav", value: "#d97706" },
-  { name: "Teal", value: "#0d9488" },
-  { name: "Skifer", value: "#475569" },
+  { key: "color.sage", value: "#3f6f5e" },
+  { key: "color.blue", value: "#2563eb" },
+  { key: "color.indigo", value: "#4f46e5" },
+  { key: "color.purple", value: "#7c3aed" },
+  { key: "color.pink", value: "#db2777" },
+  { key: "color.orange", value: "#ea580c" },
+  { key: "color.amber", value: "#d97706" },
+  { key: "color.teal", value: "#0d9488" },
+  { key: "color.slate", value: "#475569" },
 ] as const;
 
 // A soft tinted background + solid text, derived from the user's chosen

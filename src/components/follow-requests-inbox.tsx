@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 import { avatarStyle, type Profile } from "@/lib/profiles";
 
 export type PendingRequest = {
@@ -19,6 +20,7 @@ export default function FollowRequestsInbox({
   currentUserId: string;
 }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [requests, setRequests] = useState(initialRequests);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -47,7 +49,7 @@ export default function FollowRequestsInbox({
 
   if (requests.length === 0) {
     return (
-      <p className="text-sm text-muted">Ingen nye følgeforespørsler.</p>
+      <p className="text-sm text-muted">{t("inbox.noRequests")}</p>
     );
   }
 
@@ -83,14 +85,14 @@ export default function FollowRequestsInbox({
               disabled={busyId === r.followerId}
               className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
             >
-              Godta
+              {t("common.accept")}
             </button>
             <button
               onClick={() => respond(r.followerId, "decline")}
               disabled={busyId === r.followerId}
               className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft disabled:opacity-60"
             >
-              Avslå
+              {t("common.decline")}
             </button>
           </div>
         </li>

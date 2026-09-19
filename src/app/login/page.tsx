@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import LanguageSwitch from "@/components/language-switch";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { emailForIfiUsername } from "@/lib/ifi-auth";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [ifiUsername, setIfiUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +29,7 @@ export default function LoginPage() {
 
     if (error) {
       setLoading(false);
-      setErrorMessage("Feil IFI-brukernavn eller passord.");
+      setErrorMessage(t("auth.badCredentials"));
       return;
     }
 
@@ -36,6 +39,7 @@ export default function LoginPage() {
 
   return (
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
+      <LanguageSwitch />
 
       <div className="relative w-full max-w-sm">
         <div className="mb-10 text-center">
@@ -45,7 +49,9 @@ export default function LoginPage() {
           >
             K
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">Logg inn</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t("auth.login")}
+          </h1>
           <p className="mt-2 text-sm text-muted">
             Kollokvie<span className="text-accent">@IFI</span>
           </p>
@@ -58,7 +64,7 @@ export default function LoginPage() {
                 htmlFor="ifiUsername"
                 className="mb-1.5 block text-sm font-medium"
               >
-                IFI-brukernavn
+                {t("auth.ifiUsername")}
               </label>
               <input
                 id="ifiUsername"
@@ -77,7 +83,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="mb-1.5 block text-sm font-medium"
               >
-                Passord
+                {t("auth.password")}
               </label>
               <input
                 id="password"
@@ -99,16 +105,16 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
             >
-              {loading ? "Logger inn…" : "Logg inn"}
+              {loading ? t("auth.loggingIn") : t("auth.login")}
             </button>
 
             <p className="pt-1 text-center text-xs text-muted">
-              Ny her?{" "}
+              {t("auth.newHere")}{" "}
               <Link
                 href="/signup"
                 className="font-medium text-accent hover:text-accent-hover"
               >
-                Registrer deg
+                {t("auth.signup")}
               </Link>
             </p>
           </form>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { avatarStyle, type Profile } from "@/lib/profiles";
 import { NAV_ITEMS } from "./nav-items";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function TopNav({
   profile,
@@ -13,6 +14,7 @@ export default function TopNav({
   pendingRequestCount: number;
 }) {
   const pathname = usePathname();
+  const { t } = useI18n();
   const initial = (profile?.full_name || profile?.username || "?")
     .charAt(0)
     .toUpperCase();
@@ -29,7 +31,7 @@ export default function TopNav({
       </Link>
 
       <nav className="hidden min-w-0 flex-1 items-center gap-1 sm:flex">
-        {NAV_ITEMS.map(({ href, label, Icon }) => {
+        {NAV_ITEMS.map(({ href, labelKey, Icon }) => {
           const isActive = pathname.startsWith(href);
           return (
             <Link
@@ -42,7 +44,7 @@ export default function TopNav({
               }`}
             >
               <Icon className="h-5 w-5 shrink-0" />
-              <span className="whitespace-nowrap">{label}</span>
+              <span className="whitespace-nowrap">{t(labelKey)}</span>
             </Link>
           );
         })}
@@ -52,7 +54,7 @@ export default function TopNav({
         href="/profile"
         style={avatarStyle(profile?.accent_color)}
         className="relative ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition active:scale-95 sm:ml-0"
-        aria-label="Din profil"
+        aria-label={t("nav.yourProfile")}
       >
         {initial}
         {pendingRequestCount > 0 && (

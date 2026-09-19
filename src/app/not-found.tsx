@@ -1,5 +1,5 @@
 import NotFoundView from "@/components/not-found-view";
 
 export default function NotFound() {
-  return <NotFoundView href="/" label="Til forsiden" fullScreen />;
+  return <NotFoundView href="/" labelKey="notFound.toStart" fullScreen />;
 }

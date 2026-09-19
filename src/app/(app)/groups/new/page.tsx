@@ -7,9 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import CourseSingleSelect from "@/components/course-single-select";
 import type { Group, Visibility } from "@/lib/groups";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function NewGroupPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [course, setCourse] = useState<Course | null>(null);
@@ -58,7 +60,7 @@ export default function NewGroupPage() {
 
     if (error || !group) {
       setSaving(false);
-      setErrorMessage(error?.message ?? "Noe gikk galt.");
+      setErrorMessage(error?.message ?? t("common.somethingWrong"));
       return;
     }
 
@@ -73,22 +75,22 @@ export default function NewGroupPage() {
         href="/groups"
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Mine kollokviegrupper
+        {t("group.backToMine")}
       </Link>
 
-      <h1 className="mt-4 text-xl font-semibold">Lag kollokviegruppe</h1>
+      <h1 className="mt-4 text-xl font-semibold">{t("group.create")}</h1>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
           <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
-            Navn
+            {t("group.name")}
           </label>
           <input
             id="name"
             type="text"
             required
             autoFocus
-            placeholder="Kollokvie i algoritmer"
+            placeholder={t("group.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -96,7 +98,9 @@ export default function NewGroupPage() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Emne</label>
+          <label className="mb-1.5 block text-sm font-medium">
+            {t("group.course")}
+          </label>
           <CourseSingleSelect
             value={course}
             onChange={setCourse}
@@ -109,12 +113,12 @@ export default function NewGroupPage() {
             htmlFor="description"
             className="mb-1.5 block text-sm font-medium"
           >
-            Beskrivelse
+            {t("group.description")}
           </label>
           <textarea
             id="description"
             rows={3}
-            placeholder="Hva skal dere gjøre sammen?"
+            placeholder={t("group.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full resize-none rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -122,7 +126,9 @@ export default function NewGroupPage() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Synlighet</label>
+          <label className="mb-1.5 block text-sm font-medium">
+            {t("group.visibility")}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -133,7 +139,7 @@ export default function NewGroupPage() {
                   : "border-card-border hover:bg-accent-soft/60"
               }`}
             >
-              Offentlig
+              {t("common.public")}
             </button>
             <button
               type="button"
@@ -144,24 +150,22 @@ export default function NewGroupPage() {
                   : "border-card-border hover:bg-accent-soft/60"
               }`}
             >
-              Privat
+              {t("common.private")}
             </button>
           </div>
           <p className="mt-1 text-xs text-muted">
-            {visibility === "public"
-              ? "Alle kan se og bli med i kollokviegruppa. Vises under Utforsk."
-              : "Bare folk du følger eller som følger deg kan bli med."}
+            {visibility === "public" ? t("group.publicHint") : t("group.privateHint")}
           </p>
         </div>
 
         <div>
           <label htmlFor="location" className="mb-1.5 block text-sm font-medium">
-            Rom
+            {t("group.room")}
           </label>
           <input
             id="location"
             type="text"
-            placeholder="Ada Lovelaces hus, rom 2439"
+            placeholder={t("group.roomPlaceholder")}
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -171,7 +175,7 @@ export default function NewGroupPage() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="date" className="mb-1.5 block text-sm font-medium">
-              Dato
+              {t("group.date")}
             </label>
             <input
               id="date"
@@ -183,7 +187,7 @@ export default function NewGroupPage() {
           </div>
           <div>
             <label htmlFor="time" className="mb-1.5 block text-sm font-medium">
-              Tid
+              {t("group.time")}
             </label>
             <input
               id="time"
@@ -200,13 +204,13 @@ export default function NewGroupPage() {
             htmlFor="maxMembers"
             className="mb-1.5 block text-sm font-medium"
           >
-            Maks antall personer
+            {t("group.max")}
           </label>
           <input
             id="maxMembers"
             type="number"
             min={1}
-            placeholder="Valgfritt"
+            placeholder={t("common.optional")}
             value={maxMembers}
             onChange={(e) => setMaxMembers(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -220,7 +224,7 @@ export default function NewGroupPage() {
           disabled={saving || !name.trim()}
           className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
         >
-          {saving ? "Oppretter…" : "Opprett kollokviegruppe"}
+          {saving ? t("group.creating") : t("group.createSubmit")}
         </button>
       </form>
     </div>

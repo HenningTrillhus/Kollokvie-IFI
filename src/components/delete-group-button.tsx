@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function DeleteGroupButton({ groupId }: { groupId: string }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -25,14 +27,14 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
           disabled={deleting}
           className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
         >
-          {deleting ? "Sletter…" : "Ja, slett kollokviegruppa"}
+          {deleting ? t("common.deleting") : t("group.deleteConfirm")}
         </button>
         <button
           onClick={() => setConfirming(false)}
           disabled={deleting}
           className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft"
         >
-          Avbryt
+          {t("common.cancel")}
         </button>
       </div>
     );
@@ -43,7 +45,7 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
       onClick={() => setConfirming(true)}
       className="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10"
     >
-      Slett kollokviegruppe
+      {t("group.delete")}
     </button>
   );
 }

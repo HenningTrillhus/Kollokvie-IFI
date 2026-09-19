@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 import { avatarStyle, type Profile } from "@/lib/profiles";
 
 export default function GroupInvitePanel({
@@ -11,6 +12,7 @@ export default function GroupInvitePanel({
   groupId: string;
   excludeIds: string[];
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
@@ -58,7 +60,7 @@ export default function GroupInvitePanel({
         onClick={() => setOpen(true)}
         className="rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium transition hover:bg-accent-soft"
       >
-        Inviter
+        {t("invite.button")}
       </button>
     );
   }
@@ -66,28 +68,28 @@ export default function GroupInvitePanel({
   return (
     <div className="rounded-xl border border-card-border p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">Inviter folk</h3>
+        <h3 className="text-sm font-medium">{t("invite.title")}</h3>
         <button
           onClick={() => setOpen(false)}
           className="text-xs text-muted hover:text-foreground"
         >
-          Lukk
+          {t("common.close")}
         </button>
       </div>
 
       <input
         type="text"
         autoFocus
-        placeholder="Navn eller brukernavn…"
+        placeholder={t("search.peoplePlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="mt-3 w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
       <div className="mt-3 space-y-2">
-        {loading && query.trim() && <p className="text-sm text-muted">Søker…</p>}
+        {loading && query.trim() && <p className="text-sm text-muted">{t("common.searching")}</p>}
         {!loading && query.trim() && results.length === 0 && (
-          <p className="text-sm text-muted">Fant ingen brukere.</p>
+          <p className="text-sm text-muted">{t("search.noUsers")}</p>
         )}
         {query.trim() && results.map((profile) => (
           <div
@@ -111,7 +113,7 @@ export default function GroupInvitePanel({
               disabled={invited.has(profile.id)}
               className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
             >
-              {invited.has(profile.id) ? "Invitert" : "Inviter"}
+              {invited.has(profile.id) ? t("invite.invited") : t("invite.button")}
             </button>
           </div>
         ))}

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
+import { programLabel } from "@/lib/i18n";
 
 export default function StudyProgramSelect({
   value,
@@ -11,6 +13,7 @@ export default function StudyProgramSelect({
   onChange: (value: string) => void;
   options: readonly string[];
 }) {
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -24,7 +27,9 @@ export default function StudyProgramSelect({
   }, []);
 
   const filtered = options.filter((option) =>
-    option.toLowerCase().includes(query.trim().toLowerCase())
+    [option, programLabel(lang, option)].some((label) =>
+      label.toLowerCase().includes(query.trim().toLowerCase())
+    )
   );
 
   return (
@@ -34,7 +39,7 @@ export default function StudyProgramSelect({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       >
-        <span className={value ? "" : "text-muted"}>{value || "Ikke valgt"}</span>
+        <span className={value ? "" : "text-muted"}>{value ? programLabel(lang, value) : t("common.notSelected")}</span>
         <span className="text-muted">⌄</span>
       </button>
 
@@ -45,7 +50,7 @@ export default function StudyProgramSelect({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Søk…"
+            placeholder={t("select.search")}
             className="w-full border-b border-card-border bg-transparent px-4 py-2 text-sm outline-none"
           />
           <div className="max-h-64 overflow-y-auto">
@@ -58,7 +63,7 @@ export default function StudyProgramSelect({
               }}
               className="block w-full px-4 py-2 text-left text-sm text-muted transition hover:bg-accent-soft"
             >
-              Ikke valgt
+              {t("common.notSelected")}
             </button>
             {filtered.map((option) => (
               <button
@@ -73,7 +78,7 @@ export default function StudyProgramSelect({
                   value === option ? "bg-accent-soft text-accent" : ""
                 }`}
               >
-                {option}
+                {programLabel(lang, option)}
               </button>
             ))}
           </div>

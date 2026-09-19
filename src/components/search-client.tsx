@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
 import { avatarStyle, type Profile } from "@/lib/profiles";
@@ -13,6 +14,7 @@ type Mode = "people" | "groups";
 type GroupResult = { group: Group; memberCount: number };
 
 export default function SearchClient({ currentUserId }: { currentUserId: string }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
   const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
@@ -100,8 +102,8 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
       <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
         {(
           [
-            ["people", "Folk"],
-            ["groups", "Kollokviegrupper"],
+            ["people", t("search.people")],
+            ["groups", t("search.groups")],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -121,7 +123,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
         type="text"
         autoFocus
         placeholder={
-          mode === "people" ? "Navn eller brukernavn…" : "Navn, emnekode eller beskrivelse…"
+          mode === "people" ? t("search.peoplePlaceholder") : t("search.groupsPlaceholder")
         }
         value={query}
         onChange={(e) => setQuery(e.target.value)}
@@ -129,12 +131,12 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
       />
 
       <div className="mt-5 space-y-2">
-        {loading && trimmedQuery && <p className="text-sm text-muted">Søker…</p>}
+        {loading && trimmedQuery && <p className="text-sm text-muted">{t("common.searching")}</p>}
         {!loading && trimmedQuery && mode === "people" && results.length === 0 && (
-          <p className="text-sm text-muted">Fant ingen brukere.</p>
+          <p className="text-sm text-muted">{t("search.noUsers")}</p>
         )}
         {!loading && trimmedQuery && mode === "groups" && groupResults.length === 0 && (
-          <p className="text-sm text-muted">Fant ingen kollokviegrupper.</p>
+          <p className="text-sm text-muted">{t("search.noGroups")}</p>
         )}
         {trimmedQuery &&
           mode === "groups" &&

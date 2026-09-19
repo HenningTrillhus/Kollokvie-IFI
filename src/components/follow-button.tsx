@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/client";
 
 type Status = "none" | "pending" | "accepted" | "loading";
 
@@ -16,6 +17,7 @@ export default function FollowButton({
   initialStatus?: "none" | "pending" | "accepted";
 }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [status, setStatus] = useState<Status>(initialStatus ?? "loading");
   const [busy, setBusy] = useState(false);
 
@@ -81,7 +83,7 @@ export default function FollowButton({
         disabled={busy}
         className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
       >
-        Følger
+        {t("follow.following")}
       </button>
     );
   }
@@ -93,7 +95,7 @@ export default function FollowButton({
         disabled={busy}
         className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium text-muted transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-60"
       >
-        Forespørsel sendt
+        {t("follow.requested")}
       </button>
     );
   }
@@ -104,7 +106,7 @@ export default function FollowButton({
       disabled={busy}
       className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
     >
-      Følg
+      {t("follow.follow")}
     </button>
   );
 }

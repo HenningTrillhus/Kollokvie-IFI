@@ -7,9 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import CourseSingleSelect from "@/components/course-single-select";
 import type { Group, Visibility } from "@/lib/groups";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function GroupSettingsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const params = useParams<{ id: string }>();
   const groupId = params.id;
 
@@ -106,7 +108,7 @@ export default function GroupSettingsPage() {
   if (loading) {
     return (
       <div className="mx-auto w-full max-w-sm px-6 py-10 text-sm text-muted">
-        Laster…
+        {t("common.loading")}
       </div>
     );
   }
@@ -114,14 +116,12 @@ export default function GroupSettingsPage() {
   if (notOwner) {
     return (
       <div className="mx-auto w-full max-w-sm px-6 py-10">
-        <p className="text-sm text-muted">
-          Bare den som lagde kollokviegruppa kan endre innstillingene.
-        </p>
+        <p className="text-sm text-muted">{t("group.onlyOwner")}</p>
         <Link
           href={`/groups/${groupId}`}
           className="mt-4 inline-block text-sm font-medium text-accent hover:text-accent-hover"
         >
-          ← Tilbake til kollokviegruppa
+          {t("group.backToGroup")}
         </Link>
       </div>
     );
@@ -133,17 +133,17 @@ export default function GroupSettingsPage() {
         href={`/groups/${groupId}`}
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Tilbake til kollokviegruppa
+        {t("group.backToGroup")}
       </Link>
 
       <h1 className="mt-4 text-xl font-semibold">
-        Innstillinger for kollokviegruppa
+        {t("group.settingsTitle")}
       </h1>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
           <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
-            Navn
+            {t("group.name")}
           </label>
           <input
             id="name"
@@ -156,7 +156,9 @@ export default function GroupSettingsPage() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Emne</label>
+          <label className="mb-1.5 block text-sm font-medium">
+            {t("group.course")}
+          </label>
           <CourseSingleSelect
             value={course}
             onChange={setCourse}
@@ -169,7 +171,7 @@ export default function GroupSettingsPage() {
             htmlFor="description"
             className="mb-1.5 block text-sm font-medium"
           >
-            Beskrivelse
+            {t("group.description")}
           </label>
           <textarea
             id="description"
@@ -181,7 +183,9 @@ export default function GroupSettingsPage() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Synlighet</label>
+          <label className="mb-1.5 block text-sm font-medium">
+            {t("group.visibility")}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -192,7 +196,7 @@ export default function GroupSettingsPage() {
                   : "border-card-border hover:bg-accent-soft/60"
               }`}
             >
-              Offentlig
+              {t("common.public")}
             </button>
             <button
               type="button"
@@ -203,14 +207,14 @@ export default function GroupSettingsPage() {
                   : "border-card-border hover:bg-accent-soft/60"
               }`}
             >
-              Privat
+              {t("common.private")}
             </button>
           </div>
         </div>
 
         <div>
           <label htmlFor="location" className="mb-1.5 block text-sm font-medium">
-            Rom
+            {t("group.room")}
           </label>
           <input
             id="location"
@@ -224,7 +228,7 @@ export default function GroupSettingsPage() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="date" className="mb-1.5 block text-sm font-medium">
-              Dato
+              {t("group.date")}
             </label>
             <input
               id="date"
@@ -236,7 +240,7 @@ export default function GroupSettingsPage() {
           </div>
           <div>
             <label htmlFor="time" className="mb-1.5 block text-sm font-medium">
-              Tid
+              {t("group.time")}
             </label>
             <input
               id="time"
@@ -253,13 +257,13 @@ export default function GroupSettingsPage() {
             htmlFor="maxMembers"
             className="mb-1.5 block text-sm font-medium"
           >
-            Maks antall personer
+            {t("group.max")}
           </label>
           <input
             id="maxMembers"
             type="number"
             min={1}
-            placeholder="Valgfritt"
+            placeholder={t("common.optional")}
             value={maxMembers}
             onChange={(e) => setMaxMembers(e.target.value)}
             className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -267,14 +271,14 @@ export default function GroupSettingsPage() {
         </div>
 
         {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
-        {saved && <p className="text-sm text-accent">Lagret.</p>}
+        {saved && <p className="text-sm text-accent">{t("common.saved")}</p>}
 
         <button
           type="submit"
           disabled={saving || !name.trim()}
           className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
         >
-          {saving ? "Lagrer…" : "Lagre"}
+          {saving ? t("common.saving") : t("common.save")}
         </button>
       </form>
     </div>

@@ -8,10 +8,12 @@ import FollowRequestsInbox, {
   type PendingRequest,
 } from "@/components/follow-requests-inbox";
 import GroupInvitesInbox from "@/components/group-invites-inbox";
+import { getT } from "@/lib/i18n/server";
 
 export default async function InboxPage() {
   const user = await getAuthUser();
   if (!user) return null;
+  const { t } = await getT();
 
   const supabase = await createClient();
 
@@ -56,14 +58,14 @@ export default async function InboxPage() {
         href="/profile"
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Tilbake til profilen
+        {t("profile.backToProfile")}
       </Link>
 
-      <h1 className="mt-4 text-xl font-semibold">Innboks</h1>
+      <h1 className="mt-4 text-xl font-semibold">{t("inbox.title")}</h1>
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold text-muted">
-          Følgeforespørsler
+          {t("inbox.followRequests")}
         </h2>
         <FollowRequestsInbox
           initialRequests={followRequests}
@@ -73,7 +75,7 @@ export default async function InboxPage() {
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-semibold text-muted">
-          Gruppeinvitasjoner
+          {t("inbox.groupInvites")}
         </h2>
         <GroupInvitesInbox initialInvites={groupInvites} />
       </section>

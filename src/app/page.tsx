@@ -1,6 +1,8 @@
 import Link from "next/link";
+import LanguageSwitch from "@/components/language-switch";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getT } from "@/lib/i18n/server";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -12,8 +14,11 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
+  const { t } = await getT();
+
   return (
     <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
+      <LanguageSwitch />
 
       <div className="relative w-full max-w-sm text-center">
         <div className="mb-10">
@@ -24,7 +29,7 @@ export default async function Home() {
             Kollokvie<span className="text-accent">@IFI</span>
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Finn og hold kontakt med kollokviegruppen din
+            {t("app.tagline")}
           </p>
         </div>
 
@@ -33,18 +38,18 @@ export default async function Home() {
             href="/login"
             className="block w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover"
           >
-            Logg inn
+            {t("auth.login")}
           </Link>
           <Link
             href="/signup"
             className="block w-full rounded-xl border border-card-border px-4 py-2.5 text-sm font-medium transition hover:bg-accent-soft"
           >
-            Registrer deg
+            {t("auth.signup")}
           </Link>
         </div>
 
         <p className="mt-8 text-xs text-muted">
-          Laget for studenter ved Institutt for informatikk, UiO
+          {t("app.forStudents")}
         </p>
       </div>
     </main>

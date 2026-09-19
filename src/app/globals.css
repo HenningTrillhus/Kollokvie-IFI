@@ -1,14 +1,43 @@
 @import "tailwindcss";
 
+/* Light: white and light blue. Dark: the original charcoal + sage.
+   No data-theme attribute = follow the system setting. */
 :root {
-  --background: #faf9f7;
-  --foreground: #1c1b1a;
+  color-scheme: light;
+  --background: #f3f8fe;
+  --foreground: #10233f;
   --card: #ffffff;
-  --card-border: #eceae6;
-  --muted: #6b6863;
-  --accent: #3f6f5e;
-  --accent-hover: #345c4e;
-  --accent-soft: #e7efec;
+  --card-border: #d6e4f5;
+  --muted: #566a86;
+  --accent: #2b74c7;
+  --accent-hover: #205fa8;
+  --accent-soft: #e2effc;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #16181a;
+  --foreground: #eeece8;
+  --card: #1f2224;
+  --card-border: #2c3033;
+  --muted: #9a9691;
+  --accent: #6fa08c;
+  --accent-hover: #82b19d;
+  --accent-soft: #24312c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --background: #16181a;
+    --foreground: #eeece8;
+    --card: #1f2224;
+    --card-border: #2c3033;
+    --muted: #9a9691;
+    --accent: #6fa08c;
+    --accent-hover: #82b19d;
+    --accent-soft: #24312c;
+  }
 }
 
 @theme inline {
@@ -22,19 +51,6 @@
   --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #16181a;
-    --foreground: #eeece8;
-    --card: #1f2224;
-    --card-border: #2c3033;
-    --muted: #9a9691;
-    --accent: #6fa08c;
-    --accent-hover: #82b19d;
-    --accent-soft: #24312c;
-  }
 }
 
 html {

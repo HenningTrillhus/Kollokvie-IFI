@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { addCustomCourse, type Course } from "@/lib/courses";
+import { useI18n } from "@/lib/i18n/client";
 
 export default function CourseSingleSelect({
   value,
@@ -13,6 +14,7 @@ export default function CourseSingleSelect({
   onChange: (course: Course | null) => void;
   priorityCodes?: string[];
 }) {
+  const { t } = useI18n();
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -88,7 +90,7 @@ export default function CourseSingleSelect({
         className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       >
         <span className={value ? "" : "text-muted"}>
-          {value ? `${value.code} – ${value.name}` : "Velg emne"}
+          {value ? `${value.code} – ${value.name}` : t("course.choose")}
         </span>
         <span className="text-muted">⌄</span>
       </button>
@@ -103,7 +105,7 @@ export default function CourseSingleSelect({
               setQuery(e.target.value);
               setAddingCustom(false);
             }}
-            placeholder="Søk emnekode eller navn…"
+            placeholder={t("course.searchPlaceholder")}
             className="w-full border-b border-card-border bg-transparent px-4 py-2 text-sm outline-none"
           />
           <div className="max-h-64 overflow-y-auto">
@@ -119,7 +121,7 @@ export default function CourseSingleSelect({
               </button>
             ))}
             {sorted.length === 0 && (
-              <p className="px-4 py-3 text-sm text-muted">Ingen treff.</p>
+              <p className="px-4 py-3 text-sm text-muted">{t("course.noMatch")}</p>
             )}
           </div>
 
@@ -128,16 +130,12 @@ export default function CourseSingleSelect({
               {addingCustom ? (
                 <div className="space-y-2">
                   <p className="text-xs text-muted">
-                    Legg til{" "}
-                    <span className="font-medium text-foreground">
-                      {trimmed.toUpperCase()}
-                    </span>{" "}
-                    som eget fag
+                    {t("course.addHint", { code: trimmed.toUpperCase() })}
                   </p>
                   <input
                     type="text"
                     autoFocus
-                    placeholder="Navn på faget"
+                    placeholder={t("course.customName")}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     className="w-full rounded-lg border border-card-border bg-transparent px-3 py-1.5 text-sm outline-none focus:border-accent"
@@ -148,7 +146,7 @@ export default function CourseSingleSelect({
                     disabled={saving || !customName.trim()}
                     className="w-full rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
                   >
-                    {saving ? "Legger til…" : "Legg til fag"}
+                    {saving ? t("course.adding") : t("course.addSubmit")}
                   </button>
                 </div>
               ) : (
@@ -157,7 +155,7 @@ export default function CourseSingleSelect({
                   onClick={() => setAddingCustom(true)}
                   className="text-sm font-medium text-accent hover:text-accent-hover"
                 >
-                  + Legg til «{trimmed.toUpperCase()}» som eget fag
+                  {t("course.addLink", { code: trimmed.toUpperCase() })}
                 </button>
               )}
             </div>

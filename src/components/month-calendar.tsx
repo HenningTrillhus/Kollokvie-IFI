@@ -8,33 +8,22 @@ import {
   firstWeekdayMondayIndex,
   toDateKey,
   EVENT_TYPE_COLORS,
-  EVENT_TYPE_LABELS,
+  EVENT_TYPE_KEYS,
   type CalendarEvent,
   type EventType,
 } from "@/lib/events";
 import type { Group } from "@/lib/groups";
+import { useI18n } from "@/lib/i18n/client";
 
-const WEEKDAY_LABELS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
-const MONTH_LABELS = [
-  "Januar",
-  "Februar",
-  "Mars",
-  "April",
-  "Mai",
-  "Juni",
-  "Juli",
-  "August",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
 const GROUP_SESSION_COLOR = "#3f6f5e";
 
 const today = new Date();
 const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
 export default function MonthCalendar({ currentUserId }: { currentUserId: string }) {
+  const { t, lang } = useI18n();
+  const WEEKDAY_LABELS = t("cal.weekdays").split("|");
+  const MONTH_LABELS = t("cal.months").split("|");
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -175,7 +164,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => changeMonth(-1)}
-          aria-label="Forrige måned"
+          aria-label={t("cal.prevMonth")}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition hover:bg-accent-soft hover:text-foreground"
         >
           ‹
@@ -185,7 +174,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
         </h1>
         <button
           onClick={() => changeMonth(1)}
-          aria-label="Neste måned"
+          aria-label={t("cal.nextMonth")}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition hover:bg-accent-soft hover:text-foreground"
         >
           ›
@@ -255,7 +244,10 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
         {selectedDate ? (
           <>
             <h2 className="text-sm font-semibold">
-              {Number(selectedDate.split("-")[2])}. {MONTH_LABELS[month].toLowerCase()}
+              {t("cal.dayHeading", {
+                day: Number(selectedDate.split("-")[2]),
+                month: lang === "no" ? MONTH_LABELS[month].toLowerCase() : MONTH_LABELS[month],
+              })}
             </h2>
 
             {(selectedSessions.length > 0 || selectedEvents.length > 0) && (
@@ -273,7 +265,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{g.name}</p>
                         <p className="text-xs text-muted">
-                          Kollokviegruppe
+                          {t("cal.studyGroup")}
                           {g.event_time ? ` · ${g.event_time.slice(0, 5)}` : ""}
                         </p>
                       </div>
@@ -292,15 +284,15 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
                       />
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{e.title}</p>
-                        <p className="text-xs text-muted">{EVENT_TYPE_LABELS[e.type]}</p>
+                        <p className="text-xs text-muted">{t(EVENT_TYPE_KEYS[e.type])}</p>
                       </div>
                     </div>
                     <button
                       onClick={() => deleteEvent(e.id)}
-                      aria-label="Slett hendelse"
+                      aria-label={t("cal.deleteEvent")}
                       className="shrink-0 text-xs text-muted transition hover:text-red-500"
                     >
-                      Slett
+                      {t("common.delete")}
                     </button>
                   </li>
                 ))}
@@ -310,7 +302,7 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
             <form onSubmit={addEvent} className="mt-4 flex flex-wrap gap-2">
               <input
                 type="text"
-                placeholder="Ny hendelse…"
+                placeholder={t("cal.newEvent")}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 className="min-w-0 flex-1 rounded-xl border border-card-border bg-transparent px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -320,24 +312,21 @@ export default function MonthCalendar({ currentUserId }: { currentUserId: string
                 onChange={(e) => setNewType(e.target.value as EventType)}
                 className="rounded-xl border border-card-border bg-transparent px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               >
-                <option value="exam">Eksamen</option>
-                <option value="deadline">Innlevering</option>
-                <option value="other">Annet</option>
+                <option value="exam">{t("cal.exam")}</option>
+                <option value="deadline">{t("cal.deadline")}</option>
+                <option value="other">{t("cal.other")}</option>
               </select>
               <button
                 type="submit"
                 disabled={saving || !newTitle.trim()}
                 className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
               >
-                {saving ? "Legger til…" : "Legg til"}
+                {saving ? t("cal.adding") : t("cal.add")}
               </button>
             </form>
           </>
         ) : (
-          <p className="text-sm text-muted">
-            Klikk på en dag for å se eller legge til hendelser, som eksamener og
-            innleveringer. Kollokviegruppene dine dukker automatisk opp på sin dato.
-          </p>
+          <p className="text-sm text-muted">{t("cal.hint")}</p>
         )}
       </section>
     </div>

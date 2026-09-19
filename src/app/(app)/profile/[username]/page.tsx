@@ -14,6 +14,8 @@ import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
 import BackButton from "@/components/back-button";
 import { getUserCourses } from "@/lib/courses";
+import { programLabel } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export default async function PublicProfilePage({
   params,
@@ -21,6 +23,7 @@ export default async function PublicProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const { t, lang } = await getT();
   const user = await getAuthUser();
   if (!user) redirect("/login");
 
@@ -88,8 +91,10 @@ export default async function PublicProfilePage({
             <p className="text-sm text-muted">@{profile.username}</p>
             {profile.study_program && (
               <p className="mt-1 text-xs text-muted">
-                {profile.study_program}
-                {profile.study_year ? ` · ${profile.study_year}. år` : ""}
+                {programLabel(lang, profile.study_program)}
+                {profile.study_year
+                  ? ` · ${t("profile.year", { n: profile.study_year })}`
+                  : ""}
               </p>
             )}
           </div>
@@ -109,11 +114,11 @@ export default async function PublicProfilePage({
       <div className="mt-6 flex gap-6 text-sm">
         <span>
           <span className="font-semibold">{counts.followers}</span>{" "}
-          <span className="text-muted">følgere</span>
+          <span className="text-muted">{t("profile.followers")}</span>
         </span>
         <span>
           <span className="font-semibold">{counts.following}</span>{" "}
-          <span className="text-muted">følger</span>
+          <span className="text-muted">{t("profile.following")}</span>
         </span>
       </div>
 
@@ -122,22 +127,24 @@ export default async function PublicProfilePage({
           <SwipeTabs
             tabs={[
               {
-                label: "Følgere",
+                label: t("profile.tabFollowers"),
                 count: followerProfiles.length,
                 content: (
                   <ProfileList
                     profiles={followerProfiles}
-                    emptyLabel="Ingen følgere ennå."
+                    emptyLabel={t("profile.noFollowers")}
                   />
                 ),
               },
               {
-                label: "Følger",
+                label: t("profile.tabFollowing"),
                 count: followingProfiles.length,
                 content: (
                   <ProfileList
                     profiles={followingProfiles}
-                    emptyLabel={`@${profile.username} følger ingen ennå.`}
+                    emptyLabel={t("profile.userFollowsNobody", {
+                      username: profile.username,
+                    })}
                   />
                 ),
               },
@@ -146,7 +153,7 @@ export default async function PublicProfilePage({
         </div>
       ) : (
         <p className="mt-8 text-sm text-muted">
-          Følg @{profile.username} for å se hvem de følger og blir fulgt av.
+          {t("profile.followToSee", { username: profile.username })}
         </p>
       )}
     </div>

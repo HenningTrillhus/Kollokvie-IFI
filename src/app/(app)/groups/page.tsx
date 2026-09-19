@@ -3,10 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getGroupMemberCount, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
+import { getT } from "@/lib/i18n/server";
 
 export default async function GroupsPage() {
   const user = await getAuthUser();
   if (!user) return null;
+  const { t } = await getT();
 
   const supabase = await createClient();
   const { data: memberRows } = await supabase
@@ -26,20 +28,18 @@ export default async function GroupsPage() {
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mine kollokviegrupper</h1>
+        <h1 className="text-xl font-semibold">{t("nav.myGroups")}</h1>
         <Link
           href="/groups/new"
           className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover"
         >
-          Lag kollokviegruppe
+          {t("group.create")}
         </Link>
       </div>
 
       <div className="mt-6 space-y-2">
         {groups.length === 0 && (
-          <p className="text-sm text-muted">
-            Du er ikke med i noen kollokviegrupper ennå.
-          </p>
+          <p className="text-sm text-muted">{t("group.none")}</p>
         )}
         {groups.map((group, i) => (
           <GroupCard key={group.id} group={group} memberCount={counts[i]} />

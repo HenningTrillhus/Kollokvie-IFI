@@ -8,12 +8,8 @@ import ProfileList from "@/components/profile-list";
 import GroupJoinButton from "@/components/group-join-button";
 import DeleteGroupButton from "@/components/delete-group-button";
 import GroupInvitePanel from "@/components/group-invite-panel";
-
-function formatDate(dateStr: string | null) {
-  if (!dateStr) return null;
-  const [year, month, day] = dateStr.split("-");
-  return `${day}.${month}.${year}`;
-}
+import { formatDate } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/server";
 
 export default async function GroupDetailPage({
   params,
@@ -21,6 +17,7 @@ export default async function GroupDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { t, lang } = await getT();
   const user = await getAuthUser();
   if (!user) redirect("/login");
 
@@ -45,7 +42,7 @@ export default async function GroupDetailPage({
   const isMember = memberIds.includes(user.id);
   const members = await getProfilesByIds(supabase, memberIds);
   const isFull = typedGroup.max_members ? memberCount >= typedGroup.max_members : false;
-  const dateLabel = formatDate(typedGroup.event_date);
+  const dateLabel = formatDate(typedGroup.event_date, lang);
 
   return (
     <div className="mx-auto w-full max-w-lg px-6 py-10">
@@ -53,7 +50,7 @@ export default async function GroupDetailPage({
         href="/groups"
         className="text-sm font-medium text-muted transition hover:text-foreground"
       >
-        ← Mine kollokviegrupper
+        {t("group.backToMine")}
       </Link>
 
       <div className="mt-4 flex items-start justify-between gap-3">
@@ -72,7 +69,7 @@ export default async function GroupDetailPage({
           {isOwner && (
             <Link
               href={`/groups/${typedGroup.id}/settings`}
-              aria-label="Innstillinger for kollokviegruppa"
+              aria-label={t("group.settingsAria")}
               className="rounded-lg border border-card-border px-2.5 py-1 text-xs font-medium transition hover:bg-accent-soft"
             >
               ⚙︎
@@ -83,18 +80,21 @@ export default async function GroupDetailPage({
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted">
         <span>
-          {memberCount}
-          {typedGroup.max_members ? ` / ${typedGroup.max_members}` : ""} medlemmer
+          {typedGroup.max_members
+            ? t("group.membersMax", { count: memberCount, max: typedGroup.max_members })
+            : t("group.members", { count: memberCount })}
         </span>
         {typedGroup.location && <span>{typedGroup.location}</span>}
         {dateLabel && (
           <span>
             {dateLabel}
-            {typedGroup.event_time ? ` kl. ${typedGroup.event_time.slice(0, 5)}` : ""}
+            {typedGroup.event_time
+              ? ` ${t("group.atTime", { time: typedGroup.event_time.slice(0, 5) })}`
+              : ""}
           </span>
         )}
         <span className="rounded-md border border-card-border px-1.5 py-0.5 text-xs">
-          {typedGroup.visibility === "public" ? "Offentlig" : "Privat"}
+          {typedGroup.visibility === "public" ? t("common.public") : t("common.private")}
         </span>
       </div>
 
@@ -111,9 +111,7 @@ export default async function GroupDetailPage({
           />
         )}
         {!isOwner && !isMember && !canJoinData && (
-          <p className="text-xs text-muted">
-            Du må følge eieren for å bli med i denne private kollokviegruppa.
-          </p>
+          <p className="text-xs text-muted">{t("group.mustFollowOwner")}</p>
         )}
       </div>
 
@@ -124,13 +122,15 @@ export default async function GroupDetailPage({
       )}
 
       <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold text-muted">Medlemmer</h2>
+        <h2 className="mb-3 text-sm font-semibold text-muted">
+          {t("group.membersHeading")}
+        </h2>
         <ProfileList
           profiles={members}
           emptyLabel={
             memberCount > 0 && !isMember
-              ? "Medlemslisten vises når du er med i kollokviegruppa."
-              : "Ingen medlemmer ennå."
+              ? t("group.memberListHidden")
+              : t("group.noMembers")
           }
         />
       </section>
