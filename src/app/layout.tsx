@@ -37,6 +37,8 @@ export async function generateViewport(): Promise<Viewport> {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
+    maximumScale: 1,
+    userScalable: false,
     themeColor: theme === "dark" ? DARK_BG : LIGHT_BG,
   };
 }

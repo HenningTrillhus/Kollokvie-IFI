@@ -42,6 +42,8 @@
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  /* No pinch-zoom: it's an app, not a document. */
+  touch-action: pan-x pan-y;
 }
 
 body {
@@ -87,6 +89,19 @@ textarea {
   textarea {
     font-size: 16px !important;
   }
+}
+
+/* Native date/time pickers have an intrinsic width on iOS that pushes
+   neighbours out of their grid cell; make them behave like normal inputs. */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 .no-scrollbar {
