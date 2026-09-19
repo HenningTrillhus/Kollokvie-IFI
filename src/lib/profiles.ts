@@ -28,10 +28,16 @@ export const ACCENT_COLORS = [
 ] as const;
 
 // A soft tinted background + solid text, derived from the user's chosen
-// accent color, for avatars and other per-user accents.
+// accent color, for avatars and other per-user accents. The tint is layered
+// over the page background instead of being semi-transparent, so overlapping
+// avatars (group cards) never show each other through.
 export function avatarStyle(color: string | null | undefined) {
   const base = color || ACCENT_COLORS[0].value;
-  return { backgroundColor: `${base}22`, color: base };
+  return {
+    backgroundColor: "var(--background)",
+    backgroundImage: `linear-gradient(${base}22, ${base}22)`,
+    color: base,
+  };
 }
 
 export const STUDY_PROGRAMS = [
