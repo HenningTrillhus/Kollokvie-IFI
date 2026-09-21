@@ -11,13 +11,17 @@ const securityHeaders = [
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    value:
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), bluetooth=(), serial=(), hid=(), display-capture=()",
   },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
 const nextConfig: NextConfig = {
+  // Production behaviour, spelled out: no "Powered by" header and no source
+  // maps that would hand out the original source code to every visitor.
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

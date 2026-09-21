@@ -249,6 +249,7 @@ export default function SignupPage() {
                 <Link
                   href="/personvern"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="font-medium text-accent hover:text-accent-hover"
                 >
                   {t("auth.privacyLink")}
@@ -257,6 +258,7 @@ export default function SignupPage() {
                 <Link
                   href="/vilkar"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="font-medium text-accent hover:text-accent-hover"
                 >
                   {t("auth.termsLink")}

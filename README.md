@@ -97,6 +97,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0031` | Sikkerhet: tekstgrenser og lenke-sjekk, strammere bildelagring, mindre rettigheter for uinnloggede |
 | `0032` | Profilikoner 01–65 (var 01–60) |
 | `0033` | Sikkerhet 2: skjulte tegn avvises, kvoter per bruker, smalere skrivetilgang, egendefinerte emner merkes med hvem som la dem til |
+| `0034` | Slår av GraphQL-endepunktet (valgfritt, appen bruker det ikke) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
@@ -224,6 +225,18 @@ Tilgjengelighetserklæringen (`/tilgjengelighet`) er en egenvurdering, ikke en r
 | **Skjemaer og XSS** | React escaper all tekst; ingen `dangerouslySetInnerHTML`, `innerHTML` eller `eval` i koden. Tekst renses før lagring (`src/lib/sanitize.ts`: kontrolltegn, usynlige tegn og høyre-mot-venstre-triks som lurer navn og titler) og databasen avviser de samme tegnene (`clean_text`, migrering 0033). Lenker må være `http(s)`. Feilmeldinger fra databasen vises aldri rått. |
 | **Misbruk og kvoter** | Per bruker: maks 30 kollokviegrupper, 1000 hendelser, 40 emner, 200 kalendervalg, 1000 følger-forespørsler, 200 medlemskap, 500 invitasjoner og 25 egne emner (migrering 0033). Lengdegrenser på all tekst. |
 | **Prompt injection** | Ikke relevant: appen bruker ingen AI-modell og sender ingen tekst til en. Legger du til AI senere, behandle brukertekst som data, aldri som instruksjoner. |
+
+#### Revisjon (september 2026)
+
+| Sjekk | Resultat |
+| --- | --- |
+| Hemmeligheter i git-historikken (64 commits, alle grener) | Ingen treff på JWT-er, `service_role`, Supabase-, Resend-, GitHub-, AWS-, Slack- eller Vercel-nøkler, private nøkler eller databasepassord. Ingen `.env`-filer har noen gang vært committet. |
+| Avhengigheter | `npm audit`: 0 sårbarheter. Alt er oppdatert til siste utgave innenfor gjeldende versjonsmajor (React 19.3.0, Next.js 16.3.5). Hoppene til ESLint 10, TypeScript 7 og @types/node 26 er utsatt med vilje: Next.js sin ESLint-pakke støtter dem ikke ennå. |
+| Ubrukte pakker og filer | Alle pakker i `package.json` brukes. De fem ubrukte SVG-ene fra prosjektmalen i `public/` er fjernet. |
+| Debug og feilsøking | Ingen `console.log`, `debugger` eller feilsøkingsflagg i koden. `productionBrowserSourceMaps` er av, og produksjonsbygget har ingen source maps. Dev-verktøy (feiloverlegg, `unsafe-eval` i CSP) finnes bare når du kjører `npm run dev`. |
+| Sikkerhetshoder | Målt mot et produksjonsbygg: CSP med nonce, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy (utvidet), COOP, CORP. Ingen `X-Powered-By`. Uinnloggede får omdirigering til `/login` for alle ukjente og beskyttede stier. |
+| Passord | Appen lagrer, logger og sender aldri passord selv. Passordet går direkte til Supabase Auth, som lagrer det som en saltet **bcrypt**-hash. Appen krever i tillegg minst 8 tegn, avviser vanlige og personlige passord, og logger ut andre enheter ved passordbytte. |
+| Database | Row Level Security på alle 10 tabeller, alle definer-funksjoner har fast `search_path`, uinnloggede har ingen tabelltilgang, kolonnetilgang er begrenset, kvoter og tekstregler håndheves (migrering 0031 og 0033). `supabase/audit.sql` kan du kjøre selv for å bekrefte dette mot den levende databasen. |
 
 #### Kjente og aksepterte begrensninger
 
