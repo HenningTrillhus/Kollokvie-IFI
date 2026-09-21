@@ -333,6 +333,7 @@ export const messages = {
   "settings.notSelected": { no: "Ikke valgt", en: "Not selected" },
 
   // ---- accent colors
+  "color.custom": { no: "Egen farge", en: "Custom color" },
   "color.sage": { no: "Salvie", en: "Sage" },
   "color.blue": { no: "Blå", en: "Blue" },
   "color.indigo": { no: "Indigo", en: "Indigo" },

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Avatar from "@/components/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
+import ColorSwatchInput from "@/components/color-swatch-input";
 import {
   AVATAR_BUCKET,
   PRESET_AVATARS,
@@ -198,7 +199,7 @@ export default function AvatarPicker({
       {!value && (
         <div className="mt-4 border-t border-card-border pt-4">
           <p className="mb-2 text-sm font-medium">{t("settings.color")}</p>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             {ACCENT_COLORS.map((color) => (
               <button
                 key={color.value}
@@ -215,6 +216,12 @@ export default function AvatarPicker({
                 }`}
               />
             ))}
+            <ColorSwatchInput
+              className="h-8 w-8"
+              value={profile.accent_color}
+              active={!ACCENT_COLORS.some((c) => c.value === profile.accent_color)}
+              onCommit={chooseColor}
+            />
           </div>
         </div>
       )}

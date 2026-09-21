@@ -6,7 +6,8 @@ import { cardClass } from "@/components/form-ui";
 import BottomSheet from "@/components/bottom-sheet";
 import MonthGrid from "@/components/calendar/month-grid";
 import { SemesterAgenda, SemesterGrid, SemesterPanes } from "@/components/calendar/semester-view";
-import DayPanel, { type NewEvent } from "@/components/calendar/day-panel";
+import DayPanel from "@/components/calendar/day-panel";
+import AddEventForm, { type NewEvent } from "@/components/calendar/add-event-form";
 import CourseFilterPanel, { FilterChips, type FilterCourse } from "@/components/calendar/course-filter";
 import UpcomingStrip from "@/components/calendar/upcoming-strip";
 import { daysInMonth, daysUntil, toDateKey, type CalendarEvent } from "@/lib/events";
@@ -45,6 +46,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [semester, setSemester] = useState<Semester>(() => currentSemester(now));
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [upcoming, setUpcoming] = useState<CalendarEvent[]>([]);
@@ -246,6 +248,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       const course = v.course;
       setExtraCourses((prev) => (prev.some((c) => c.code === course.code) ? prev : [...prev, course]));
     }
+    setAddOpen(false);
     return true;
   }
 
@@ -403,9 +406,10 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
               key={selectedDate ?? "none"}
               date={selectedDate}
               items={selectedDate ? itemsByDate.get(selectedDate) ?? [] : []}
-              priorityCodes={myCourses.map((c) => c.code)}
-              saveError={saveError}
-              onAdd={addEvent}
+              onAdd={() => {
+                setSaveError(false);
+                setAddOpen(true);
+              }}
               onDelete={deleteEvent}
             />
           </>
@@ -434,6 +438,20 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
           </>
         )}
       </div>
+
+      {addOpen && selectedDate && (
+        <BottomSheet
+          tall
+          title={`${t("cal.addHeading")} · ${dateFmt(selectedDate)}`}
+          onClose={() => setAddOpen(false)}
+        >
+          <AddEventForm
+            saveError={saveError}
+            priorityCodes={myCourses.map((c) => c.code)}
+            onSubmit={addEvent}
+          />
+        </BottomSheet>
+      )}
 
       {sheetOpen && (
         <BottomSheet title={t("cal.filters")} onClose={() => setSheetOpen(false)}>

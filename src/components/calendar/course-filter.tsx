@@ -11,6 +11,7 @@ import {
   type Prefs,
 } from "@/lib/calendar-prefs";
 import { useI18n } from "@/lib/i18n/client";
+import ColorSwatchInput from "@/components/color-swatch-input";
 
 export type FilterCourse = { code: string; name: string };
 
@@ -179,7 +180,7 @@ function PrefRow({
       </div>
 
       {picking && (
-        <div className="mt-2.5 flex flex-wrap gap-2.5 pl-10">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2.5 pl-10">
           {PALETTE.map((c) => (
             <button
               key={c}
@@ -196,6 +197,14 @@ function PrefRow({
               }`}
             />
           ))}
+          <ColorSwatchInput
+            value={color}
+            active={!PALETTE.some((c) => c === color.toLowerCase())}
+            onCommit={(c) => {
+              onColor(c);
+              setPicking(false);
+            }}
+          />
         </div>
       )}
     </div>

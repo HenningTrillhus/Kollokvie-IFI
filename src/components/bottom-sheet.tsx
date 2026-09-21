@@ -7,10 +7,13 @@ import { useI18n } from "@/lib/i18n/client";
 export default function BottomSheet({
   title,
   onClose,
+  tall = false,
   children,
 }: {
   title: string;
   onClose: () => void;
+  // A tall sheet covers most of the screen (for forms).
+  tall?: boolean;
   children: ReactNode;
 }) {
   const { t } = useI18n();
@@ -28,7 +31,7 @@ export default function BottomSheet({
         onClick={onClose}
         className="animate-fade-only absolute inset-0 bg-black/40"
       />
-      <div className="animate-sheet-up relative flex max-h-[80%] w-full max-w-xl flex-col rounded-t-3xl border border-b-0 border-card-border bg-card pb-[env(safe-area-inset-bottom)] shadow-2xl">
+      <div className={`animate-sheet-up relative flex ${tall ? "h-[94%]" : "max-h-[80%]"} w-full max-w-xl flex-col rounded-t-3xl border border-b-0 border-card-border bg-card pb-[env(safe-area-inset-bottom)] shadow-2xl`}>
         <div className="flex items-center justify-between px-5 pb-2 pt-4">
           <span aria-hidden className="absolute left-1/2 top-2 h-1 w-9 -translate-x-1/2 rounded-full bg-card-border" />
           <h2 className="text-base font-semibold">{title}</h2>
