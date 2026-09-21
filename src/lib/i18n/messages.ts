@@ -85,8 +85,8 @@ export const messages = {
   },
   "verify.title": { no: "Bekreft e-posten din", en: "Confirm your email" },
   "verify.sent": {
-    no: "Vi har sendt en kode på seks siffer til {email}. Skriv den inn under.",
-    en: "We sent a six-digit code to {email}. Enter it below.",
+    no: "Vi har sendt en kode til {email}. Skriv den inn under.",
+    en: "We sent a code to {email}. Enter it below.",
   },
   "verify.codeLabel": { no: "Kode", en: "Code" },
   "verify.submit": { no: "Bekreft", en: "Confirm" },

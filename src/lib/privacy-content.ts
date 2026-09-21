@@ -39,7 +39,7 @@ const no: Policy = {
     {
       heading: "2. Hvilke opplysninger vi behandler",
       bullets: [
-        "Konto: fullt navn, brukernavn og UiO-e-postadressen din (brukernavn@uio.no). Adressen bekreftes med en kode på seks siffer som sendes til den når du registrerer deg. Passordet ditt lagres kryptert (som hash) av Supabase Auth. Vi kan aldri se det.",
+        "Konto: fullt navn, brukernavn og UiO-e-postadressen din (brukernavn@uio.no). Adressen bekreftes med en engangskode som sendes til den når du registrerer deg. Passordet ditt lagres kryptert (som hash) av Supabase Auth. Vi kan aldri se det.",
         "Profil (valgfritt): studielinje, årstrinn, emner, GitHub- og LinkedIn-lenke, bio, profilbilde (et ferdig ikon eller et bilde du laster opp) og en farge.",
         "Bruk: hvem du følger og hvem som følger deg (også forespørsler), kollokviegrupper du lager, er med i eller blir invitert til, og hendelser du legger i kalenderen (for eksempel eksamener og innleveringer).",
         "Tekniske opplysninger: en innloggingsøkt i en informasjonskapsel, og valg av språk og tema. Leverandørene våre kan i tillegg logge IP-adresse og tekniske data for drift og sikkerhet.",
@@ -148,7 +148,7 @@ const en: Policy = {
     {
       heading: "2. What information we process",
       bullets: [
-        "Account: full name, username and your UiO email address (username@uio.no). The address is confirmed with a six-digit code sent to it when you sign up. Your password is stored encrypted (as a hash) by Supabase Auth. We can never see it.",
+        "Account: full name, username and your UiO email address (username@uio.no). The address is confirmed with a one-time code sent to it when you sign up. Your password is stored encrypted (as a hash) by Supabase Auth. We can never see it.",
         "Profile (optional): study program, year, courses, GitHub and LinkedIn link, bio, profile picture (a ready-made icon or a picture you upload) and a color.",
         "Usage: who you follow and who follows you (including requests), study groups you create, join or are invited to, and events you add to the calendar (for example exams and deadlines).",
         "Technical: a sign-in session in a cookie, and your language and theme choice. Our providers may also log IP addresses and technical data for operation and security.",

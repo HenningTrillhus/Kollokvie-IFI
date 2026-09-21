@@ -111,14 +111,14 @@ personvernerklæringen. Når personvernerklæringen endres på en måte som krev
 ## E-postkode ved registrering (valgfritt, men anbefalt)
 
 Uten dette kan hvem som helst registrere seg med et hvilket som helst IFI-brukernavn. Med det må man ha
-tilgang til `brukernavn@uio.no` og skrive inn en kode på seks siffer.
+tilgang til `brukernavn@uio.no` og skrive inn en engangskode.
 
 1. Opprett en konto hos [Resend](https://resend.com) (velg EU-region), legg til domenet ditt og legg
    DNS-oppføringene inn hos domeneleverandøren. Lag en API-nøkkel med «Sending access».
 2. Supabase → **Authentication → SMTP Settings**: skru på egen SMTP med vert `smtp.resend.com`,
    port `465`, bruker `resend`, passord = API-nøkkelen, og avsender `no-reply@ditt-domene`.
 3. Supabase → **Authentication → Sign In / Providers → Email**: skru på **Confirm email**, skru av
-   **Secure email change**, og sett kodelengde til 6 og gyldighet til rundt 10 minutter.
+   **Secure email change**, og sett gyldighet til rundt 10 minutter. Kodelengden (6–10 siffer) kan du velge fritt; er den ikke 8, sett `NEXT_PUBLIC_OTP_LENGTH` til samme tall.
 4. Supabase → **Authentication → Email Templates**: bytt «Confirm signup» og «Change Email Address» til
    maler som viser `{{ .Token }}` (koden) i stedet for en lenke.
 5. Kjør `0024_verified_ifi_email.sql` i SQL Editor.

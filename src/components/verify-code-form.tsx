@@ -4,10 +4,16 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 
-const CODE_LENGTH = 6;
+// Supabase decides how long the emailed code is (Authentication > Providers >
+// Email > "Email OTP Length"; 6 to 10 digits). We accept any of those, and
+// confirm automatically once the expected length is typed. Set
+// NEXT_PUBLIC_OTP_LENGTH to match it (default 8).
+const CODE_LENGTH = Number(process.env.NEXT_PUBLIC_OTP_LENGTH) || 8;
+const MIN_LENGTH = 6;
+const MAX_LENGTH = 10;
 const RESEND_SECONDS = 60;
 
-// "Enter the 6-digit code we emailed you." Used when signing up, when logging
+// "Enter the code we emailed you." Used when signing up, when logging
 // in with an unconfirmed address, and when an older account verifies its email.
 export default function VerifyCodeForm({
   email,
@@ -38,7 +44,7 @@ export default function VerifyCodeForm({
   }, [cooldown]);
 
   async function verify(value: string) {
-    if (value.length !== CODE_LENGTH || busy) return;
+    if (value.length < MIN_LENGTH || busy) return;
     setBusy(true);
     setError("");
     setNote("");
@@ -55,7 +61,7 @@ export default function VerifyCodeForm({
   }
 
   function handleChange(raw: string) {
-    const digits = raw.replace(/\D/g, "").slice(0, CODE_LENGTH);
+    const digits = raw.replace(/\D/g, "").slice(0, MAX_LENGTH);
     setCode(digits);
     setError("");
     // Verify as soon as the last digit is in.
@@ -93,10 +99,10 @@ export default function VerifyCodeForm({
         inputMode="numeric"
         autoComplete="one-time-code"
         autoFocus
-        maxLength={CODE_LENGTH}
-        placeholder="••••••"
+        maxLength={MAX_LENGTH}
+        placeholder={"•".repeat(CODE_LENGTH)}
         aria-label={t("verify.codeLabel")}
-        className="block h-14 w-full rounded-xl border border-card-border bg-transparent text-center text-2xl font-semibold tracking-[0.5em] outline-none transition placeholder:text-muted/40 focus:border-accent focus:ring-2 focus:ring-accent-soft"
+        className="block h-14 w-full rounded-xl border border-card-border bg-transparent text-center text-2xl font-semibold tracking-[0.35em] outline-none transition placeholder:text-muted/40 focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
       {error && <p className="text-center text-sm text-red-500">{error}</p>}
@@ -104,7 +110,7 @@ export default function VerifyCodeForm({
 
       <button
         type="submit"
-        disabled={busy || code.length !== CODE_LENGTH}
+        disabled={busy || code.length < MIN_LENGTH}
         className="h-11 w-full rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
       >
         {busy ? t("verify.verifying") : t("verify.submit")}
