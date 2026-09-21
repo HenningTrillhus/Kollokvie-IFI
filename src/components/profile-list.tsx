@@ -1,6 +1,5 @@
-import Link from "next/link";
 import type { Profile } from "@/lib/profiles";
-import Avatar from "@/components/avatar";
+import PersonRow from "@/components/person-row";
 
 // Rows of people, separated by hairlines. Meant to sit inside a card.
 export default function ProfileList({
@@ -17,19 +16,12 @@ export default function ProfileList({
   return (
     <ul className="divide-y divide-card-border">
       {profiles.map((profile, i) => (
-        <li key={profile.id} style={{ ["--i" as string]: i }} className="animate-rise">
-          <Link
-            href={`/profile/${profile.id}`}
-            className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent-soft active:bg-accent-soft"
-          >
-            <Avatar profile={profile} className="h-9 w-9 text-sm" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{profile.full_name}</p>
-              {profile.username && (
-                <p className="truncate text-xs text-muted">@{profile.username}</p>
-              )}
-            </div>
-          </Link>
+        <li
+          key={profile.id}
+          style={{ ["--i" as string]: i }}
+          className="animate-rise overflow-hidden first:rounded-t-xl last:rounded-b-xl"
+        >
+          <PersonRow profile={profile} compact />
         </li>
       ))}
     </ul>

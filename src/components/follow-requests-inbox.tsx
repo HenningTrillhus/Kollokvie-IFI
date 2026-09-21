@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import Avatar from "@/components/avatar";
+import PersonRow from "@/components/person-row";
 import { EmptyCard, ListCard } from "@/components/form-ui";
 import { useI18n } from "@/lib/i18n/client";
 import type { Profile } from "@/lib/profiles";
@@ -68,22 +67,10 @@ export default function FollowRequestsInbox({
       {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
       <ListCard>
         {requests.map((r) => (
-          <div
+          <PersonRow
             key={r.followerId}
-            className="space-y-3 px-4 py-3"
-          >
-            <Link
-              href={`/profile/${r.profile.id}`}
-              className="flex min-w-0 items-center gap-3"
-            >
-              <Avatar profile={r.profile} className="h-10 w-10 text-sm" />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{r.profile.full_name}</p>
-                {r.profile.username && (
-                  <p className="truncate text-xs text-muted">@{r.profile.username}</p>
-                )}
-              </div>
-            </Link>
+            profile={r.profile}
+            below={
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => respond(r.followerId, "accept")}
@@ -98,7 +85,8 @@ export default function FollowRequestsInbox({
                 {t("common.decline")}
               </button>
             </div>
-          </div>
+            }
+          />
         ))}
       </ListCard>
     </>

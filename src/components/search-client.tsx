@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import FollowButton from "@/components/follow-button";
@@ -9,7 +8,7 @@ import GroupCard from "@/components/group-card";
 import { Card, EmptyCard, ListCard } from "@/components/form-ui";
 import SearchInput from "@/components/search-input";
 import { PROFILE_VIEW, escapeLike, type Profile } from "@/lib/profiles";
-import Avatar from "@/components/avatar";
+import PersonRow from "@/components/person-row";
 import { getGroupCardData, withFullGroupsLast, type Group, type GroupCardData } from "@/lib/groups";
 
 type FollowStatus = "none" | "pending" | "accepted";
@@ -301,33 +300,17 @@ export default function SearchClient({
           ) : (
             <ListCard>
               {results.map((profile, i) => (
-                <div
-                  key={profile.id}
-                  style={{ ["--i" as string]: i }}
-                  className="animate-rise flex items-center justify-between gap-3 px-4 py-3 transition hover:bg-accent-soft/50"
-                >
-                  <Link
-                    href={`/profile/${profile.id}`}
-                    className="flex min-w-0 items-center gap-3"
-                  >
-                    <Avatar profile={profile} className="h-10 w-10 text-sm" />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{profile.full_name}</p>
-                      <p className="truncate text-xs text-muted">
-                        {profile.username ? `@${profile.username}` : t("search.privateProfile")}
-                        {mutuals[profile.id] ? (
-                          <span className="text-accent">
-                            {" · "}
-                            {t("search.mutual", { n: mutuals[profile.id] })}
-                          </span>
-                        ) : null}
-                      </p>
-                    </div>
-                  </Link>
-                  <FollowButton
-                    targetUserId={profile.id}
-                    currentUserId={currentUserId}
-                    initialStatus={statuses[profile.id] ?? "none"}
+                <div key={profile.id} style={{ ["--i" as string]: i }} className="animate-rise">
+                  <PersonRow
+                    profile={profile}
+                    mutual={mutuals[profile.id]}
+                    right={
+                      <FollowButton
+                        targetUserId={profile.id}
+                        currentUserId={currentUserId}
+                        initialStatus={statuses[profile.id] ?? "none"}
+                      />
+                    }
                   />
                 </div>
               ))}

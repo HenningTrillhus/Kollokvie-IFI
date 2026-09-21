@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import { escapeLike, PROFILE_VIEW, type Profile } from "@/lib/profiles";
-import Avatar from "@/components/avatar";
+import PersonRow from "@/components/person-row";
 import { Card, inputClass } from "@/components/form-ui";
 
 export default function GroupInvitePanel({
@@ -104,23 +104,20 @@ export default function GroupInvitePanel({
           )}
           <ul className="divide-y divide-card-border">
             {results.map((profile) => (
-              <li key={profile.id} className="flex items-center justify-between gap-3 py-2.5">
-                <div className="flex min-w-0 items-center gap-3">
-                  <Avatar profile={profile} className="h-9 w-9 text-sm" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{profile.full_name}</p>
-                    {profile.username && (
-                      <p className="truncate text-xs text-muted">@{profile.username}</p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => invite(profile.id)}
-                  disabled={invited.has(profile.id)}
-                  className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover active:scale-95 disabled:opacity-60"
-                >
-                  {invited.has(profile.id) ? t("invite.invited") : t("invite.button")}
-                </button>
+              <li key={profile.id}>
+                <PersonRow
+                  profile={profile}
+                  compact
+                  right={
+                    <button
+                      onClick={() => invite(profile.id)}
+                      disabled={invited.has(profile.id)}
+                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-accent-hover active:scale-95 disabled:opacity-60"
+                    >
+                      {invited.has(profile.id) ? t("invite.invited") : t("invite.button")}
+                    </button>
+                  }
+                />
               </li>
             ))}
           </ul>
