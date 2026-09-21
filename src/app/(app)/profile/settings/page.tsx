@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ACCENT_COLORS,
   STUDY_PROGRAMS,
-  sanitizeExternalUrl,
+  linkUrl,
+  parseLinkHandle,
 } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
 import StudyProgramSelect from "@/components/study-program-select";
@@ -15,6 +16,8 @@ import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
 import ChangePasswordCard from "@/components/change-password-card";
 import ProfileVisibility from "@/components/profile-visibility";
+import YearPicker from "@/components/year-picker";
+import LinkHandleInput from "@/components/link-handle-input";
 import AvatarPicker from "@/components/avatar-picker";
 import { Card, Field, SectionTitle, StickyBar, inputClass } from "@/components/form-ui";
 import { ChevronRightIcon } from "@/components/meta-icons";
@@ -26,13 +29,12 @@ import { cleanLine, cleanText } from "@/lib/sanitize";
 
 const BIO_MAX = 160;
 
-const STUDY_YEARS = [1, 2, 3, 4, 5];
 
 type Fields = {
   bio: string;
   fullName: string;
-  githubUrl: string;
-  linkedinUrl: string;
+  githubHandle: string;
+  linkedinHandle: string;
   studyProgram: string;
   studyYear: string;
   courseCodes: string[];
@@ -50,8 +52,8 @@ export default function SettingsPage() {
 
   const [bio, setBio] = useState("");
   const [fullName, setFullName] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [githubHandle, setGithubHandle] = useState("");
+  const [linkedinHandle, setLinkedinHandle] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
@@ -102,8 +104,8 @@ export default function SettingsPage() {
         setIfiUsername(profile.ifi_username ?? "");
         setIsPrivate(profile.is_private ?? true);
         setFullName(profile.full_name);
-        setGithubUrl(profile.github_url ?? "");
-        setLinkedinUrl(profile.linkedin_url ?? "");
+        setGithubHandle(parseLinkHandle("github", profile.github_url ?? "") ?? "");
+        setLinkedinHandle(parseLinkHandle("linkedin", profile.linkedin_url ?? "") ?? "");
         setStudyProgram(profile.study_program ?? "");
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
       }
@@ -113,8 +115,8 @@ export default function SettingsPage() {
       setSaved({
         bio: savedBio,
         fullName: profile?.full_name ?? "",
-        githubUrl: profile?.github_url ?? "",
-        linkedinUrl: profile?.linkedin_url ?? "",
+        githubHandle: parseLinkHandle("github", profile?.github_url ?? "") ?? "",
+        linkedinHandle: parseLinkHandle("linkedin", profile?.linkedin_url ?? "") ?? "",
         studyProgram: profile?.study_program ?? "",
         studyYear: profile?.study_year ? String(profile.study_year) : "",
         courseCodes: userCourses.map((c) => c.code),
@@ -126,8 +128,8 @@ export default function SettingsPage() {
   const current: Fields = {
     bio,
     fullName,
-    githubUrl,
-    linkedinUrl,
+    githubHandle,
+    linkedinHandle,
     studyProgram,
     studyYear,
     courseCodes: courses.map((c) => c.code),
@@ -164,14 +166,15 @@ export default function SettingsPage() {
       setErrorMessage(t("settings.nameRequired"));
       return;
     }
-    const github = githubUrl.trim() ? sanitizeExternalUrl(githubUrl) : null;
-    const linkedin = linkedinUrl.trim() ? sanitizeExternalUrl(linkedinUrl) : null;
-    if (githubUrl.trim() && !github) {
-      setErrorMessage(t("settings.invalidLink", { field: "GitHub" }));
+    // Only a username (or a link to that site's profile) is accepted.
+    const github = parseLinkHandle("github", githubHandle);
+    const linkedin = parseLinkHandle("linkedin", linkedinHandle);
+    if (github === null) {
+      setErrorMessage(t("settings.invalidGithub"));
       return;
     }
-    if (linkedinUrl.trim() && !linkedin) {
-      setErrorMessage(t("settings.invalidLink", { field: "LinkedIn" }));
+    if (linkedin === null) {
+      setErrorMessage(t("settings.invalidLinkedin"));
       return;
     }
 
@@ -182,8 +185,8 @@ export default function SettingsPage() {
       .from("profiles")
       .update({
         full_name: trimmedName,
-        github_url: github,
-        linkedin_url: linkedin,
+        github_url: github ? linkUrl("github", github) : null,
+        linkedin_url: linkedin ? linkUrl("linkedin", linkedin) : null,
         study_program: studyProgram || null,
         study_year: studyYear ? Number(studyYear) : null,
       })
@@ -247,14 +250,14 @@ export default function SettingsPage() {
       ...current,
       bio: trimmedBio,
       fullName: trimmedName,
-      githubUrl: github ?? "",
-      linkedinUrl: linkedin ?? "",
+      githubHandle: github,
+      linkedinHandle: linkedin,
     });
     setSavedCourses(courses);
     setBio(trimmedBio);
     setFullName(trimmedName);
-    setGithubUrl(github ?? "");
-    setLinkedinUrl(linkedin ?? "");
+    setGithubHandle(github);
+    setLinkedinHandle(linkedin);
     setSaving(false);
     setJustSaved(true);
     router.refresh();
@@ -265,8 +268,8 @@ export default function SettingsPage() {
     if (!saved) return;
     setBio(saved.bio);
     setFullName(saved.fullName);
-    setGithubUrl(saved.githubUrl);
-    setLinkedinUrl(saved.linkedinUrl);
+    setGithubHandle(saved.githubHandle);
+    setLinkedinHandle(saved.linkedinHandle);
     setStudyProgram(saved.studyProgram);
     setStudyYear(saved.studyYear);
     setCourses(savedCourses);
@@ -417,7 +420,8 @@ export default function SettingsPage() {
             <ProfileVisibility userId={userId} initialPrivate={isPrivate} />
           </section>
 
-          <section style={rise(2)} className="animate-rise">
+          {/* z-30: the program and course lists open downward and must sit above the cards below. */}
+          <section style={rise(2)} className="animate-rise relative z-30">
             <SectionTitle>{t("settings.secStudy")}</SectionTitle>
             <Card>
               <Field label={t("settings.program")}>
@@ -428,20 +432,8 @@ export default function SettingsPage() {
                 />
               </Field>
 
-              <Field label={t("settings.year")} htmlFor="studyYear">
-                <select
-                  id="studyYear"
-                  value={studyYear}
-                  onChange={(e) => edit(setStudyYear)(e.target.value)}
-                  className={inputClass}
-                >
-                  <option value="">{t("common.notSelected")}</option>
-                  {STUDY_YEARS.map((year) => (
-                    <option key={year} value={year}>
-                      {t("profile.year", { n: year })}
-                    </option>
-                  ))}
-                </select>
+              <Field label={t("settings.year")}>
+                <YearPicker value={studyYear} onChange={edit(setStudyYear)} />
               </Field>
 
               <Field label={t("settings.courses")} hint={t("settings.coursesHint")}>
@@ -453,33 +445,23 @@ export default function SettingsPage() {
           <section style={rise(2)} className="animate-rise">
             <SectionTitle>{t("settings.secLinks")}</SectionTitle>
             <Card>
-              <Field label={t("settings.github")} htmlFor="githubUrl">
-                <input
-                  id="githubUrl"
-                  type="text"
-                  maxLength={250}
-                  inputMode="url"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  placeholder="github.com/brukernavn"
-                  value={githubUrl}
-                  onChange={(e) => edit(setGithubUrl)(e.target.value)}
-                  className={inputClass}
+              <Field label={t("settings.github")} hint={t("settings.linkHint")}>
+                <LinkHandleInput
+                  id="githubHandle"
+                  prefix="github.com/"
+                  placeholder={t("settings.githubPlaceholder")}
+                  value={githubHandle}
+                  onChange={edit(setGithubHandle)}
                 />
               </Field>
 
-              <Field label={t("settings.linkedin")} htmlFor="linkedinUrl">
-                <input
-                  id="linkedinUrl"
-                  type="text"
-                  maxLength={250}
-                  inputMode="url"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  placeholder="linkedin.com/in/brukernavn"
-                  value={linkedinUrl}
-                  onChange={(e) => edit(setLinkedinUrl)(e.target.value)}
-                  className={inputClass}
+              <Field label={t("settings.linkedin")}>
+                <LinkHandleInput
+                  id="linkedinHandle"
+                  prefix="linkedin.com/in/"
+                  placeholder={t("settings.linkedinPlaceholder")}
+                  value={linkedinHandle}
+                  onChange={edit(setLinkedinHandle)}
                 />
               </Field>
             </Card>

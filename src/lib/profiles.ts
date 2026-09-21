@@ -73,30 +73,59 @@ export const STUDY_PROGRAMS = [
   "Informatikk: språkteknologi (master)",
 ] as const;
 
-// Only allow http(s) links so a stored value can never become a
-// javascript:-style URL when rendered as an href.
-export function sanitizeExternalUrl(value: string): string | null {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-  try {
-    const url = new URL(withScheme);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    return url.toString();
-  } catch {
-    return null;
+// Profile links can only point to GitHub or LinkedIn. People give a username
+// (or paste their profile link), and the address is built here, so nothing
+// else can ever be stored or shown as a link.
+const GITHUB_HANDLE = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
+const LINKEDIN_HANDLE = /^[A-Za-z0-9-]{3,100}$/;
+
+type LinkKind = "github" | "linkedin";
+
+// "" for nothing typed, the username if it is valid, or null if it is not.
+export function parseLinkHandle(kind: LinkKind, input: string): string | null {
+  let v = input.trim().replace(/^@/, "");
+  if (!v) return "";
+
+  // Something that looks like an address: it must be that site's profile page.
+  if (/[/.:]/.test(v)) {
+    let url: URL;
+    try {
+      url = new URL(/^https?:\/\//i.test(v) ? v : `https://${v}`);
+    } catch {
+      return null;
+    }
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (kind === "github") {
+      if (host !== "github.com" || parts.length !== 1) return null;
+      v = parts[0];
+    } else {
+      // (LinkedIn also uses country addresses such as no.linkedin.com.)
+      if (
+        !/^(?:[a-z]{2,3}.)?linkedin.com$/.test(host) ||
+        parts.length !== 2 ||
+        parts[0].toLowerCase() !== "in"
+      ) {
+        return null;
+      }
+      v = parts[1];
+    }
   }
+  return (kind === "github" ? GITHUB_HANDLE : LINKEDIN_HANDLE).test(v) ? v : null;
 }
 
-// For rendering a stored link: null unless it is a plain http(s) address.
-export function safeExternalHref(value: string | null | undefined): string | null {
-  if (!value) return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
-  } catch {
-    return null;
-  }
+export function linkUrl(kind: LinkKind, handle: string): string {
+  return kind === "github"
+    ? `https://github.com/${handle}`
+    : `https://www.linkedin.com/in/${handle}`;
+}
+
+// A stored address, checked again before it is shown: the proper GitHub or
+// LinkedIn address, or null.
+export function safeLinkUrl(kind: LinkKind, stored: string | null | undefined): string | null {
+  if (!stored) return null;
+  const handle = parseLinkHandle(kind, stored);
+  return handle ? linkUrl(kind, handle) : null;
 }
 
 // Escape LIKE wildcards so user input like "%" or "_" matches literally.

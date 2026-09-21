@@ -1,4 +1,4 @@
-import { safeExternalHref } from "@/lib/profiles";
+import { safeLinkUrl } from "@/lib/profiles";
 
 export default function ProfileLinks({
   githubUrl,
@@ -7,8 +7,8 @@ export default function ProfileLinks({
   githubUrl: string | null;
   linkedinUrl: string | null;
 }) {
-  githubUrl = safeExternalHref(githubUrl);
-  linkedinUrl = safeExternalHref(linkedinUrl);
+  githubUrl = safeLinkUrl("github", githubUrl);
+  linkedinUrl = safeLinkUrl("linkedin", linkedinUrl);
   if (!githubUrl && !linkedinUrl) return null;
 
   return (

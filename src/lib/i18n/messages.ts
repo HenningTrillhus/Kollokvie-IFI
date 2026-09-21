@@ -542,8 +542,23 @@ export const messages = {
     no: "Velg så mange emner du vil. Finner du ikke faget, kan du legge det til selv.",
     en: "Pick as many courses as you like. If you can't find a course, you can add it yourself.",
   },
-  "settings.github": { no: "GitHub-lenke", en: "GitHub link" },
-  "settings.linkedin": { no: "LinkedIn-lenke", en: "LinkedIn link" },
+  "settings.github": { no: "GitHub", en: "GitHub" },
+  "settings.linkedin": { no: "LinkedIn", en: "LinkedIn" },
+  "settings.githubPlaceholder": { no: "ditt-brukernavn", en: "your-username" },
+  "settings.linkedinPlaceholder": { no: "ditt-navn-123abc", en: "your-name-123abc" },
+  "settings.linkHint": {
+    no: "Skriv bare brukernavnet ditt, så lager vi lenken. Bare GitHub og LinkedIn er mulig.",
+    en: "Just type your username and we build the link. Only GitHub and LinkedIn are possible.",
+  },
+  "settings.invalidGithub": {
+    no: "GitHub-brukernavnet er ugyldig. Bruk bare bokstaver, tall og bindestrek, eller lim inn lenken til github.com-profilen din.",
+    en: "The GitHub username is not valid. Use only letters, numbers and hyphens, or paste the link to your github.com profile.",
+  },
+  "settings.invalidLinkedin": {
+    no: "LinkedIn-navnet er ugyldig. Skriv det som står etter linkedin.com/in/, eller lim inn lenken til LinkedIn-profilen din.",
+    en: "The LinkedIn name is not valid. Type what comes after linkedin.com/in/, or paste the link to your LinkedIn profile.",
+  },
+  "year.clear": { no: "Fjern valg", en: "Clear" },
   "settings.ifiLocked": {
     no: "Kan ikke endres — det er dette du logger inn med.",
     en: "Can't be changed — it's what you log in with.",

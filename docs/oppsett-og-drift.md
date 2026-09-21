@@ -106,6 +106,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0036` | Åpen/privat profil, del 2 (kjør etter at appen er oppdatert): stenger direkte lesing av profiltabellen |
 | `0037` | Hastighetsgrenser per bruker (rate limiting) på skriving, og på opprydderen for uferdige registreringer |
 | `0038` | Notater i kalenderen: hendelsestypen `note` og kolonnen `body` |
+| `0039` | Profillenker kan bare være GitHub eller LinkedIn, i fast form (gamle lenker skrives om eller fjernes) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
