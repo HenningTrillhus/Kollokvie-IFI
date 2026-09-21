@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE_OPTIONS } from "./cookie-options";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/personvern"];
+const PUBLIC_PATHS = ["/login", "/signup", "/personvern", "/vilkar", "/informasjonskapsler"];
 const AUTH_PAGES = ["/login", "/signup"];
 
 export async function updateSession(request: NextRequest) {

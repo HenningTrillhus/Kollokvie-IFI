@@ -37,8 +37,6 @@ export async function generateViewport(): Promise<Viewport> {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
-    maximumScale: 1,
-    userScalable: false,
     themeColor: theme === "dark" ? DARK_BG : LIGHT_BG,
   };
 }
@@ -53,6 +51,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+        <a href="#main-content" className="skip-link">
+          {translate(lang, "a11y.skip")}
+        </a>
         <I18nProvider lang={lang} theme={theme}>
           {children}
         </I18nProvider>

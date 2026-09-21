@@ -23,7 +23,7 @@ export default async function VerifyEmailPage() {
   const { t } = await getT();
 
   return (
-    <main className="relative mx-auto w-full max-w-sm px-6 pb-12 pt-20">
+    <main id="main-content" className="relative mx-auto w-full max-w-sm px-6 pb-12 pt-20">
       <LanguageSwitch />
       <div className="mb-6 text-center">
         <Logo className="mb-4 inline-block h-14 w-14" />

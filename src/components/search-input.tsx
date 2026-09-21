@@ -26,6 +26,7 @@ export default function SearchInput({
         type="search"
         enterKeyHint="search"
         placeholder={placeholder}
+        aria-label={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`${inputClass} ${value ? "pr-11" : ""}`}

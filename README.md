@@ -11,8 +11,9 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 
 ## Hva appen kan
 
-- **Innlogging med IFI-brukernavn og passord.** Ingen e-post. Registrering ber om fullt
-  navn, brukernavn, IFI-brukernavn og passord (skrevet to ganger).
+- **Innlogging med IFI-brukernavn og passord.** Registrering ber om fullt navn, IFI-brukernavn
+  (bare små bokstaver, det er delen før @uio.no) og passord (skrevet to ganger). IFI-brukernavnet er
+  også brukernavnet i appen. Adressen bekreftes med en engangskode på e-post.
 - **Utforsk.** Alle kollokviegrupper du kan se, med søk, emnefilter og filter for
   offentlige/private. Fulle kollokviegrupper legges bakerst og merkes «Full». Kortene viser profilbildene til de
   fire første medlemmene.
@@ -24,10 +25,10 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
   blant 60 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
   En kort bio (160 tegn) er bare synlig for de som følger deg.
-- **Personvern og samtykke.** Fullstendig personvernerklæring (`/personvern`, norsk og engelsk), obligatorisk
+- **Personvern og samtykke.** Personvernerklæring (`/personvern`), bruksvilkår (`/vilkar`) og erklæring om
+  informasjonskapsler (`/informasjonskapsler`), alle på norsk og engelsk. Obligatorisk, ikke forhåndskrysset
   samtykke ved registrering, en samtykkeside (`/samtykke`) for eksisterende brukere, og «Last ned dataene mine»
-  og «Slett bruker» i Innstillinger. Innlogging lagres i langvarige informasjonskapsler, og en liten
-  melding sier «Logget inn som …» når appen åpnes.
+  og «Slett bruker» i Innstillinger. Se [Personvern, juridisk og tilgjengelighet](#personvern-juridisk-og-tilgjengelighet).
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med måneds- og semestervisning. Semestrene følger UiOs datoer (høst og vår, med kilde-lenke),
@@ -35,10 +36,11 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   kalenderen fyller skjermen uten at siden scroller: bokser og rader du sveiper i gjør jobben. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Du velger
   hvilke emner som vises og hvilken farge hvert emne har. Obliger og annet kan markeres som ferdige (med konfetti), og havner bakerst. Kollokviegruppene dine står på riktig dato.
 - **Søk** etter folk og kollokviegrupper, med resultatene i en egen scroll-boks og sider (30 per side).
+  Uten søketekst vises alle: folk du har flest felles kontakter med først, resten og kollokviegruppene A–Å.
 - **Lyst og mørkt tema** (hvitt og lyseblått, eller mørkt), og **norsk og engelsk**.
   Begge velges nederst i Innstillinger.
-- **Appfølelse på mobil.** Fast topp- og bunnmeny, låst side, ingen zoom, PWA som kan
-  legges til på hjemskjermen.
+- **Appfølelse på mobil.** Fast topp- og bunnmeny, låst side, PWA som kan legges til på hjemskjermen.
+  Innlogging og registrering fyller skjermen uten å scrolle. Nettleser-zoom er tillatt (tilgjengelighet).
 - **Oppdaterer seg selv.** Nye kollokviegrupper og innboksvarsler hentes automatisk
   hvert 30. sekund og når du kommer tilbake til appen, og det er en oppdater-knapp på
   Utforsk.
@@ -90,11 +92,12 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
 | `0023` | «Ferdig» på hendelser (`events.completed_at`) og ikon 01–45 |
 
-### 4. Skru av e-postbekreftelse
+### 4. E-postbekreftelse
 
-Appen bruker Supabase sin e-post/passord-innlogging med en utledet adresse
-(`brukernavn@kollokvie.internal`, se `src/lib/ifi-auth.ts`), så Supabase må ikke kreve
-bekreftelse: **Authentication → Sign In / Providers → Email → skru av «Confirm email»**.
+Uten e-postkode (se «E-postkode ved registrering» lenger ned) bruker appen en utledet adresse
+(`brukernavn@kollokvie.internal`, se `src/lib/ifi-auth.ts`), og Supabase må da **ikke** kreve bekreftelse
+(**Authentication → Sign In / Providers → Email → skru av «Confirm email»**). Med e-postkode skal den
+derimot være **på**. E-postmalene ligger ferdig i `supabase/email-templates/`.
 
 ### 5. Kjør appen
 
@@ -129,6 +132,76 @@ tilgang til `brukernavn@uio.no` og skrive inn en engangskode.
 
 Eksisterende brukere (laget før dette) blir bedt om å bekrefte UiO-e-posten sin én gang på `/bekreft`.
 Gjør stegene i rekkefølge: appen ber ikke om kode før steg 6.
+
+## Personvern, juridisk og tilgjengelighet
+
+> Dette er en teknisk gjennomgang, ikke juridisk rådgivning. Tekstene under `/personvern`, `/vilkar` og
+> `/informasjonskapsler` er skrevet for denne appen slik den fungerer nå, men la gjerne noen med juridisk
+> kompetanse lese gjennom dem, spesielt hvis appen vokser eller begynner å samle inn mer.
+
+### Sider og tekster
+
+| Side | Fil | Innhold |
+| --- | --- | --- |
+| `/personvern` | `src/lib/privacy-content.ts` | Personvernerklæring (GDPR): hvem, hva, hvorfor, hvem ser hva, databehandlere, lagringstid, rettigheter |
+| `/vilkar` | `src/lib/legal-content.ts` | Bruksvilkår: uavhengig av UiO, regler for bruk, innhold, fjerning, ansvar, norsk rett |
+| `/informasjonskapsler` | `src/lib/legal-content.ts` | Alle informasjonskapsler og lokal lagring, med varighet |
+
+Endrer du personvernerklæringen på en måte som krever nytt samtykke, endre `PRIVACY_VERSION` i `src/lib/privacy.ts`.
+Alle blir da bedt om å godta på nytt (`/samtykke`), og hvert samtykke lagres med versjon og tidspunkt.
+
+### Samtykke og skjemaer
+
+- Avkrysningsboksen ved registrering er **ikke forhåndskrysset**, og man kan ikke opprette bruker uten den. Den lenker til
+  personvernerklæringen og vilkårene.
+- Samtykkesiden har «Godta» og «Avslå» som like store knapper, og forklarer at man kan slette kontoen i stedet.
+- Å trekke samtykket er like enkelt som å gi det: «Slett bruker» i Innstillinger, uten omveier.
+- Informasjonsboksen om informasjonskapsler (`src/components/cookie-notice.tsx`) har bare «OK», fordi vi ikke bruker
+  kapsler som krever samtykke. Legger du til statistikk, reklame eller sporing, må den byttes ut med et ekte valg
+  (godta/avslå med lik vekt) som blokkerer dem til samtykke er gitt.
+
+### Datainnsamling (dataminimering)
+
+Obligatorisk: fullt navn, IFI-brukernavn (= e-postadressen `brukernavn@uio.no`) og passord (lagres som hash av Supabase Auth).
+Alt annet er **valgfritt**: studielinje, årstrinn, emner, GitHub/LinkedIn, bio, profilbilde, farge. Vi lagrer ingen
+telefonnummer, fødselsdato, adresse, posisjon eller enhets-ID-er, og ingen analyse. Kalenderhendelser er bare synlige for eieren.
+
+### Tredjeparter (revisjon)
+
+| Tjeneste | Hva | Sted | Merknad |
+| --- | --- | --- | --- |
+| Supabase | Database, innlogging, bildelagring | EU (Irland) | Databehandler. Signer DPA hos Supabase |
+| Vercel | Hosting | Dublin (`dub1`) | Databehandler. Signer DPA hos Vercel |
+| Resend | Sender e-postkoden | EU (Irland) | Databehandler. Signer DPA hos Resend |
+
+Ingen analyse-, reklame-, sporings-, chat- eller kartverktøy, og ingen skript, skrifter eller bilder lastes fra tredjeparts-domener
+i nettleseren (skriftene hostes selv via `next/font`). Avhengighetene i `package.json` er bare Next.js, React og Supabase-klientene.
+Legger du til en ny tjeneste: oppdater personvernerklæringen (§ 5), cookie-erklæringen, og denne tabellen.
+
+### Tilgjengelighet
+
+- «Hopp til innholdet»-lenke, riktige landemerker (`main`, `nav`, `header`), `lang`-attributt på siden.
+- Synlig fokusramme for tastaturbrukere, tastaturnavigasjon i faner (piltaster), dialoger (Escape, fokus fanges og
+  gjenopprettes) og nedtrekksmenyer (`aria-expanded`).
+- Alle felt og ikon-knapper har tilgjengelige navn. Feilmeldinger leses opp (`role="alert"`). Profilbilder er
+  dekorative (`alt=""`) fordi navnet står ved siden av; ikonvelgeren har navn på hvert ikon.
+- Respekterer «reduser bevegelse» (animasjoner og konfetti). Feilfarge har nok kontrast i lys og mørk modus.
+- Nettleser-zoom er tillatt. Felt er 16 px på berøringsskjermer, så iOS ikke zoomer inn av seg selv.
+
+### Sikkerhet
+
+Sikkerhetshoder settes i `next.config.ts` (nosniff, ingen innramming, strengt referrer-policy, HSTS, låst tillatelses-policy).
+Tilgang til data håndheves i databasen med Row Level Security. Ingen Content-Security-Policy ennå.
+
+### Dette må du gjøre selv
+
+1. **Legg inn en kontakt-e-post**: sett `NEXT_PUBLIC_CONTACT_EMAIL` i Vercel (Settings → Environment Variables) og deploy på nytt.
+   GDPR krever at brukerne kan kontakte behandlingsansvarlig. Uten den viser sidene bare navnet ditt.
+2. Les gjennom de tre tekstene og rett det som ikke stemmer (for eksempel navn på behandlingsansvarlig og databaseregion).
+3. Signer databehandleravtaler (DPA) med Supabase, Vercel og Resend (finnes i kontoinnstillingene deres).
+4. Ha en enkel oversikt over behandlingen (hva, hvorfor, hvem, hvor lenge). Tabellene over dekker mesteparten.
+5. Behold «Confirm email» skrudd på i Supabase Auth (se «E-postkode ved registrering»), ellers kan hvem som helst registrere seg med en annens adresse.
+6. Ta jevnlig stikkprøver på at slettede kontoer faktisk er borte, og slett inaktive test-kontoer.
 
 ## Deploy (Vercel)
 

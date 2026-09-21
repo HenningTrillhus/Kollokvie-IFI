@@ -97,6 +97,7 @@ export default function VerifyCodeForm({
         value={code}
         onChange={(e) => handleChange(e.target.value)}
         inputMode="numeric"
+        data-large
         autoComplete="one-time-code"
         autoFocus
         maxLength={MAX_LENGTH}
@@ -105,8 +106,16 @@ export default function VerifyCodeForm({
         className="block h-14 w-full rounded-xl border border-card-border bg-transparent text-center text-2xl font-semibold tracking-[0.35em] outline-none transition placeholder:text-muted/40 focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
-      {error && <p className="text-center text-sm text-red-500">{error}</p>}
-      {note && <p className="text-center text-sm text-accent">{note}</p>}
+      {error && (
+        <p role="alert" className="text-center text-sm text-red-500">
+          {error}
+        </p>
+      )}
+      {note && (
+        <p role="status" className="text-center text-sm text-accent">
+          {note}
+        </p>
+      )}
 
       <button
         type="submit"

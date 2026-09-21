@@ -42,8 +42,8 @@
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
-  /* No pinch-zoom: it's an app, not a document. */
-  touch-action: pan-x pan-y;
+  /* Double-tap zoom is off, pinch-zoom stays on (WCAG 1.4.4). */
+  touch-action: manipulation;
 }
 
 body {
@@ -178,5 +178,64 @@ input[type="search"]::-webkit-search-decoration {
   .animate-check-pop,
   .animate-fade-only {
     animation: none;
+  }
+}
+
+
+/* ---- Accessibility -------------------------------------------------- */
+
+/* A visible focus ring for keyboard users on links and buttons. (Text fields
+   already show their own accent ring.) */
+:where(a, button, summary, [role="tab"], [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* "Skip to content": hidden until it gets keyboard focus. */
+.skip-link {
+  position: fixed;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 0.75rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* iOS zooms into any field with text smaller than 16px when you tap it.
+   Keeping fields at 16px on touch screens stops that without disabling zoom. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([data-large]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Error red with enough contrast on both themes (red-500 is too pale). */
+.text-red-500 {
+  color: #c62828;
+}
+html[data-theme="dark"] .text-red-500 {
+  color: #f28b82;
+}
+
+/* Respect "reduce motion": no sliding, fading or smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
+import LegalLinks from "@/components/legal-links";
+import CookieNotice from "@/components/cookie-notice";
 import Logo from "@/components/logo";
 import { redirect } from "next/navigation";
 import { getAuthUser } from "@/lib/supabase/get-user";
@@ -15,7 +17,7 @@ export default async function Home() {
   const { t } = await getT();
 
   return (
-    <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
+    <main id="main-content" className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
       <LanguageSwitch />
 
       <div className="relative w-full max-w-sm text-center">
@@ -44,14 +46,11 @@ export default async function Home() {
           </Link>
         </div>
 
-        <p className="mt-8 text-xs text-muted">
-          {t("app.forStudents")}
-          {" · "}
-          <Link href="/personvern" className="underline-offset-2 transition hover:text-foreground hover:underline">
-            {t("privacy.link")}
-          </Link>
-        </p>
+        <p className="mt-8 text-xs text-muted">{t("app.forStudents")}</p>
+        <p className="mt-1 text-xs text-muted">{t("app.independent")}</p>
+        <LegalLinks className="mt-3 justify-center" />
       </div>
+      <CookieNotice />
     </main>
   );
 }

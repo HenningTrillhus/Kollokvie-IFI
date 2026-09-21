@@ -25,12 +25,30 @@ export default function SwipeTabs({ tabs }: { tabs: Tab[] }) {
 
   return (
     <div className={`overflow-hidden ${cardClass}`}>
-      <div role="tablist" className="relative flex border-b border-card-border">
+      <div
+        role="tablist"
+        // Arrow keys move between the tabs (and Home/End jump to the ends).
+        onKeyDown={(e) => {
+          const last = tabs.length - 1;
+          const next =
+            e.key === "ArrowRight" ? Math.min(active + 1, last)
+            : e.key === "ArrowLeft" ? Math.max(active - 1, 0)
+            : e.key === "Home" ? 0
+            : e.key === "End" ? last
+            : null;
+          if (next === null) return;
+          e.preventDefault();
+          goTo(next);
+          e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
+        }}
+        className="relative flex border-b border-card-border"
+      >
         {tabs.map((tab, i) => (
           <button
             key={tab.label}
             role="tab"
             aria-selected={active === i}
+            tabIndex={active === i ? 0 : -1}
             onClick={() => goTo(i)}
             className={`flex-1 px-3 py-3 text-sm font-medium transition active:opacity-70 ${
               active === i ? "text-foreground" : "text-muted"
@@ -61,7 +79,7 @@ export default function SwipeTabs({ tabs }: { tabs: Tab[] }) {
         className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
       >
         {tabs.map((tab) => (
-          <div key={tab.label} className="w-full shrink-0 snap-start snap-always">
+          <div key={tab.label} role="tabpanel" aria-label={tab.label} className="w-full shrink-0 snap-start snap-always">
             <div className="max-h-80 overflow-y-auto overscroll-contain p-2">
               {tab.content}
             </div>

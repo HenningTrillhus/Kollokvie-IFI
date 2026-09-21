@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n/client";
 
 // A panel that slides up from the bottom, with its own scrolling content.
@@ -17,12 +17,46 @@ export default function BottomSheet({
   children: ReactNode;
 }) {
   const { t } = useI18n();
-
+  const dialog = useRef<HTMLDivElement>(null);
+  // The latest onClose, without re-running the focus setup on every render.
+  const closeRef = useRef(onClose);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    closeRef.current = onClose;
+  });
+
+  // Keyboard: Escape closes, Tab stays inside the sheet, and focus returns to
+  // whatever opened it.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    dialog.current?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeRef.current();
+        return;
+      }
+      if (e.key !== "Tab" || !dialog.current) return;
+      const focusable = dialog.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === dialog.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus?.();
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true" aria-label={title}>
@@ -31,7 +65,7 @@ export default function BottomSheet({
         onClick={onClose}
         className="animate-fade-only absolute inset-0 bg-black/40"
       />
-      <div className={`animate-sheet-up relative flex ${tall ? "h-[94%]" : "max-h-[80%]"} w-full max-w-xl flex-col rounded-t-3xl border border-b-0 border-card-border bg-card pb-[env(safe-area-inset-bottom)] shadow-2xl`}>
+      <div ref={dialog} tabIndex={-1} className={`animate-sheet-up relative flex ${tall ? "h-[94%]" : "max-h-[80%]"} w-full max-w-xl flex-col rounded-t-3xl border border-b-0 border-card-border bg-card pb-[env(safe-area-inset-bottom)] shadow-2xl outline-none`}>
         <div className="flex items-center justify-between px-5 pb-2 pt-4">
           <span aria-hidden className="absolute left-1/2 top-2 h-1 w-9 -translate-x-1/2 rounded-full bg-card-border" />
           <h2 className="text-base font-semibold">{title}</h2>

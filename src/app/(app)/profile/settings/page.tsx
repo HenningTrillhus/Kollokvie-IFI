@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import LegalLinks from "@/components/legal-links";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -444,12 +445,7 @@ export default function SettingsPage() {
 
       <section className="mt-4 space-y-2.5 border-t border-card-border pt-4">
         <div className="flex items-center justify-between gap-3">
-          <Link
-            href="/personvern"
-            className="text-xs text-muted transition hover:text-foreground"
-          >
-            {t("settings.privacy")}
-          </Link>
+          <LegalLinks />
           <button
             type="button"
             onClick={handleExport}

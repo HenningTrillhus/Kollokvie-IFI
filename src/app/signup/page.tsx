@@ -239,12 +239,20 @@ export default function SignupPage() {
                 >
                   {t("auth.privacyLink")}
                 </Link>
+                {t("auth.consentAnd")}
+                <Link
+                  href="/vilkar"
+                  target="_blank"
+                  className="font-medium text-accent hover:text-accent-hover"
+                >
+                  {t("auth.termsLink")}
+                </Link>
                 {t("auth.consentAfter")}
               </span>
             </label>
 
             {errorMessage && (
-              <p className="text-sm text-red-500">{errorMessage}</p>
+              <p role="alert" className="text-sm text-red-500">{errorMessage}</p>
             )}
 
             <button

@@ -9,7 +9,7 @@ export type PolicySection = {
   bullets?: string[];
 };
 
-type Policy = {
+export type Policy = {
   title: string;
   intro: string;
   summaryTitle: string;
@@ -28,6 +28,7 @@ const no: Policy = {
     "Andre innloggede brukere ser deler av profilen din: navn, brukernavn, studielinje, emner og profilbilde. Bioen din ser bare de som følger deg.",
     "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema).",
     "Du kan når som helst laste ned dataene dine, endre dem eller slette kontoen, og dermed trekke samtykket ditt.",
+    "Bruken din er også omfattet av bruksvilkårene.",
   ],
   sections: [
     {
@@ -97,12 +98,18 @@ const no: Policy = {
     {
       heading: "8. Informasjonskapsler",
       paragraphs: [
-        "Vi bruker bare informasjonskapsler som er nødvendige for at tjenesten skal fungere. De krever ikke samtykke etter ekomloven § 3-15, men du skal informeres om dem:",
+        "Vi bruker bare informasjonskapsler og lokal lagring som er nødvendige for at tjenesten skal fungere. De krever ikke samtykke etter ekomloven § 3-15, men du skal informeres om dem. Full oversikt, også over lokal lagring i nettleseren, finner du i erklæringen om informasjonskapsler. Kapslene er:",
       ],
       bullets: [
         "sb-…-auth-token: holder deg innlogget. Varer i inntil 400 dager, eller til du logger ut.",
         "lang: valgt språk. Varer i ett år.",
         "theme: valgt tema (lys eller mørk). Varer i ett år.",
+      ],
+    },
+    {
+      heading: "8b. Lokal lagring",
+      paragraphs: [
+        "Vi bruker også lokal lagring i nettleseren (for eksempel for å huske hvor du var i søkeresultatene, og at du har lukket informasjonsboksen om informasjonskapsler). Alt om dette står i erklæringen om informasjonskapsler og lokal lagring.",
       ],
     },
     {
@@ -118,7 +125,13 @@ const no: Policy = {
       ],
     },
     {
-      heading: "11. Endringer",
+      heading: "11. Automatiserte avgjørelser",
+      paragraphs: [
+        "Vi bruker ingen automatiserte avgjørelser eller profilering som har rettslig eller lignende betydelig virkning for deg.",
+      ],
+    },
+    {
+      heading: "12. Endringer",
       paragraphs: [
         "Endrer vi erklæringen på en måte som krever nytt samtykke, ber vi deg godta den på nytt neste gang du åpner appen.",
       ],
@@ -137,6 +150,7 @@ const en: Policy = {
     "Other signed-in users can see parts of your profile: name, username, study program, courses and profile picture. Only people who follow you can see your bio.",
     "We only use strictly necessary cookies (sign-in, language and theme).",
     "You can download your data, change it or delete your account at any time, which also withdraws your consent.",
+    "Your use of the service is also covered by the terms of service.",
   ],
   sections: [
     {
@@ -206,12 +220,18 @@ const en: Policy = {
     {
       heading: "8. Cookies",
       paragraphs: [
-        "We only use cookies that are necessary for the service to work. They don't require consent under the Norwegian Electronic Communications Act § 3-15, but you should be informed about them:",
+        "We only use cookies and local storage that are necessary for the service to work. They don't require consent under the Norwegian Electronic Communications Act § 3-15, but you should be informed about them. A full overview, including local storage in your browser, is in the cookies policy. The cookies are:",
       ],
       bullets: [
         "sb-…-auth-token: keeps you signed in. Lasts up to 400 days, or until you sign out.",
         "lang: your chosen language. Lasts one year.",
         "theme: your chosen theme (light or dark). Lasts one year.",
+      ],
+    },
+    {
+      heading: "8b. Local storage",
+      paragraphs: [
+        "We also use local storage in your browser (for example to remember where you were in the search results, and that you closed the cookie information box). Everything about this is in the cookies and local storage policy.",
       ],
     },
     {
@@ -227,7 +247,13 @@ const en: Policy = {
       ],
     },
     {
-      heading: "11. Changes",
+      heading: "11. Automated decisions",
+      paragraphs: [
+        "We don't use automated decision-making or profiling that has legal or similarly significant effects on you.",
+      ],
+    },
+    {
+      heading: "12. Changes",
       paragraphs: [
         "If we change this policy in a way that requires new consent, we will ask you to accept it again the next time you open the app.",
       ],

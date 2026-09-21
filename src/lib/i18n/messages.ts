@@ -8,8 +8,12 @@ export const messages = {
     en: "Find and stay in touch with your study group",
   },
   "app.forStudents": {
-    no: "Laget for studenter ved Institutt for informatikk, UiO",
-    en: "Made for students at the Department of Informatics, UiO",
+    no: "For studenter ved Institutt for informatikk, UiO",
+    en: "For students at the Department of Informatics, UiO",
+  },
+  "app.independent": {
+    no: "Et uavhengig studentprosjekt, ikke drevet av eller tilknyttet UiO.",
+    en: "An independent student project, not run by or affiliated with UiO.",
   },
 
   // ---- common
@@ -67,13 +71,15 @@ export const messages = {
   },
   "auth.consentBefore": { no: "Jeg har lest ", en: "I have read the " },
   "auth.privacyLink": { no: "personvernerklæringen", en: "privacy policy" },
+  "auth.consentAnd": { no: " og ", en: " and the " },
+  "auth.termsLink": { no: "bruksvilkårene", en: "terms of service" },
   "auth.consentAfter": {
-    no: " og samtykker til at opplysningene mine behandles slik den beskriver.",
-    en: " and consent to my information being processed as it describes.",
+    no: ", og samtykker til at opplysningene mine behandles slik personvernerklæringen beskriver.",
+    en: ", and consent to my information being processed as the privacy policy describes.",
   },
   "auth.consentRequired": {
-    no: "Du må godta personvernerklæringen for å opprette bruker.",
-    en: "You need to accept the privacy policy to create an account.",
+    no: "Du må godta personvernerklæringen og bruksvilkårene for å opprette bruker.",
+    en: "You need to accept the privacy policy and the terms of service to create an account.",
   },
   "auth.ifiEmailHint": {
     no: "Vi sender en kode til {email}. Du må ha tilgang til den for å registrere deg.",
@@ -138,6 +144,17 @@ export const messages = {
 
   // ---- privacy & consent
   "privacy.link": { no: "Personvern", en: "Privacy" },
+  "terms.link": { no: "Vilkår", en: "Terms" },
+  "cookies.link": { no: "Informasjonskapsler", en: "Cookies" },
+  "legal.nav": { no: "Juridisk informasjon", en: "Legal information" },
+  "cookies.noticeTitle": { no: "Informasjon om informasjonskapsler", en: "Cookie information" },
+  "cookies.notice": {
+    no: "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema). Ingen sporing eller reklame.",
+    en: "We only use necessary cookies (sign-in, language and theme). No tracking or advertising.",
+  },
+  "cookies.readMore": { no: "Les mer", en: "Read more" },
+  "cookies.ok": { no: "OK", en: "OK" },
+  "a11y.skip": { no: "Hopp til innholdet", en: "Skip to content" },
   "privacy.back": { no: "← Tilbake", en: "← Back" },
   "privacy.updated": { no: "Sist oppdatert: {date}", en: "Last updated: {date}" },
   "privacy.contactHeading": { no: "Kontakt", en: "Contact" },
@@ -152,6 +169,10 @@ export const messages = {
     en: "Kollokvie@IFI needs your consent to process your information. This is what matters most:",
   },
   "consent.readMore": { no: "Les hele personvernerklæringen", en: "Read the full privacy policy" },
+  "consent.terms": {
+    no: "Ved å fortsette godtar du også bruksvilkårene.",
+    en: "By continuing you also accept the terms of service.",
+  },
   "consent.accept": { no: "Godta og fortsett", en: "Accept and continue" },
   "consent.accepting": { no: "Lagrer…", en: "Saving…" },
   "consent.decline": { no: "Avslå og logg ut", en: "Decline and sign out" },

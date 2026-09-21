@@ -140,7 +140,7 @@ export default function LoginPage() {
             </div>
 
             {errorMessage && (
-              <p className="text-sm text-red-500">{errorMessage}</p>
+              <p role="alert" className="text-sm text-red-500">{errorMessage}</p>
             )}
 
             <button

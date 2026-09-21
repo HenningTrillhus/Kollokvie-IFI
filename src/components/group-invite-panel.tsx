@@ -90,6 +90,7 @@ export default function GroupInvitePanel({
         type="text"
         autoFocus
         placeholder={t("search.peoplePlaceholder")}
+        aria-label={t("search.peoplePlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className={inputClass}

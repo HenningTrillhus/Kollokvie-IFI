@@ -5,6 +5,7 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfileById } from "@/lib/profiles";
 import ConsentActions from "@/components/consent-actions";
 import LanguageSwitch from "@/components/language-switch";
+import LegalLinks from "@/components/legal-links";
 import Logo from "@/components/logo";
 import { getPolicy } from "@/lib/privacy-content";
 import { PRIVACY_VERSION } from "@/lib/privacy";
@@ -26,7 +27,7 @@ export default async function ConsentPage() {
   const policy = getPolicy(lang);
 
   return (
-    <main className="relative mx-auto w-full max-w-md px-6 pb-12 pt-16">
+    <main id="main-content" className="relative mx-auto w-full max-w-md px-6 pb-12 pt-16">
       <LanguageSwitch />
 
       <div className="mb-6 text-center">
@@ -47,7 +48,7 @@ export default async function ConsentPage() {
         ))}
       </ul>
 
-      <p className="mb-5 text-center text-sm">
+      <p className="mb-2 text-center text-sm">
         <Link
           href="/personvern"
           className="font-medium text-accent hover:text-accent-hover"
@@ -55,6 +56,8 @@ export default async function ConsentPage() {
           {t("consent.readMore")}
         </Link>
       </p>
+      <p className="mb-3 text-center text-xs text-muted">{t("consent.terms")}</p>
+      <LegalLinks className="mb-5 justify-center" />
 
       <ConsentActions userId={user.id} />
     </main>

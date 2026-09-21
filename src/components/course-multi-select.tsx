@@ -114,6 +114,7 @@ export default function CourseMultiSelect({
         }}
         onFocus={() => setOpen(true)}
         placeholder={t("course.searchPlaceholder")}
+        aria-label={t("course.searchPlaceholder")}
         className="w-full rounded-xl border border-card-border bg-transparent h-11 px-3.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       />
 
@@ -148,6 +149,7 @@ export default function CourseMultiSelect({
                     type="text"
                     autoFocus
                     placeholder={t("course.customName")}
+                    aria-label={t("course.customName")}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     className="w-full rounded-lg border border-card-border bg-transparent px-3 py-1.5 text-sm outline-none focus:border-accent"

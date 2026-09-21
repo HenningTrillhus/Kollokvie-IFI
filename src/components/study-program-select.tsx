@@ -36,6 +36,8 @@ export default function StudyProgramSelect({
     <div ref={ref} className="relative">
       <button
         type="button"
+        aria-expanded={open}
+        aria-haspopup="true"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between rounded-xl border border-card-border bg-transparent h-11 px-3.5 text-left text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
       >
@@ -51,6 +53,7 @@ export default function StudyProgramSelect({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("select.search")}
+            aria-label={t("select.search")}
             className="w-full border-b border-card-border bg-transparent px-4 py-2 text-sm outline-none"
           />
           <div className="max-h-64 overflow-y-auto">
