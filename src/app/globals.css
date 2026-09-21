@@ -326,3 +326,8 @@ body {
     overflow: hidden;
   }
 }
+
+/* The GitHub logo is a black circle: white on the dark theme, so it stays visible. */
+html[data-theme="dark"] .invert-in-dark {
+  filter: invert(1);
+}

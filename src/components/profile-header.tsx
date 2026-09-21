@@ -7,7 +7,7 @@ import { LockIcon } from "@/components/meta-icons";
 import type { Course } from "@/lib/courses";
 import { programLabel } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
-import type { Profile } from "@/lib/profiles";
+import { safeLinkUrl, type Profile } from "@/lib/profiles";
 
 // A small heading inside a card.
 function Label({ children }: { children: ReactNode }) {
@@ -35,7 +35,10 @@ export default async function ProfileHeader({
   actions?: ReactNode;
 }) {
   const { t, lang } = await getT();
-  const hasLinks = Boolean(profile.github_url || profile.linkedin_url);
+  // The links card only exists if there is at least one valid link to show.
+  const hasLinks = Boolean(
+    safeLinkUrl("github", profile.github_url) || safeLinkUrl("linkedin", profile.linkedin_url)
+  );
   const rise = (i: number) => ({ ["--i" as string]: i });
 
   return (
