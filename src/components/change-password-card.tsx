@@ -1,24 +1,42 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Collapsible from "@/components/collapsible";
 import { Card, Field, inputClass } from "@/components/form-ui";
 import { MIN_PASSWORD_LENGTH } from "@/lib/passwords";
 import { useI18n } from "@/lib/i18n/client";
 
-// "Change password" for a signed-in user. Signs every other device out.
+// "Change password" for a signed-in user. Hidden until you ask for it, and it
+// signs every other device out once the new password is saved.
 export default function ChangePasswordCard() {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const firstField = useRef<HTMLInputElement>(null);
+
+  function openForm() {
+    setDone(false);
+    setError("");
+    setOpen(true);
+    // Wait for the panel to start opening, then put the cursor in the first field.
+    setTimeout(() => firstField.current?.focus(), 120);
+  }
+
+  function closeForm() {
+    setOpen(false);
+    setPassword("");
+    setConfirm("");
+    setError("");
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    setDone(false);
 
     if (password.length < MIN_PASSWORD_LENGTH) {
       setError(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
@@ -45,55 +63,83 @@ export default function ChangePasswordCard() {
     await supabase.auth.signOut({ scope: "others" });
 
     setSaving(false);
-    setPassword("");
-    setConfirm("");
+    closeForm();
     setDone(true);
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
-      <Card>
-        <h2 className="text-sm font-semibold">{t("password.title")}</h2>
-        <Field label={t("reset.newPassword")} htmlFor="changePassword">
-          <input
-            id="changePassword"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field label={t("auth.confirmPassword")} htmlFor="changePasswordConfirm">
-          <input
-            id="changePasswordConfirm"
-            type="password"
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-
-        {error && (
-          <p role="alert" className="text-sm text-red-500">
-            {error}
-          </p>
+    <Card>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold">{t("password.title")}</h2>
+          <p className="mt-0.5 text-xs text-muted">{t("password.description")}</p>
+        </div>
+        {!open && (
+          <button
+            type="button"
+            onClick={openForm}
+            className="shrink-0 rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft active:scale-95"
+          >
+            {t("password.change")}
+          </button>
         )}
-        {done && (
-          <p role="status" className="text-sm text-accent">
-            {t("password.done")}
-          </p>
-        )}
+      </div>
 
-        <button
-          type="submit"
-          disabled={saving || !password || !confirm}
-          className="h-11 w-full rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-[0.99] disabled:opacity-50"
-        >
-          {saving ? t("reset.saving") : t("password.change")}
-        </button>
-      </Card>
-    </form>
+      {done && !open && (
+        <p role="status" className="animate-pop text-sm text-accent">
+          ✓ {t("password.done")}
+        </p>
+      )}
+
+      <Collapsible open={open}>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+          <Field label={t("reset.newPassword")} htmlFor="changePassword">
+            <input
+              ref={firstField}
+              id="changePassword"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+          <Field label={t("auth.confirmPassword")} htmlFor="changePasswordConfirm">
+            <input
+              id="changePasswordConfirm"
+              type="password"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+
+          {error && (
+            <p role="alert" className="text-sm text-red-500">
+              {error}
+            </p>
+          )}
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="submit"
+              disabled={saving || !password || !confirm}
+              className="h-10 rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50"
+            >
+              {saving ? t("reset.saving") : t("reset.save")}
+            </button>
+            <button
+              type="button"
+              onClick={closeForm}
+              disabled={saving}
+              className="h-10 rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-[0.98]"
+            >
+              {t("common.cancel")}
+            </button>
+          </div>
+        </form>
+      </Collapsible>
+    </Card>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import LegalLinks from "@/components/legal-links";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -16,7 +15,9 @@ import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
 import ChangePasswordCard from "@/components/change-password-card";
 import AvatarPicker from "@/components/avatar-picker";
-import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
+import { Card, Field, SectionTitle, StickyBar, inputClass } from "@/components/form-ui";
+import { ChevronRightIcon } from "@/components/meta-icons";
+import Collapsible from "@/components/collapsible";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { downloadMyData } from "@/lib/export-data";
 import { useI18n } from "@/lib/i18n/client";
@@ -51,6 +52,7 @@ export default function SettingsPage() {
   const [studyProgram, setStudyProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
+  const [savedCourses, setSavedCourses] = useState<Course[]>([]);
 
   // What's saved in the database, so Save is only active when something changed.
   const [saved, setSaved] = useState<Fields | null>(null);
@@ -102,6 +104,7 @@ export default function SettingsPage() {
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
       }
       setCourses(userCourses);
+      setSavedCourses(userCourses);
       setBio(savedBio);
       setSaved({
         bio: savedBio,
@@ -126,6 +129,16 @@ export default function SettingsPage() {
     courseCodes: courses.map((c) => c.code),
   };
   const dirty = saved !== null && JSON.stringify(current) !== JSON.stringify(saved);
+
+  // Closing the tab or reloading with unsaved changes asks first.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   // Any edit clears the "Saved" note.
   function edit<T>(setter: (value: T) => void) {
@@ -235,6 +248,7 @@ export default function SettingsPage() {
       githubUrl: github ?? "",
       linkedinUrl: linkedin ?? "",
     });
+    setSavedCourses(courses);
     setBio(trimmedBio);
     setFullName(trimmedName);
     setGithubUrl(github ?? "");
@@ -242,6 +256,19 @@ export default function SettingsPage() {
     setSaving(false);
     setJustSaved(true);
     router.refresh();
+  }
+
+  // Put every field back to what is saved.
+  function discardChanges() {
+    if (!saved) return;
+    setBio(saved.bio);
+    setFullName(saved.fullName);
+    setGithubUrl(saved.githubUrl);
+    setLinkedinUrl(saved.linkedinUrl);
+    setStudyProgram(saved.studyProgram);
+    setStudyYear(saved.studyYear);
+    setCourses(savedCourses);
+    setErrorMessage("");
   }
 
   async function handleExport() {
@@ -299,204 +326,290 @@ export default function SettingsPage() {
     );
   }
 
+  // The save bar only shows while there is something to save (and for a moment after).
+  const showBar = dirty || saving || justSaved;
+  const rise = (i: number) => ({ ["--i" as string]: i });
+
   return (
-    <div className="mx-auto w-full max-w-md px-6 pt-5 md:max-w-xl md:pt-7">
+    <div className="mx-auto w-full max-w-md px-6 pb-8 pt-5 md:max-w-xl md:pt-7 lg:max-w-5xl">
       <Link
         href="/profile"
-        className="text-sm font-medium text-muted transition hover:text-foreground"
+        className="inline-block text-sm font-medium text-muted transition hover:text-foreground"
       >
         {t("profile.backToProfile")}
       </Link>
 
       <h1 className="mb-5 mt-3 text-xl font-semibold">{t("settings.title")}</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Card>
-          <AvatarPicker
-            profile={{
-              id: userId,
-              full_name: fullName,
-              username: ifiUsername,
-              accent_color: accentColor,
-            }}
-            value={avatar}
-            onChange={setAvatar}
-            onColorChange={setAccentColor}
-          />
-        </Card>
+      <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-8 lg:space-y-0">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <section style={rise(0)} className="animate-rise">
+            <SectionTitle>{t("settings.secProfile")}</SectionTitle>
+            <div className="space-y-4">
+              <Card>
+                <AvatarPicker
+                  profile={{
+                    id: userId,
+                    full_name: fullName,
+                    username: ifiUsername,
+                    accent_color: accentColor,
+                  }}
+                  value={avatar}
+                  onChange={setAvatar}
+                  onColorChange={setAccentColor}
+                />
+              </Card>
 
-        <Card>
-          <Field label={t("auth.fullName")} htmlFor="fullName">
-            <input
-              id="fullName"
-              type="text"
-              required
-              maxLength={100}
-              autoComplete="name"
-              value={fullName}
-              onChange={(e) => edit(setFullName)(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
+              <Card>
+                <Field label={t("auth.fullName")} htmlFor="fullName">
+                  <input
+                    id="fullName"
+                    type="text"
+                    required
+                    maxLength={100}
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => edit(setFullName)(e.target.value)}
+                    className={inputClass}
+                  />
+                </Field>
 
-          <Field label={t("settings.bio")} htmlFor="bio" hint={t("settings.bioHint")}>
-            <textarea
-              id="bio"
-              rows={3}
-              maxLength={BIO_MAX}
-              placeholder={t("settings.bioPlaceholder")}
-              value={bio}
-              onChange={(e) => edit(setBio)(e.target.value)}
-              className="block w-full min-w-0 resize-none rounded-xl border border-card-border bg-transparent px-3.5 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-            />
-            <p className="mt-1 text-right text-xs text-muted">
-              {bio.length}/{BIO_MAX}
+                <Field label={t("settings.bio")} htmlFor="bio" hint={t("settings.bioHint")}>
+                  <textarea
+                    id="bio"
+                    rows={3}
+                    maxLength={BIO_MAX}
+                    placeholder={t("settings.bioPlaceholder")}
+                    value={bio}
+                    onChange={(e) => edit(setBio)(e.target.value)}
+                    className="block w-full min-w-0 resize-none rounded-xl border border-card-border bg-transparent px-3.5 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+                  />
+                  <p
+                    className={`mt-1 text-right text-xs transition-colors ${
+                      bio.length >= BIO_MAX - 10 ? "text-accent" : "text-muted"
+                    }`}
+                  >
+                    {bio.length}/{BIO_MAX}
+                  </p>
+                </Field>
+
+                <Field
+                  label={t("auth.ifiUsername")}
+                  htmlFor="ifiUsername"
+                  hint={t("settings.ifiLocked")}
+                >
+                  <input
+                    id="ifiUsername"
+                    type="text"
+                    disabled
+                    value={ifiUsername}
+                    className={`${inputClass} cursor-not-allowed text-muted opacity-70`}
+                  />
+                </Field>
+              </Card>
+            </div>
+          </section>
+
+          <section style={rise(1)} className="animate-rise">
+            <SectionTitle>{t("settings.secStudy")}</SectionTitle>
+            <Card>
+              <Field label={t("settings.program")}>
+                <StudyProgramSelect
+                  value={studyProgram}
+                  onChange={edit(setStudyProgram)}
+                  options={STUDY_PROGRAMS}
+                />
+              </Field>
+
+              <Field label={t("settings.year")} htmlFor="studyYear">
+                <select
+                  id="studyYear"
+                  value={studyYear}
+                  onChange={(e) => edit(setStudyYear)(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">{t("common.notSelected")}</option>
+                  {STUDY_YEARS.map((year) => (
+                    <option key={year} value={year}>
+                      {t("profile.year", { n: year })}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label={t("settings.courses")} hint={t("settings.coursesHint")}>
+                <CourseMultiSelect selected={courses} onChange={edit(setCourses)} />
+              </Field>
+            </Card>
+          </section>
+
+          <section style={rise(2)} className="animate-rise">
+            <SectionTitle>{t("settings.secLinks")}</SectionTitle>
+            <Card>
+              <Field label={t("settings.github")} htmlFor="githubUrl">
+                <input
+                  id="githubUrl"
+                  type="text"
+                  maxLength={250}
+                  inputMode="url"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  placeholder="github.com/brukernavn"
+                  value={githubUrl}
+                  onChange={(e) => edit(setGithubUrl)(e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label={t("settings.linkedin")} htmlFor="linkedinUrl">
+                <input
+                  id="linkedinUrl"
+                  type="text"
+                  maxLength={250}
+                  inputMode="url"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  placeholder="linkedin.com/in/brukernavn"
+                  value={linkedinUrl}
+                  onChange={(e) => edit(setLinkedinUrl)(e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
+            </Card>
+          </section>
+
+          {errorMessage && (
+            <p role="alert" className="animate-pop text-sm text-red-500">
+              {errorMessage}
             </p>
-          </Field>
+          )}
 
-          <Field
-            label={t("auth.ifiUsername")}
-            htmlFor="ifiUsername"
-            hint={t("settings.ifiLocked")}
-          >
-            <input
-              id="ifiUsername"
-              type="text"
-              disabled
-              value={ifiUsername}
-              className={`${inputClass} cursor-not-allowed text-muted opacity-70`}
-            />
-          </Field>
-        </Card>
+          {showBar && (
+            <>
+              <StickyBar className="animate-sheet-up lg:mx-0 lg:rounded-2xl lg:border lg:px-4">
+                <div className="flex items-center gap-3">
+                  <p
+                    aria-live="polite"
+                    className={`min-w-0 flex-1 truncate text-xs ${
+                      dirty ? "text-muted" : "text-accent"
+                    }`}
+                  >
+                    {dirty ? t("settings.unsaved") : justSaved ? `✓ ${t("common.saved")}` : ""}
+                  </p>
+                  {dirty && !saving && (
+                    <button
+                      type="button"
+                      onClick={discardChanges}
+                      className="h-11 shrink-0 rounded-xl border border-card-border px-4 text-sm font-medium transition hover:bg-accent-soft active:scale-[0.98]"
+                    >
+                      {t("settings.discard")}
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={saving || !dirty}
+                    className="h-11 shrink-0 rounded-xl bg-accent px-6 text-sm font-medium text-white transition hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50"
+                  >
+                    {saving ? t("common.saving") : t("common.save")}
+                  </button>
+                </div>
+              </StickyBar>
+            </>
+          )}
+        </form>
 
-        <Card>
-          <Field label={t("settings.program")}>
-            <StudyProgramSelect
-              value={studyProgram}
-              onChange={edit(setStudyProgram)}
-              options={STUDY_PROGRAMS}
-            />
-          </Field>
+        <aside className="space-y-6">
+          <section style={rise(3)} className="animate-rise">
+            <SectionTitle>{t("settings.secAppearance")}</SectionTitle>
+            <AppearanceSettings />
+          </section>
 
-          <Field label={t("settings.year")} htmlFor="studyYear">
-            <select
-              id="studyYear"
-              value={studyYear}
-              onChange={(e) => edit(setStudyYear)(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">{t("common.notSelected")}</option>
-              {STUDY_YEARS.map((year) => (
-                <option key={year} value={year}>
-                  {t("profile.year", { n: year })}
-                </option>
+          <section style={rise(4)} className="animate-rise">
+            <SectionTitle>{t("settings.secSecurity")}</SectionTitle>
+            <ChangePasswordCard />
+          </section>
+
+          <section style={rise(5)} className="animate-rise">
+            <SectionTitle>{t("settings.secData")}</SectionTitle>
+            <div className="divide-y divide-card-border overflow-hidden rounded-2xl border border-card-border bg-card">
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={exporting}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-accent-soft/60 active:bg-accent-soft disabled:opacity-60"
+              >
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium">
+                    {exporting ? t("settings.exporting") : t("settings.export")}
+                  </span>
+                  <span className="block text-xs text-muted">{t("settings.exportHint")}</span>
+                </span>
+                <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted" />
+              </button>
+              {(
+                [
+                  ["/personvern", t("settings.privacy")],
+                  ["/vilkar", t("terms.link")],
+                  ["/informasjonskapsler", t("cookies.link")],
+                ] as const
+              ).map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium transition hover:bg-accent-soft/60 active:bg-accent-soft"
+                >
+                  {label}
+                  <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted" />
+                </Link>
               ))}
-            </select>
-          </Field>
+            </div>
+            {exportError && (
+              <p role="alert" className="mt-2 text-xs text-red-500">
+                {t("settings.exportError")}
+              </p>
+            )}
+          </section>
 
-          <Field label={t("settings.courses")} hint={t("settings.coursesHint")}>
-            <CourseMultiSelect selected={courses} onChange={edit(setCourses)} />
-          </Field>
-        </Card>
+          <section style={rise(6)} className="animate-rise">
+            <div className="rounded-2xl border border-red-500/30 bg-card p-4">
+              <h2 className="text-sm font-semibold text-red-500">{t("settings.deleteTitle")}</h2>
+              <p className="mt-1 text-xs text-muted">{t("settings.deleteText")}</p>
+              {deleteError && (
+                <p role="alert" className="mt-2 text-xs text-red-500">
+                  {deleteError}
+                </p>
+              )}
 
-        <Card>
-          <Field label={t("settings.github")} htmlFor="githubUrl">
-            <input
-              id="githubUrl"
-              type="text"
-              maxLength={250}
-              inputMode="url"
-              autoCapitalize="none"
-              autoCorrect="off"
-              placeholder="github.com/brukernavn"
-              value={githubUrl}
-              onChange={(e) => edit(setGithubUrl)(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
+              <Collapsible open={confirmingDelete}>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={deleting}
+                    className="h-9 rounded-xl bg-red-500 text-xs font-medium text-white transition hover:bg-red-600 active:scale-[0.98] disabled:opacity-60"
+                  >
+                    {deleting ? t("common.deleting") : t("settings.deleteConfirm")}
+                  </button>
+                  <button
+                    onClick={() => setConfirmingDelete(false)}
+                    disabled={deleting}
+                    className="h-9 rounded-xl border border-card-border text-xs font-medium transition hover:bg-accent-soft active:scale-[0.98]"
+                  >
+                    {t("common.cancel")}
+                  </button>
+                </div>
+              </Collapsible>
 
-          <Field label={t("settings.linkedin")} htmlFor="linkedinUrl">
-            <input
-              id="linkedinUrl"
-              type="text"
-              maxLength={250}
-              inputMode="url"
-              autoCapitalize="none"
-              autoCorrect="off"
-              placeholder="linkedin.com/in/brukernavn"
-              value={linkedinUrl}
-              onChange={(e) => edit(setLinkedinUrl)(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
-        </Card>
-
-        {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
-
-        <StickyBar>
-          <button
-            type="submit"
-            disabled={saving || !dirty}
-            className="h-11 w-full rounded-xl bg-accent px-4 text-sm font-medium text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50"
-          >
-            {saving
-              ? t("common.saving")
-              : justSaved && !dirty
-                ? `✓ ${t("common.saved")}`
-                : t("common.save")}
-          </button>
-        </StickyBar>
-      </form>
-
-      <AppearanceSettings />
-
-      <ChangePasswordCard />
-
-      <section className="mt-4 space-y-2.5 border-t border-card-border pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <LegalLinks />
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={exporting}
-            className="rounded-lg border border-card-border px-2.5 py-1 text-xs font-medium transition hover:bg-accent-soft active:scale-95 disabled:opacity-60"
-          >
-            {exporting ? t("settings.exporting") : t("settings.export")}
-          </button>
-        </div>
-        {exportError && <p className="text-xs text-red-500">{t("settings.exportError")}</p>}
-      </section>
-
-      <div className="mb-6 mt-6 rounded-xl border border-red-500/30 p-4">
-        <h2 className="text-sm font-semibold text-red-500">{t("settings.deleteTitle")}</h2>
-        <p className="mt-1 text-xs text-muted">{t("settings.deleteText")}</p>
-        {deleteError && <p className="mt-2 text-xs text-red-500">{deleteError}</p>}
-
-        {confirmingDelete ? (
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={handleDeleteAccount}
-              disabled={deleting}
-              className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
-            >
-              {deleting ? t("common.deleting") : t("settings.deleteConfirm")}
-            </button>
-            <button
-              onClick={() => setConfirmingDelete(false)}
-              disabled={deleting}
-              className="rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft"
-            >
-              {t("common.cancel")}
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setConfirmingDelete(true)}
-            className="mt-3 rounded-lg border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10"
-          >
-            {t("settings.deleteTitle")}
-          </button>
-        )}
+              {!confirmingDelete && (
+                <button
+                  onClick={() => setConfirmingDelete(true)}
+                  className="mt-3 rounded-lg border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10 active:scale-95"
+                >
+                  {t("settings.deleteTitle")}
+                </button>
+              )}
+            </div>
+          </section>
+        </aside>
       </div>
     </div>
   );

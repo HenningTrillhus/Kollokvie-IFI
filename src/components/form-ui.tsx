@@ -101,9 +101,17 @@ export function Field({
 }
 
 // Pinned to the bottom of the scrolling page, above the tab bar.
-export function StickyBar({ children }: { children: ReactNode }) {
+export function StickyBar({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="sticky bottom-0 z-20 -mx-6 border-t border-card-border bg-background/95 px-6 py-3 backdrop-blur">
+    <div
+      className={`sticky bottom-0 z-20 -mx-6 border-t border-card-border bg-background/95 px-6 py-3 backdrop-blur ${className}`}
+    >
       {children}
     </div>
   );

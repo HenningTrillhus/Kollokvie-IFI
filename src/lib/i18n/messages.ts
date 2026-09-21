@@ -158,7 +158,7 @@ export const messages = {
     no: "Tilbakestilling av passord er ikke slått på ennå.",
     en: "Password reset isn't turned on yet.",
   },
-  "password.title": { no: "Bytt passord", en: "Change password" },
+  "password.title": { no: "Passord", en: "Password" },
   "password.change": { no: "Bytt passord", en: "Change password" },
   "password.done": {
     no: "Passordet er endret. Alle andre enheter er logget ut.",
@@ -396,6 +396,22 @@ export const messages = {
   "follow.requested": { no: "Forespørsel sendt", en: "Requested" },
 
   // ---- settings
+  "settings.secProfile": { no: "Profil", en: "Profile" },
+  "settings.secStudy": { no: "Studier", en: "Studies" },
+  "settings.secLinks": { no: "Lenker", en: "Links" },
+  "settings.secAppearance": { no: "Utseende", en: "Appearance" },
+  "settings.secSecurity": { no: "Sikkerhet", en: "Security" },
+  "settings.secData": { no: "Personvern og data", en: "Privacy and data" },
+  "settings.unsaved": { no: "Du har ulagrede endringer", en: "You have unsaved changes" },
+  "settings.discard": { no: "Angre", en: "Discard" },
+  "settings.exportHint": {
+    no: "Alt vi har lagret om deg, som en fil.",
+    en: "Everything we store about you, as a file.",
+  },
+  "password.description": {
+    no: "Velg et nytt passord. Andre enheter logges ut.",
+    en: "Choose a new password. Other devices are signed out.",
+  },
   "settings.title": { no: "Innstillinger", en: "Settings" },
   "settings.photo": { no: "Profilbilde", en: "Profile picture" },
   "settings.photoUpload": { no: "Last opp bilde", en: "Upload photo" },
