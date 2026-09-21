@@ -167,7 +167,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   // Coming exams and obligs; finished ones go to the back of the row.
   const upcomingItems = useMemo(() => {
     const list = buildItems(upcoming, [], prefs).filter(
-      (i) => i.date >= todayKey && i.type !== "other"
+      (i) => i.date >= todayKey && (i.type === "exam" || i.type === "deadline")
     );
     return [...list.filter((i) => !i.done), ...list.filter((i) => i.done)].slice(0, 10);
   }, [upcoming, prefs, todayKey]);
@@ -239,6 +239,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       type: v.type,
     };
     if (v.time) payload.event_time = v.time;
+    if (v.type === "note") payload.body = v.body;
     if (v.course) payload.course_code = v.course.code;
 
     const { data, error } = await supabase.from("events").insert(payload).select().single();
@@ -253,7 +254,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
         .filter((e) => e.event_date >= rangeStart && e.event_date <= rangeEnd)
         .sort((a, b) => a.event_date.localeCompare(b.event_date))
     );
-    if (created.type !== "other" && created.event_date >= todayKey) {
+    if ((created.type === "exam" || created.type === "deadline") && created.event_date >= todayKey) {
       setUpcoming((prev) =>
         [...prev, created].sort(
           (a, b) =>
@@ -283,6 +284,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       event_time: v.time || null,
       type: v.type,
       course_code: v.course?.code ?? null,
+      body: v.type === "note" ? v.body : null,
     };
     // Exams can't be "done", so changing an oblig into an exam clears it.
     if (v.type === "exam") patch.completed_at = null;
@@ -309,7 +311,9 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     setUpcoming((prev) => {
       const rest = prev.filter((e) => e.id !== updated.id);
       const next =
-        updated.type !== "other" && updated.event_date >= todayKey ? [...rest, updated] : rest;
+        (updated.type === "exam" || updated.type === "deadline") && updated.event_date >= todayKey
+          ? [...rest, updated]
+          : rest;
       return next.sort(
         (a, b) =>
           a.event_date.localeCompare(b.event_date) ||
@@ -637,6 +641,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
             initial={{
               title: editing.title,
               type: editing.type ?? "other",
+              body: editing.body ?? "",
               time: editing.time ?? "",
               date: editing.date,
               course: editing.courseCode

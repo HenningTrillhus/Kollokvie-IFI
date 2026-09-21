@@ -18,6 +18,8 @@ export type CalItem = {
   // Marked as done, and whether it can be (obligs and other events, not exams).
   done: boolean;
   completable: boolean;
+  // The text of a note.
+  body: string | null;
 };
 
 export function buildItems(
@@ -29,7 +31,8 @@ export function buildItems(
 
   for (const e of events) {
     const courseKey = e.course_code ?? NO_COURSE_KEY;
-    if (!isVisible(prefs, courseKey)) continue;
+    // Notes have no course, so the course filters never hide them.
+    if (e.type !== "note" && !isVisible(prefs, courseKey)) continue;
     items.push({
       key: `e-${e.id}`,
       kind: "event",
@@ -42,7 +45,8 @@ export function buildItems(
       color: colorFor(prefs, courseKey),
       href: null,
       done: Boolean(e.completed_at),
-      completable: e.type !== "exam",
+      completable: e.type !== "exam" && e.type !== "note",
+      body: e.body ?? null,
     });
   }
 
@@ -63,6 +67,7 @@ export function buildItems(
       href: `/groups/${g.id}`,
       done: false,
       completable: false,
+      body: null,
     });
   }
 

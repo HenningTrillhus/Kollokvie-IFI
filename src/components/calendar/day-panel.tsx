@@ -48,7 +48,13 @@ export default function DayPanel({
   });
 
   // Not-done first, done last (each keeps its time order).
-  const ordered = [...items.filter((i) => !i.done), ...items.filter((i) => i.done)];
+  // Notes come first.
+  const others = items.filter((i) => i.type !== "note");
+  const ordered = [
+    ...items.filter((i) => i.type === "note"),
+    ...others.filter((i) => !i.done),
+    ...others.filter((i) => i.done),
+  ];
 
   return (
     <section className={`flex min-h-[6rem] flex-[3] flex-col overflow-hidden ${cardClass}`}>
@@ -68,7 +74,23 @@ export default function DayPanel({
         ) : (
           <ul ref={list} className="divide-y divide-card-border px-4">
             {ordered.map((item) => {
-              const body = (
+              const isNote = item.type === "note";
+              const body = isNote ? (
+                <div className="flex min-w-0 flex-1 items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="min-h-9 w-1 shrink-0 self-stretch rounded-full bg-accent"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      {t("cal.note")}
+                    </p>
+                    <p className="mt-0.5 whitespace-pre-line break-words text-sm leading-relaxed">
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              ) : (
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   <span
                     aria-hidden
@@ -95,7 +117,7 @@ export default function DayPanel({
                 <li
                   key={item.key}
                   data-flip={item.key}
-                  className="flex items-center gap-3 bg-card py-2.5"
+                  className={`flex gap-3 bg-card py-2.5 ${isNote ? "items-start" : "items-center"}`}
                 >
                   {item.completable && (
                     <DoneCheck done={item.done} onToggle={(el) => onToggleDone(item, el)} />

@@ -188,6 +188,7 @@ export function SemesterAgenda({
                         {item.type ? t(EVENT_TYPE_KEYS[item.type]) : t("cal.studyGroup")}
                         {item.courseCode ? ` · ${item.courseCode}` : ""}
                         {item.time ? ` · ${item.time}` : ""}
+                        {item.type === "note" && item.body ? ` · ${item.body.split("\n")[0]}` : ""}
                       </p>
                     </div>
                   </button>

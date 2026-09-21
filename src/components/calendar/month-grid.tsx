@@ -6,7 +6,7 @@ import type { CalItem } from "@/lib/calendar-items";
 import { useI18n } from "@/lib/i18n/client";
 
 // Which item names the day: an exam beats an oblig, then study groups, then the rest.
-const PRIORITY = { exam: 0, deadline: 1, group: 2, other: 3 } as const;
+const PRIORITY = { exam: 0, deadline: 1, group: 2, other: 3, note: 4 } as const;
 function rank(item: CalItem) {
   return PRIORITY[item.type ?? "group"];
 }
@@ -88,7 +88,10 @@ export default function MonthGrid({
         {cells.map((day, index) => {
           if (day === null) return <div key={index} />;
           const dateKey = toDateKey(year, month, day);
-          const items = itemsByDate.get(dateKey) ?? [];
+          const everything = itemsByDate.get(dateKey) ?? [];
+          // Notes get their own small dot; everything else names and tints the day.
+          const items = everything.filter((i) => i.type !== "note");
+          const hasNote = everything.length > items.length;
           const isToday = dateKey === todayKey;
           const isSelected = dateKey === selectedDate;
           // What is on this day: its most important item names it, and the day is tinted.
@@ -109,12 +112,19 @@ export default function MonthGrid({
                     }
                   : undefined
               }
-              className={`flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-1.5 lg:active:scale-[0.99] ${
+              className={`relative flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-1.5 lg:active:scale-[0.99] ${
                 isSelected
                   ? "border-accent bg-accent-soft"
                   : "border-transparent hover:bg-accent-soft/60 lg:border-card-border/60"
               }`}
             >
+              {hasNote && (
+                <span
+                  aria-label={t("cal.note")}
+                  title={t("cal.note")}
+                  className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent"
+                />
+              )}
               <span className="flex flex-col items-center gap-0.5 lg:w-full lg:flex-row lg:justify-between">
                 <span
                   className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none ${

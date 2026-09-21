@@ -35,7 +35,7 @@ Det er laget av en student, for studenter, og er ikke en offisiell tjeneste fra 
 - Tre nivåer: åpen, privat (bare for de du følger eller som følger deg) og kun invitasjon.
 
 **Kalender**
-- Måned og semester (med UiOs semesterdatoer), eksamen, oblig og annet, med emnefarger og filter.
+- Måned og semester (med UiOs semesterdatoer), eksamen, oblig, annet og **notater for dagen**, med emnefarger og filter.
 - Legg til og endre hendelser med appens egen dato- og tidsvelger. Kollokviegruppene dine dukker opp på riktig dag.
 - På PC: to kolonner med frister og valgt dag ved siden av måneden.
 

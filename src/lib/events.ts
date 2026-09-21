@@ -1,5 +1,5 @@
 // "deadline" is shown as "Oblig" (assignment); the stored value stays the same.
-export type EventType = "exam" | "deadline" | "other";
+export type EventType = "exam" | "deadline" | "other" | "note";
 
 export type CalendarEvent = {
   id: string;
@@ -11,15 +11,18 @@ export type CalendarEvent = {
   type: EventType;
   // When it was marked as done (obligs and other events), or null.
   completed_at?: string | null;
+  // The text of a note (type "note").
+  body?: string | null;
   created_at: string;
 };
 
-export const EVENT_TYPES: EventType[] = ["exam", "deadline", "other"];
+export const EVENT_TYPES: EventType[] = ["exam", "deadline", "other", "note"];
 
 export const EVENT_TYPE_KEYS = {
   exam: "cal.exam",
   deadline: "cal.oblig",
   other: "cal.other",
+  note: "cal.note",
 } as const;
 
 export function daysInMonth(year: number, month: number) {

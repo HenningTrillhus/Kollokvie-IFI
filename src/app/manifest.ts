@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     lang: "no",
     // Matches the icon's navy for the launch splash.
-    background_color: "#202743",
+    background_color: "#1b2540",
     theme_color: "#f3f8fe",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
