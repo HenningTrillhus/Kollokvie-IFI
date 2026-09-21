@@ -147,6 +147,14 @@ export const messages = {
   "explore.noMatch": { no: "Ingen kollokviegrupper matcher.", en: "No study groups match." },
 
   // ---- search
+  "search.hint": {
+    no: "Søk etter folk eller kollokviegrupper.",
+    en: "Search for people or study groups.",
+  },
+  "search.results": { no: "{n} treff", en: "{n} results" },
+  "search.page": { no: "Side {page} av {pages}", en: "Page {page} of {pages}" },
+  "search.prev": { no: "Forrige", en: "Previous" },
+  "search.next": { no: "Neste", en: "Next" },
   "search.people": { no: "Folk", en: "People" },
   "search.groups": { no: "Kollokviegrupper", en: "Study groups" },
   "search.peoplePlaceholder": { no: "Navn eller brukernavn…", en: "Name or username…" },
@@ -417,6 +425,9 @@ export const messages = {
   "cal.semesterStartsIn": { no: "Starter om {n} dager", en: "Starts in {n} days" },
   "cal.semesterOver": { no: "Semesteret er over", en: "The semester is over" },
   "cal.colors": { no: "Farger", en: "Colors" },
+  "cal.done": { no: "Ferdig", en: "Done" },
+  "cal.markDone": { no: "Marker som ferdig", en: "Mark as done" },
+  "cal.markUndone": { no: "Angre ferdig", en: "Mark as not done" },
   "cal.add": { no: "Legg til", en: "Add" },
   "cal.adding": { no: "Legger til…", en: "Adding…" },
   "cal.hint": {

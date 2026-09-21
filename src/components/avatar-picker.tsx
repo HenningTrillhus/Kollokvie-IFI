@@ -160,7 +160,7 @@ export default function AvatarPicker({
         <div
           role="listbox"
           aria-label={t("settings.photoChoose")}
-          className="mt-3 grid grid-cols-5 gap-2.5 sm:grid-cols-7"
+          className="mt-3 grid max-h-64 grid-cols-5 gap-2.5 overflow-y-auto overscroll-contain p-1.5 sm:grid-cols-7"
         >
           {PRESET_AVATARS.map((preset, i) => {
             const selected = value === preset;

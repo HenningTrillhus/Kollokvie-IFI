@@ -22,7 +22,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
-  blant 30 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
+  blant 45 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
   En kort bio (160 tegn) er bare synlig for de som følger deg.
 - **Personvern og samtykke.** Fullstendig personvernerklæring (`/personvern`, norsk og engelsk), obligatorisk
   samtykke ved registrering, en samtykkeside (`/samtykke`) for eksisterende brukere, og «Last ned dataene mine»
@@ -33,8 +33,8 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Kalender** med måneds- og semestervisning. Semestrene følger UiOs datoer (høst og vår, med kilde-lenke),
   og du kan bla mellom dem. En rad viser hvor lenge det er til de neste eksamenene og obligene. Hele
   kalenderen fyller skjermen uten at siden scroller: bokser og rader du sveiper i gjør jobben. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Du velger
-  hvilke emner som vises og hvilken farge hvert emne har. Kollokviegruppene dine står på riktig dato.
-- **Søk** etter folk og kollokviegrupper.
+  hvilke emner som vises og hvilken farge hvert emne har. Obliger og annet kan markeres som ferdige (med konfetti), og havner bakerst. Kollokviegruppene dine står på riktig dato.
+- **Søk** etter folk og kollokviegrupper, med resultatene i en egen scroll-boks og sider (30 per side).
 - **Lyst og mørkt tema** (hvitt og lyseblått, eller mørkt), og **norsk og engelsk**.
   Begge velges nederst i Innstillinger.
 - **Appfølelse på mobil.** Fast topp- og bunnmeny, låst side, ingen zoom, PWA som kan
@@ -77,10 +77,11 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0010`–`0015` | Kollokviegrupper, medlemmer, invitasjoner og RLS-policyer |
 | `0016` | Synlighetsnivået «kun invitasjon» |
 | `0017` | Herding: godkjenning av følgere, kapasitet i databasen, kolonnerettigheter |
-| `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 30 ikonene |
+| `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 45 ikonene |
 | `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
 | `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
 | `0022` | Kalender: klokkeslett og emne på hendelser, og `calendar_prefs` (farger og filter per emne) |
+| `0023` | «Ferdig» på hendelser (`events.completed_at`) og ikon 01–45 |
 
 ### 4. Skru av e-postbekreftelse
 

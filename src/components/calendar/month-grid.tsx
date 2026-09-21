@@ -107,7 +107,11 @@ export default function MonthGrid({
                 {items.slice(0, 4).map((item) => (
                   <span
                     key={item.key}
-                    style={{ backgroundColor: item.color }}
+                    style={
+                      item.done
+                        ? { boxShadow: `inset 0 0 0 1px ${item.color}` }
+                        : { backgroundColor: item.color }
+                    }
                     className="h-1.5 w-1.5 rounded-full"
                   />
                 ))}

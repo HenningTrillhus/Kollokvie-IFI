@@ -9,6 +9,8 @@ export type CalendarEvent = {
   event_time: string | null;
   course_code: string | null;
   type: EventType;
+  // When it was marked as done (obligs and other events), or null.
+  completed_at?: string | null;
   created_at: string;
 };
 

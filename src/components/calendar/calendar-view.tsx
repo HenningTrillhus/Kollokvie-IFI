@@ -11,7 +11,7 @@ import AddEventForm, { type NewEvent } from "@/components/calendar/add-event-for
 import CourseFilterPanel, { FilterChips, type FilterCourse } from "@/components/calendar/course-filter";
 import UpcomingStrip from "@/components/calendar/upcoming-strip";
 import { daysInMonth, daysUntil, toDateKey, type CalendarEvent } from "@/lib/events";
-import { buildItems, groupByDate } from "@/lib/calendar-items";
+import { buildItems, groupByDate, type CalItem } from "@/lib/calendar-items";
 import type { Pref, Prefs } from "@/lib/calendar-prefs";
 import { getUserCourses, type Course } from "@/lib/courses";
 import type { Group } from "@/lib/groups";
@@ -24,6 +24,7 @@ import {
   shiftSemester,
   type Semester,
 } from "@/lib/semesters";
+import { confettiFrom } from "@/lib/confetti";
 import { useI18n } from "@/lib/i18n/client";
 import { localeFor } from "@/lib/i18n";
 
@@ -151,12 +152,13 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
   const items = useMemo(() => buildItems(events, groups, prefs), [events, groups, prefs]);
   const itemsByDate = useMemo(() => groupByDate(items), [items]);
-  const upcomingItems = useMemo(
-    () => buildItems(upcoming, [], prefs)
-        .filter((i) => i.date >= todayKey && i.type !== "other")
-        .slice(0, 10),
-    [upcoming, prefs, todayKey]
-  );
+  // Coming exams and obligs; finished ones go to the back of the row.
+  const upcomingItems = useMemo(() => {
+    const list = buildItems(upcoming, [], prefs).filter(
+      (i) => i.date >= todayKey && i.type !== "other"
+    );
+    return [...list.filter((i) => !i.done), ...list.filter((i) => i.done)].slice(0, 10);
+  }, [upcoming, prefs, todayKey]);
 
   const filterCourses: FilterCourse[] = useMemo(() => {
     const byCode = new Map<string, FilterCourse>();
@@ -250,6 +252,27 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     }
     setAddOpen(false);
     return true;
+  }
+
+  // Mark an oblig / other event as done (or undo it). Optimistic: it moves and
+  // the confetti fires at once; if saving fails it goes back.
+  async function toggleDone(item: CalItem, source?: HTMLElement) {
+    if (item.kind !== "event" || !item.completable) return;
+    const previous = events.find((e) => e.id === item.id)?.completed_at ?? null;
+    const next = item.done ? null : new Date().toISOString();
+    const apply = (stamp: string | null) => (list: CalendarEvent[]) =>
+      list.map((e) => (e.id === item.id ? { ...e, completed_at: stamp } : e));
+
+    setEvents(apply(next));
+    setUpcoming(apply(next));
+    if (next && source) confettiFrom(source);
+
+    const supabase = createClient();
+    const { error } = await supabase.from("events").update({ completed_at: next }).eq("id", item.id);
+    if (error) {
+      setEvents(apply(previous));
+      setUpcoming(apply(previous));
+    }
   }
 
   async function deleteEvent(id: string) {
@@ -375,7 +398,12 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
           </div>
         </div>
 
-        <UpcomingStrip items={upcomingItems} todayKey={todayKey} onPick={pickDate} />
+        <UpcomingStrip
+          items={upcomingItems}
+          todayKey={todayKey}
+          onPick={pickDate}
+          onToggleDone={toggleDone}
+        />
 
         <div className="shrink-0">
           <FilterChips
@@ -411,6 +439,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
                 setAddOpen(true);
               }}
               onDelete={deleteEvent}
+              onToggleDone={toggleDone}
             />
           </>
         ) : (

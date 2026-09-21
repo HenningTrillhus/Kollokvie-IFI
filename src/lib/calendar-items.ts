@@ -15,6 +15,9 @@ export type CalItem = {
   type: EventType | null;
   color: string;
   href: string | null;
+  // Marked as done, and whether it can be (obligs and other events, not exams).
+  done: boolean;
+  completable: boolean;
 };
 
 export function buildItems(
@@ -38,6 +41,8 @@ export function buildItems(
       type: e.type,
       color: colorFor(prefs, courseKey),
       href: null,
+      done: Boolean(e.completed_at),
+      completable: e.type !== "exam",
     });
   }
 
@@ -56,6 +61,8 @@ export function buildItems(
       type: null,
       color: colorFor(prefs, g.course_code ?? GROUPS_KEY),
       href: `/groups/${g.id}`,
+      done: false,
+      completable: false,
     });
   }
 

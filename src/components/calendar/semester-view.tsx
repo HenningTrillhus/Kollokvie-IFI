@@ -100,7 +100,11 @@ export function SemesterGrid({
                       {dayItems.slice(0, 3).map((it) => (
                         <span
                           key={it.key}
-                          style={{ backgroundColor: it.color }}
+                          style={
+                            it.done
+                              ? { boxShadow: `inset 0 0 0 1px ${it.color}` }
+                              : { backgroundColor: it.color }
+                          }
                           className="h-1.5 w-1.5 rounded-full"
                         />
                       ))}
@@ -168,11 +172,17 @@ export function SemesterAgenda({
                     </div>
                     <span
                       aria-hidden
-                      style={{ backgroundColor: item.color }}
+                      style={{ backgroundColor: item.done ? "#22c55e" : item.color }}
                       className="h-9 w-1 shrink-0 rounded-full"
                     />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{item.title}</p>
+                    <div className={`min-w-0 flex-1 ${item.done ? "opacity-55" : ""}`}>
+                      <p
+                        className={`truncate text-sm font-medium ${
+                          item.done ? "line-through decoration-2" : ""
+                        }`}
+                      >
+                        {item.title}
+                      </p>
                       <p className="truncate text-xs text-muted">
                         {item.type ? t(EVENT_TYPE_KEYS[item.type]) : t("cal.studyGroup")}
                         {item.courseCode ? ` · ${item.courseCode}` : ""}
