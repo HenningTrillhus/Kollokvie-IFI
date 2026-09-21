@@ -74,6 +74,16 @@ export default function SignupPage() {
     setLoading(true);
     const supabase = createClient();
 
+    const email = emailForIfiUsername(ifiUsername);
+
+    // A half-finished earlier sign-up (never confirmed) must not block this one:
+    // clear it first. Confirmed accounts are never touched. (Ignored if the
+    // database function isn't installed.)
+    await supabase.rpc("release_unconfirmed_signup", {
+      p_email: email,
+      p_username: username.trim(),
+    });
+
     // Is the username free? (Only checked if the database function exists.)
     const { data: free, error: checkError } = await supabase.rpc("username_available", {
       name: username.trim(),
@@ -84,7 +94,6 @@ export default function SignupPage() {
       return;
     }
 
-    const email = emailForIfiUsername(ifiUsername);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
