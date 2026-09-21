@@ -34,7 +34,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Kalender** med måneds- og semestervisning. Semestrene følger UiOs datoer (høst og vår, med kilde-lenke),
   og du kan bla mellom dem. En rad viser hvor lenge det er til de neste eksamenene og obligene. Hele
   kalenderen fyller skjermen uten at siden scroller: bokser og rader du sveiper i gjør jobben. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Trykk på en hendelse for å endre den (tittel, type, emne, tid og dato), uten å slette den. Du velger
-  hvilke emner som vises og hvilken farge hvert emne har. Obliger og annet kan markeres som ferdige (med konfetti), og havner bakerst. Kollokviegruppene dine står på riktig dato.
+  hvilke emner som vises og hvilken farge hvert emne har. Obliger og annet kan markeres som ferdige (med konfetti), og havner bakerst. Dager med noe på er farget, og typen (eksamen, oblig, annet, gruppe) står med små bokstaver i dagen. En eksamen eller oblig uten tittel får bare navnet «Eksamen» eller «Oblig». På PC har semestervisningen en lang, tynn oversikt til venstre og bare obliger og eksamener (som kan krysses av) til høyre. Kollokviegruppene dine står på riktig dato.
 - **Søk** etter folk og kollokviegrupper, med resultatene i en egen scroll-boks og sider (30 per side).
   Uten søketekst vises alle: folk du har flest felles kontakter med først, resten og kollokviegruppene A–Å.
 - **Lyst og mørkt tema** (hvitt og lyseblått, eller mørkt), og **norsk og engelsk**.

@@ -141,6 +141,8 @@ export const messages = {
   "time.minute": { no: "Minutt", en: "Minute" },
   "time.clear": { no: "Fjern tid", en: "Clear time" },
   "time.done": { no: "Ferdig", en: "Done" },
+  "cal.groupShort": { no: "Gruppe", en: "Group" },
+  "cal.deadlinesTitle": { no: "Obliger og eksamener", en: "Assignments and exams" },
   "cal.editHeading": { no: "Rediger", en: "Edit" },
   "cal.editEvent": { no: "Rediger {title}", en: "Edit {title}" },
   "cal.date": { no: "Dato", en: "Date" },

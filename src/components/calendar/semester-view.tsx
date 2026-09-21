@@ -5,6 +5,7 @@ import { EVENT_TYPE_KEYS, toDateKey } from "@/lib/events";
 import { semesterMonths, semesterRange, type Semester } from "@/lib/semesters";
 import type { CalItem } from "@/lib/calendar-items";
 import { cardClass } from "@/components/form-ui";
+import DoneCheck from "@/components/calendar/done-check";
 import { useI18n } from "@/lib/i18n/client";
 import { localeFor } from "@/lib/i18n";
 
@@ -256,6 +257,106 @@ export function SemesterPanes({ overview, list }: { overview: ReactNode; list: R
           {list}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Wide screens: only the exams and obligs of the semester, month by month.
+// Tick the obligs off right here, or tap one to see its day.
+export function SemesterDeadlines({
+  semester,
+  items,
+  todayKey,
+  onPickDay,
+  onToggleDone,
+}: {
+  semester: Semester;
+  items: CalItem[];
+  todayKey: string;
+  onPickDay: (dateKey: string) => void;
+  onToggleDone: (item: CalItem, source: HTMLElement) => void;
+}) {
+  const { t, lang } = useI18n();
+  const months = semesterMonths(semester);
+  const range = semesterRange(semester);
+  const monthNames = t("cal.months").split("|");
+
+  const deadlines = items.filter(
+    (i) =>
+      (i.type === "exam" || i.type === "deadline") && i.date >= range.start && i.date <= range.end
+  );
+  const byMonth = new Map<number, CalItem[]>();
+  deadlines.forEach((i) => {
+    const m = Number(i.date.split("-")[1]) - 1;
+    byMonth.set(m, [...(byMonth.get(m) ?? []), i]);
+  });
+
+  if (deadlines.length === 0) {
+    return <p className="px-5 py-6 text-sm text-muted">{t("cal.semesterEmpty")}</p>;
+  }
+
+  return (
+    <div className="pb-2">
+      {months.map(({ month }) => {
+        const list = byMonth.get(month);
+        if (!list) return null;
+        return (
+          <section key={month}>
+            <h3 className="sticky top-0 z-10 bg-card/95 px-5 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted backdrop-blur">
+              {monthNames[month]}
+            </h3>
+            <ul className="divide-y divide-card-border">
+              {list.map((item) => {
+                const date = parseKey(item.date);
+                const weekday = date.toLocaleDateString(localeFor(lang), { weekday: "short" });
+                const overdue = item.date < todayKey && !item.done;
+                return (
+                  <li key={item.key} className="flex items-center gap-2 pr-4 transition hover:bg-accent-soft/60">
+                    <button
+                      onClick={() => onPickDay(item.date)}
+                      className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-5 text-left"
+                    >
+                      <div className="w-9 shrink-0 text-center leading-tight">
+                        <p className={`text-base font-semibold ${overdue ? "text-red-500" : ""}`}>
+                          {date.getDate()}
+                        </p>
+                        <p className="text-[10px] uppercase text-muted">{weekday}</p>
+                      </div>
+                      <span
+                        aria-hidden
+                        style={{ backgroundColor: item.done ? "#22c55e" : item.color }}
+                        className="h-9 w-1 shrink-0 rounded-full"
+                      />
+                      <div className={`min-w-0 flex-1 ${item.done ? "opacity-55" : ""}`}>
+                        <p
+                          className={`truncate text-sm font-medium ${
+                            item.done ? "line-through decoration-2" : ""
+                          }`}
+                        >
+                          {item.title}
+                        </p>
+                        <p className="truncate text-xs text-muted">
+                          {item.type ? t(EVENT_TYPE_KEYS[item.type]) : ""}
+                          {item.courseCode ? ` · ${item.courseCode}` : ""}
+                          {item.time ? ` · ${item.time}` : ""}
+                        </p>
+                      </div>
+                    </button>
+                    {item.completable && (
+                      <DoneCheck done={item.done} onToggle={(el) => onToggleDone(item, el)} />
+                    )}
+                    {item.done && (
+                      <span className="shrink-0 rounded-md bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-600">
+                        {t("cal.done")}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
     </div>
   );
 }

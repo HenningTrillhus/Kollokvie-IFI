@@ -5,7 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 import { cardClass } from "@/components/form-ui";
 import BottomSheet from "@/components/bottom-sheet";
 import MonthGrid from "@/components/calendar/month-grid";
-import { SemesterAgenda, SemesterGrid, SemesterPanes } from "@/components/calendar/semester-view";
+import {
+  SemesterAgenda,
+  SemesterDeadlines,
+  SemesterGrid,
+  SemesterPanes,
+} from "@/components/calendar/semester-view";
 import DayPanel from "@/components/calendar/day-panel";
 import AddEventForm, { type NewEvent } from "@/components/calendar/add-event-form";
 import CourseFilterPanel, { FilterChips, type FilterCourse } from "@/components/calendar/course-filter";
@@ -468,7 +473,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
               : "flex min-h-0 flex-1 flex-col gap-2 md:gap-3"
           }
         >
-        <div className={`contents empty:hidden ${mode === "month" ? "lg:col-start-2 lg:row-start-1 lg:block" : ""}`}>
+        <div className={`contents empty:hidden ${mode === "month" ? "lg:col-start-2 lg:row-start-1 lg:block" : "lg:hidden"}`}>
           <UpcomingStrip
             items={upcomingItems}
             todayKey={todayKey}
@@ -477,7 +482,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
           />
         </div>
 
-        <div className={`shrink-0 ${mode === "month" ? "lg:col-start-2 lg:row-start-2" : ""}`}>
+        <div className={`shrink-0 ${mode === "month" ? "lg:col-start-2 lg:row-start-2" : "lg:hidden"}`}>
           <FilterChips
             courses={filterCourses}
             prefs={prefs}
@@ -522,6 +527,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
           </>
         ) : (
           <>
+            {/* Phone and tablet: swipe between the overview and the list. */}
+            <div className="contents lg:hidden">
             <SemesterPanes
               overview={
                 <SemesterGrid
@@ -534,6 +541,43 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
               }
               list={<SemesterAgenda semester={semester} items={items} onPickDay={pickDate} />}
             />
+            </div>
+
+            {/* Wide screen: the semester as a long, thin strip on the left; exams
+                and obligs (tick them off here) with the course filters on the right. */}
+            <div className="hidden min-h-0 flex-1 gap-4 lg:grid lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
+              <div className={`min-h-0 overflow-y-auto overscroll-contain ${cardClass}`}>
+                <SemesterGrid
+                  semester={semester}
+                  itemsByDate={itemsByDate}
+                  todayKey={todayKey}
+                  loading={loading}
+                  onPickDay={pickDate}
+                />
+              </div>
+              <div className={`flex min-h-0 flex-col overflow-hidden ${cardClass}`}>
+                <div className="shrink-0 space-y-2 border-b border-card-border p-3">
+                  <h2 className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t("cal.deadlinesTitle")}
+                  </h2>
+                  <FilterChips
+                    courses={filterCourses}
+                    prefs={prefs}
+                    onChange={updatePref}
+                    onOpenColors={() => setSheetOpen(true)}
+                  />
+                </div>
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  <SemesterDeadlines
+                    semester={semester}
+                    items={items}
+                    todayKey={todayKey}
+                    onPickDay={pickDate}
+                    onToggleDone={toggleDone}
+                  />
+                </div>
+              </div>
+            </div>
             <a
               href={UIO_CALENDAR_URL}
               target="_blank"

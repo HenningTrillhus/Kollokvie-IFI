@@ -1,9 +1,15 @@
 "use client";
 
 import { useRef, type TouchEvent } from "react";
-import { daysInMonth, firstWeekdayMondayIndex, toDateKey } from "@/lib/events";
+import { EVENT_TYPE_KEYS, daysInMonth, firstWeekdayMondayIndex, toDateKey } from "@/lib/events";
 import type { CalItem } from "@/lib/calendar-items";
 import { useI18n } from "@/lib/i18n/client";
+
+// Which item names the day: an exam beats an oblig, then study groups, then the rest.
+const PRIORITY = { exam: 0, deadline: 1, group: 2, other: 3 } as const;
+function rank(item: CalItem) {
+  return PRIORITY[item.type ?? "group"];
+}
 
 export default function MonthGrid({
   year,
@@ -85,23 +91,47 @@ export default function MonthGrid({
           const items = itemsByDate.get(dateKey) ?? [];
           const isToday = dateKey === todayKey;
           const isSelected = dateKey === selectedDate;
+          // What is on this day: its most important item names it, and the day is tinted.
+          const top = [...items].sort((a, b) => rank(a) - rank(b))[0];
+          const label = top ? (top.type ? t(EVENT_TYPE_KEYS[top.type]) : t("cal.groupShort")) : "";
+          const strong = top ? rank(top) <= 1 : false;
 
           return (
             <button
               key={dateKey}
               onClick={() => onSelect(dateKey)}
+              style={
+                top && !isSelected
+                  ? {
+                      backgroundColor: `color-mix(in srgb, ${top.color} ${strong ? 16 : 9}%, transparent)`,
+                    }
+                  : undefined
+              }
               className={`flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-1.5 lg:active:scale-[0.99] ${
                 isSelected
                   ? "border-accent bg-accent-soft"
                   : "border-transparent hover:bg-accent-soft/60 lg:border-card-border/60"
               }`}
             >
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none lg:self-start ${
-                  isToday ? "bg-accent font-semibold text-white" : ""
-                }`}
-              >
-                {day}
+              <span className="flex flex-col items-center gap-0.5 lg:w-full lg:flex-row lg:justify-between">
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none ${
+                    isToday ? "bg-accent font-semibold text-white" : ""
+                  }`}
+                >
+                  {day}
+                </span>
+                {top && (
+                  // The kind of thing that's on this day, in small print.
+                  <span
+                    className={`max-w-full truncate text-[8px] font-bold uppercase leading-none tracking-tight [@media(max-height:700px)]:hidden lg:text-[10px] ${
+                      strong ? "text-foreground" : "text-muted"
+                    }`}
+                  >
+                    {label}
+                    {items.length > 1 ? ` +${items.length - 1}` : ""}
+                  </span>
+                )}
               </span>
               {/* Wide screens have room for the titles themselves. */}
               <span className="hidden min-h-0 flex-col gap-0.5 text-left lg:flex">

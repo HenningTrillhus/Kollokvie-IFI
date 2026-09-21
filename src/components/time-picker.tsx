@@ -29,6 +29,7 @@ export default function TimePicker({
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const panelId = useId();
+  const panel = useRef<HTMLDivElement>(null);
   const hourList = useRef<HTMLDivElement>(null);
   const minuteList = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,13 @@ export default function TimePicker({
         list.scrollTop = chosen.offsetTop - list.clientHeight / 2 + chosen.clientHeight / 2;
       }
     }
+    // Once the panel has slid open, make sure all of it is on screen (in a sheet
+    // it would otherwise sit half below the fold and need scrolling).
+    const timer = setTimeout(
+      () => panel.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }),
+      330
+    );
+    return () => clearTimeout(timer);
   }, [open]);
 
   function pickHour(h: string) {
@@ -84,7 +92,7 @@ export default function TimePicker({
   }
 
   const option = (selected: boolean) =>
-    `h-9 w-full shrink-0 rounded-lg text-sm font-medium tabular-nums transition ${
+    `h-8 w-full shrink-0 rounded-lg text-sm sm:h-9 font-medium tabular-nums transition ${
       selected ? "bg-accent text-white" : "text-foreground hover:bg-accent-soft"
     }`;
 
@@ -108,7 +116,7 @@ export default function TimePicker({
         onClick={() => setOpen((v) => !v)}
         className={`flex w-full items-center justify-between gap-2 rounded-xl border bg-transparent text-left outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft ${
           open ? "border-accent" : "border-card-border"
-        } ${large ? "h-12 px-4 text-base" : "h-11 px-3.5 text-sm"}`}
+        } ${large ? "h-11 px-4 text-base sm:h-12" : "h-11 px-3.5 text-sm"}`}
       >
         <span className={value ? "font-medium tabular-nums" : "text-muted"}>
           {value ? value.slice(0, 5) : t("time.choose")}
@@ -118,7 +126,10 @@ export default function TimePicker({
 
       <div id={panelId}>
         <Collapsible open={open}>
-          <div className="mt-2 rounded-xl border border-card-border bg-card p-2 shadow-sm">
+          <div
+            ref={panel}
+            className="mt-2 rounded-xl border border-card-border bg-card p-2 shadow-sm"
+          >
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <p className="mb-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
@@ -129,7 +140,7 @@ export default function TimePicker({
                   role="listbox"
                   aria-label={t("time.hour")}
                   onKeyDown={(e) => handleKeys(e, HOURS, hour, pickHour)}
-                  className="relative max-h-44 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg"
+                  className="relative max-h-36 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg sm:max-h-44"
                 >
                   {HOURS.map((h) => (
                     <button
@@ -156,7 +167,7 @@ export default function TimePicker({
                   role="listbox"
                   aria-label={t("time.minute")}
                   onKeyDown={(e) => handleKeys(e, minutes, minute, pickMinute)}
-                  className="relative max-h-44 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg"
+                  className="relative max-h-36 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg sm:max-h-44"
                 >
                   {minutes.map((m) => (
                     <button

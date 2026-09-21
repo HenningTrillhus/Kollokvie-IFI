@@ -19,7 +19,7 @@ export type NewEvent = {
 };
 
 const bigInput =
-  "block h-12 w-full min-w-0 rounded-xl border border-card-border bg-transparent px-4 text-base outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft";
+  "block h-11 w-full min-w-0 rounded-xl border border-card-border bg-transparent px-4 text-base outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft sm:h-12";
 
 // The "add an event" form, made for thumbs: big fields, big buttons. It lives
 // in a tall sheet that covers the calendar while you fill it in.
@@ -44,9 +44,12 @@ export default function AddEventForm({
   const [date, setDate] = useState(initial?.date ?? "");
   const [saving, setSaving] = useState(false);
 
+  // An exam or oblig needs no title: it is simply called "Exam" / "Oblig".
+  const defaultTitle = type === "other" ? "" : t(EVENT_TYPE_KEYS[type]);
+
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const clean = cleanLine(title);
+    const clean = cleanLine(title) || defaultTitle;
     if (!clean || (editing && !date)) return;
     setSaving(true);
     const ok = await onSubmit({ title: clean, type, course, time, date });
@@ -56,7 +59,7 @@ export default function AddEventForm({
 
   return (
     <form onSubmit={submit} className="flex min-h-full flex-col">
-      <div className="flex-1 space-y-5 px-5 pb-4 pt-2">
+      <div className="flex-1 space-y-4 px-5 pb-3 pt-1 sm:space-y-5 sm:pb-4 sm:pt-2">
         <Field label={t("cal.title")} htmlFor="cal-title">
           <input
             id="cal-title"
@@ -65,20 +68,20 @@ export default function AddEventForm({
             maxLength={200}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={t("cal.titlePlaceholder")}
+            placeholder={defaultTitle || t("cal.titlePlaceholder")}
             className={bigInput}
           />
         </Field>
 
         <div>
-          <p className="mb-2 text-sm font-medium">{t("cal.type")}</p>
+          <p className="mb-1.5 text-sm font-medium">{t("cal.type")}</p>
           <div className="grid grid-cols-3 gap-2">
             {EVENT_TYPES.map((value) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setType(value)}
-                className={`h-12 rounded-xl border text-sm font-medium transition active:scale-95 ${
+                className={`h-11 rounded-xl border text-sm font-medium transition active:scale-95 sm:h-12 ${
                   type === value
                     ? "border-accent bg-accent-soft text-accent"
                     : "border-card-border text-muted"
@@ -124,11 +127,11 @@ export default function AddEventForm({
         {saveError && <p className="text-sm text-red-500">{t("cal.saveError")}</p>}
       </div>
 
-      <div className="sticky bottom-0 border-t border-card-border bg-card px-5 py-3">
+      <div className="sticky bottom-0 border-t border-card-border bg-card px-5 py-2.5 sm:py-3">
         <button
           type="submit"
-          disabled={saving || !title.trim() || (editing && !date)}
-          className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-accent text-base font-semibold text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60"
+          disabled={saving || (!title.trim() && !defaultTitle) || (editing && !date)}
+          className="min-h-[3rem] w-full rounded-2xl bg-accent text-base font-semibold text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60"
         >
           {editing
             ? saving
