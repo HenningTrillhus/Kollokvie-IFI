@@ -195,6 +195,12 @@ export const messages = {
     en: "Search for people or study groups.",
   },
   "search.results": { no: "{n} treff", en: "{n} results" },
+  "search.browsePeople": {
+    no: "{n} brukere · felles kontakter først",
+    en: "{n} users · shared connections first",
+  },
+  "search.browseGroups": { no: "{n} kollokviegrupper · A–Å", en: "{n} study groups · A–Z" },
+  "search.mutual": { no: "{n} felles", en: "{n} in common" },
   "search.page": { no: "Side {page} av {pages}", en: "Page {page} of {pages}" },
   "search.prev": { no: "Forrige", en: "Previous" },
   "search.next": { no: "Neste", en: "Next" },

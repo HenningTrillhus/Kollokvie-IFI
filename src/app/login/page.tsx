@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import LanguageSwitch from "@/components/language-switch";
+import AuthShell from "@/components/auth-shell";
 import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
-import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -89,23 +88,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-16">
-      <LanguageSwitch />
-
-      <div className="relative w-full max-w-sm">
-        <div className="mb-10 text-center">
-          <Link href="/" className="mb-4 inline-block">
-            <Logo className="h-16 w-16" />
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {confirmEmail ? t("verify.title") : t("auth.login")}
-          </h1>
-          <p className="mt-2 text-sm text-muted">
-            Kollokvie<span className="text-accent">@IFI</span>
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-card-border bg-card p-8 shadow-sm">
+    <AuthShell title={confirmEmail ? t("verify.title") : t("auth.login")}>
           {confirmEmail ? (
             <VerifyCodeForm
               email={confirmEmail}
@@ -115,11 +98,11 @@ export default function LoginPage() {
               onBack={() => setConfirmEmail(null)}
             />
           ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label
                 htmlFor="ifiUsername"
-                className="mb-1.5 block text-sm font-medium"
+                className="mb-1 block text-sm font-medium"
               >
                 {t("auth.ifiUsername")}
               </label>
@@ -134,14 +117,14 @@ export default function LoginPage() {
                 placeholder="olan"
                 value={ifiUsername}
                 onChange={(e) => setIfiUsername(e.target.value.toLowerCase().replace(/\s/g, ""))}
-                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
             </div>
 
             <div>
               <label
                 htmlFor="password"
-                className="mb-1.5 block text-sm font-medium"
+                className="mb-1 block text-sm font-medium"
               >
                 {t("auth.password")}
               </label>
@@ -152,7 +135,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
             </div>
 
@@ -163,7 +146,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
+              className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60"
             >
               {loading ? t("auth.loggingIn") : t("auth.login")}
             </button>
@@ -179,14 +162,6 @@ export default function LoginPage() {
             </p>
           </form>
           )}
-        </div>
-
-        <p className="mt-6 text-center text-xs text-muted">
-          <Link href="/personvern" className="transition hover:text-foreground">
-            {t("privacy.link")}
-          </Link>
-        </p>
-      </div>
-    </main>
+    </AuthShell>
   );
 }

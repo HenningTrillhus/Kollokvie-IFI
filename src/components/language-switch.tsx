@@ -6,13 +6,15 @@ import { setLanguage } from "@/lib/i18n/actions";
 import { LANGS } from "@/lib/i18n";
 
 // Small NO / EN toggle for the logged-out pages.
-export default function LanguageSwitch() {
+export default function LanguageSwitch({ inline = false }: { inline?: boolean }) {
   const { lang } = useI18n();
   const [pending, startTransition] = useTransition();
 
   return (
     <div
-      className="absolute right-4 top-4 flex rounded-lg border border-card-border p-0.5 text-xs font-medium"
+      className={`flex rounded-lg border border-card-border p-0.5 text-xs font-medium ${
+        inline ? "" : "absolute right-4 top-4"
+      }`}
       role="radiogroup"
       aria-label="Language"
     >
@@ -24,7 +26,7 @@ export default function LanguageSwitch() {
           aria-checked={lang === value}
           disabled={pending}
           onClick={() => startTransition(() => setLanguage(value))}
-          className={`rounded-md px-2 py-1 uppercase transition ${
+          className={`rounded-md px-2.5 py-1.5 uppercase transition ${
             lang === value ? "bg-accent text-white" : "text-muted"
           }`}
         >

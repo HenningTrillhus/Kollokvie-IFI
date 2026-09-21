@@ -38,6 +38,8 @@ export default function SearchClient({
   const [total, setTotal] = useState(0);
   const [results, setResults] = useState<Profile[]>([]);
   const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
+  // Shared connections per person (only filled when browsing without a search).
+  const [mutuals, setMutuals] = useState<Record<string, number>>({});
   const [groupResults, setGroupResults] = useState<GroupCardData[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +93,8 @@ export default function SearchClient({
     const trimmed = query.trim();
     // Commas and parentheses would break the PostgREST or-filter syntax.
     const term = escapeLike(trimmed.replace(/[,()*]/g, " ").trim());
-    if (!term) return;
+    // No search text: browse everyone / every group instead of asking for input.
+    const browsing = !term;
 
     // A slower, older request must never overwrite a newer one's results.
     let cancelled = false;
@@ -103,15 +106,46 @@ export default function SearchClient({
       const supabase = createClient();
 
       if (mode === "people") {
-        const { data, count } = await supabase
-          .from("profiles")
-          .select("*", { count: "exact" })
-          .neq("id", currentUserId)
-          .or(`username.ilike.%${term}%,full_name.ilike.%${term}%`)
-          .order("full_name", { ascending: true })
-          .range(from, to);
+        let matches: Profile[] = [];
+        let count: number | null = null;
+        const mutualMap: Record<string, number> = {};
 
-        const matches = (data ?? []) as Profile[];
+        if (browsing) {
+          // People you share the most connections with first, then A-Z.
+          const { data: rows, error } = await supabase.rpc("suggested_profiles", {
+            p_limit: PAGE_SIZE,
+            p_offset: from,
+          });
+          if (!error && rows) {
+            const list = rows as { profile: Profile; mutual: number; total: number }[];
+            matches = list.map((r) => r.profile);
+            list.forEach((r) => {
+              if (r.mutual > 0) mutualMap[r.profile.id] = r.mutual;
+            });
+            count = list.length ? Number(list[0].total) : 0;
+          } else {
+            // The database function is not installed yet: plain A-Z.
+            const res = await supabase
+              .from("profiles")
+              .select("*", { count: "exact" })
+              .neq("id", currentUserId)
+              .order("full_name", { ascending: true })
+              .range(from, to);
+            matches = (res.data ?? []) as Profile[];
+            count = res.count;
+          }
+        } else {
+          const res = await supabase
+            .from("profiles")
+            .select("*", { count: "exact" })
+            .neq("id", currentUserId)
+            .or(`username.ilike.%${term}%,full_name.ilike.%${term}%`)
+            .order("full_name", { ascending: true })
+            .range(from, to);
+          matches = (res.data ?? []) as Profile[];
+          count = res.count;
+        }
+
         // One batched lookup for every result's relationship status.
         const { data: followRows } = matches.length
           ? await supabase
@@ -131,27 +165,30 @@ export default function SearchClient({
         });
         setResults(matches);
         setStatuses(statusMap);
+        setMutuals(mutualMap);
         setTotal(count ?? matches.length);
       } else {
-        const { data, count } = await supabase
-          .from("groups")
-          .select("*", { count: "exact" })
-          .or(
-            `name.ilike.%${term}%,description.ilike.%${term}%,course_code.ilike.%${term}%`
-          )
-          .order("created_at", { ascending: false })
-          .range(from, to);
+        let groupQuery = supabase.from("groups").select("*", { count: "exact" });
+        if (browsing) {
+          groupQuery = groupQuery.order("name", { ascending: true });
+        } else {
+          groupQuery = groupQuery
+            .or(`name.ilike.%${term}%,description.ilike.%${term}%,course_code.ilike.%${term}%`)
+            .order("created_at", { ascending: false });
+        }
+        const { data, count } = await groupQuery.range(from, to);
 
         const groups = (data ?? []) as Group[];
         const cards = await getGroupCardData(supabase, groups);
         if (cancelled) return;
-        setGroupResults(withFullGroupsLast(cards));
+        // Browsing is strictly alphabetical; a search keeps full groups last.
+        setGroupResults(browsing ? cards : withFullGroupsLast(cards));
         setTotal(count ?? groups.length);
       }
 
       setLoading(false);
       needsScroll.current = true; // applied once the new rows are on screen
-    }, 300);
+    }, browsing ? 0 : 300);
 
     return () => {
       cancelled = true;
@@ -213,71 +250,81 @@ export default function SearchClient({
         </Card>
       </div>
 
-      {!trimmedQuery ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center px-6 text-center">
-          <p className="text-sm text-muted">{t("search.hint")}</p>
+      <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <div className="flex shrink-0 items-center justify-between px-1 text-xs text-muted">
+          <span>
+            {loading
+              ? t("common.searching")
+              : trimmedQuery
+                ? t("search.results", { n: total })
+                : t(mode === "people" ? "search.browsePeople" : "search.browseGroups", {
+                    n: total,
+                  })}
+          </span>
         </div>
-      ) : (
-        <div className="flex min-h-0 flex-1 flex-col gap-2">
-          <div className="flex shrink-0 items-center justify-between px-1 text-xs text-muted">
-            <span>{loading ? t("common.searching") : t("search.results", { n: total })}</span>
-          </div>
 
-          {/* Its own scroll box: the page itself never scrolls. */}
-          <div
-            ref={scroller}
-            onScroll={rememberScroll}
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain transition-opacity ${
-              loading ? "opacity-60" : ""
-            }`}
-          >
-            {!loading && shown === 0 ? (
-              <EmptyCard>
-                {mode === "people" ? t("search.noUsers") : t("search.noGroups")}
-              </EmptyCard>
-            ) : mode === "groups" ? (
-              <div className="space-y-3 pb-1">
-                {groupResults.map(({ group, memberCount, members }, i) => (
-                  <GroupCard
-                    key={group.id}
-                    group={group}
-                    memberCount={memberCount}
-                    members={members}
-                    index={i}
-                  />
-                ))}
-              </div>
-            ) : (
-              <ListCard>
-                {results.map((profile) => (
-                  <div
-                    key={profile.id}
-                    className="flex items-center justify-between gap-3 px-4 py-3"
+        {/* Its own scroll box: the page itself never scrolls. */}
+        <div
+          ref={scroller}
+          onScroll={rememberScroll}
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain transition-opacity ${
+            loading ? "opacity-60" : ""
+          }`}
+        >
+          {!loading && shown === 0 ? (
+            <EmptyCard>
+              {mode === "people" ? t("search.noUsers") : t("search.noGroups")}
+            </EmptyCard>
+          ) : mode === "groups" ? (
+            <div className="space-y-3 pb-1">
+              {groupResults.map(({ group, memberCount, members }, i) => (
+                <GroupCard
+                  key={group.id}
+                  group={group}
+                  memberCount={memberCount}
+                  members={members}
+                  index={i}
+                />
+              ))}
+            </div>
+          ) : (
+            <ListCard>
+              {results.map((profile) => (
+                <div
+                  key={profile.id}
+                  className="flex items-center justify-between gap-3 px-4 py-3"
+                >
+                  <Link
+                    href={`/profile/${encodeURIComponent(profile.username)}`}
+                    className="flex min-w-0 items-center gap-3"
                   >
-                    <Link
-                      href={`/profile/${encodeURIComponent(profile.username)}`}
-                      className="flex min-w-0 items-center gap-3"
-                    >
-                      <Avatar profile={profile} className="h-10 w-10 text-sm" />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{profile.full_name}</p>
-                        <p className="truncate text-xs text-muted">@{profile.username}</p>
-                      </div>
-                    </Link>
-                    <FollowButton
-                      targetUserId={profile.id}
-                      currentUserId={currentUserId}
-                      initialStatus={statuses[profile.id] ?? "none"}
-                    />
-                  </div>
-                ))}
-              </ListCard>
-            )}
-          </div>
-
-          {pages > 1 && <Pager page={page} pages={pages} onChange={setPage} />}
+                    <Avatar profile={profile} className="h-10 w-10 text-sm" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{profile.full_name}</p>
+                      <p className="truncate text-xs text-muted">
+                        @{profile.username}
+                        {mutuals[profile.id] ? (
+                          <span className="text-accent">
+                            {" · "}
+                            {t("search.mutual", { n: mutuals[profile.id] })}
+                          </span>
+                        ) : null}
+                      </p>
+                    </div>
+                  </Link>
+                  <FollowButton
+                    targetUserId={profile.id}
+                    currentUserId={currentUserId}
+                    initialStatus={statuses[profile.id] ?? "none"}
+                  />
+                </div>
+              ))}
+            </ListCard>
+          )}
         </div>
-      )}
+
+        {pages > 1 && <Pager page={page} pages={pages} onChange={setPage} />}
+      </div>
     </div>
   );
 }

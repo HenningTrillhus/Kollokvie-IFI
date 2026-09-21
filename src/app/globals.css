@@ -55,7 +55,9 @@ body {
 /* Inside the app shell the document itself must never scroll: header and tab
    bar stay pinned and only designated scroll boxes move. */
 html:has(.app-shell),
-html:has(.app-shell) body {
+html:has(.app-shell) body,
+html:has(.auth-shell),
+html:has(.auth-shell) body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
