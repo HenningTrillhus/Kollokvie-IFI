@@ -40,47 +40,54 @@ const termsNo: Policy = {
         "bryter andres opphavsrett eller personvern, for eksempel bilder av andre uten samtykke,",
         "er spam, reklame eller masseutsendelser,",
         "henter ut eller samler inn profiler eller andre data automatisk (scraping),",
-        "forsøker å forstyrre tjenesten, omgå sikkerheten eller få tilgang til andres kontoer eller data.",
+        "forsøker å forstyrre tjenesten, omgå sikkerheten eller få tilgang til andres kontoer eller data,",
+        "sender uvanlig mange forespørsler eller bruker automatiserte verktøy mot tjenesten.",
       ],
     },
     {
-      heading: "5. Faglig ærlighet",
+      heading: "5. Grenser",
+      paragraphs: [
+        "Tjenesten har kvoter (for eksempel hvor mange kollokviegrupper og hendelser du kan lage) og hastighetsgrenser. De er satt høyt, så vanlig bruk aldri merker dem. Går du over, kan handlingen bli avvist en stund, og vi kan stenge ute den som gjentatte ganger prøver å overbelaste eller ødelegge tjenesten.",
+      ],
+    },
+    {
+      heading: "6. Faglig ærlighet",
       paragraphs: [
         "Kollokviegrupper er til faglig samarbeid og diskusjon. Du er selv ansvarlig for å følge UiOs regler om selvstendig arbeid, samarbeid og fusk. Tjenesten er ikke ment for å dele eller selge besvarelser til vurderte oppgaver.",
       ],
     },
     {
-      heading: "6. Innholdet ditt",
+      heading: "7. Innholdet ditt",
       paragraphs: [
         "Du eier innholdet du legger inn (for eksempel profil, bio, bilde, kollokviegrupper og kalenderhendelser) og er ansvarlig for det. Du gir oss en begrenset, ikke-eksklusiv rett til å lagre og vise innholdet i tjenesten, slik synlighetsvalgene dine bestemmer. Retten opphører når du sletter innholdet eller kontoen din.",
       ],
     },
     {
-      heading: "7. Fjerning av innhold og stenging",
+      heading: "8. Fjerning av innhold og stenging",
       paragraphs: [
         "Vi kan fjerne innhold og stenge eller slette kontoer som bryter disse vilkårene, eller som setter andre eller tjenesten i fare. Skal vi stenge en konto, sier vi fra og forklarer hvorfor, med mindre det er urimelig, for eksempel ved alvorlig misbruk. Ser du innhold som bryter vilkårene, kan du ta kontakt (se nederst).",
       ],
     },
     {
-      heading: "8. Tilgjengelighet og endringer",
+      heading: "9. Tilgjengelighet og endringer",
       paragraphs: [
         "Tjenesten er gratis og leveres slik den er. Vi lover ikke at den alltid er tilgjengelig eller feilfri. Vi kan endre, pause eller avvikle tjenesten. Avvikler vi den, prøver vi å gi beskjed i god tid slik at du kan laste ned dataene dine (Innstillinger).",
       ],
     },
     {
-      heading: "9. Ansvar",
+      heading: "10. Ansvar",
       paragraphs: [
         "Så langt loven tillater, er vi ikke ansvarlige for indirekte tap, for innhold brukere har lagt inn, eller for avtaler og samarbeid mellom brukere. Begrensningen gjelder ikke ved forsett eller grov uaktsomhet, og heller ikke der loven ikke tillater å begrense ansvar. Dine ufravikelige rettigheter, blant annet som forbruker, påvirkes ikke.",
       ],
     },
     {
-      heading: "10. Endringer i vilkårene",
+      heading: "11. Endringer i vilkårene",
       paragraphs: [
         "Vi kan oppdatere vilkårene. Ved vesentlige endringer ber vi deg godta dem på nytt neste gang du åpner appen. Datoen øverst viser når de sist ble endret.",
       ],
     },
     {
-      heading: "11. Lovvalg og tvister",
+      heading: "12. Lovvalg og tvister",
       paragraphs: [
         "Norsk rett gjelder. Tvister som ikke lar seg løse i minnelighet, behandles av norske domstoler med Oslo tingrett som verneting, med mindre ufravikelige regler sier noe annet.",
       ],
@@ -124,47 +131,54 @@ const termsEn: Policy = {
         "infringes others' copyright or privacy, for example pictures of others without consent,",
         "is spam, advertising or bulk messaging,",
         "collects profiles or other data automatically (scraping),",
-        "tries to disrupt the service, bypass its security or gain access to other people's accounts or data.",
+        "tries to disrupt the service, bypass its security or gain access to other people's accounts or data,",
+        "sends an unusual number of requests or uses automated tools against the service.",
       ],
     },
     {
-      heading: "5. Academic integrity",
+      heading: "5. Limits",
+      paragraphs: [
+        "The service has quotas (for example how many study groups and events you can create) and rate limits. They are set high, so normal use never notices them. If you go over, the action may be rejected for a while, and we may block anyone who repeatedly tries to overload or break the service.",
+      ],
+    },
+    {
+      heading: "6. Academic integrity",
       paragraphs: [
         "Study groups are for academic collaboration and discussion. You are responsible for following UiO's rules on independent work, collaboration and cheating. The service is not meant for sharing or selling answers to assessed assignments.",
       ],
     },
     {
-      heading: "6. Your content",
+      heading: "7. Your content",
       paragraphs: [
         "You own the content you add (for example profile, bio, picture, study groups and calendar events) and you are responsible for it. You give us a limited, non-exclusive right to store and display the content in the service, as your visibility choices determine. The right ends when you delete the content or your account.",
       ],
     },
     {
-      heading: "7. Removal of content and suspension",
+      heading: "8. Removal of content and suspension",
       paragraphs: [
         "We may remove content and suspend or delete accounts that break these terms or put others or the service at risk. When we suspend an account we tell you and explain why, unless that is unreasonable, for example in cases of serious abuse. If you see content that breaks the terms, contact us (see the bottom of this page).",
       ],
     },
     {
-      heading: "8. Availability and changes",
+      heading: "9. Availability and changes",
       paragraphs: [
         "The service is free and provided as it is. We don't promise that it is always available or free of errors. We may change, pause or discontinue the service. If we discontinue it, we will try to give notice in good time so you can download your data (Settings).",
       ],
     },
     {
-      heading: "9. Liability",
+      heading: "10. Liability",
       paragraphs: [
         "To the extent the law allows, we are not liable for indirect loss, for content added by users, or for agreements and cooperation between users. This limitation does not apply to intent or gross negligence, or where the law does not allow limiting liability. Your mandatory rights, including as a consumer, are not affected.",
       ],
     },
     {
-      heading: "10. Changes to the terms",
+      heading: "11. Changes to the terms",
       paragraphs: [
         "We may update these terms. For material changes we will ask you to accept them again the next time you open the app. The date at the top shows when they were last changed.",
       ],
     },
     {
-      heading: "11. Governing law and disputes",
+      heading: "12. Governing law and disputes",
       paragraphs: [
         "Norwegian law applies. Disputes that cannot be settled amicably are handled by Norwegian courts with Oslo District Court as the venue, unless mandatory rules say otherwise.",
       ],

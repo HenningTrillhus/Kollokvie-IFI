@@ -18,6 +18,6 @@ Vi svarer så raskt vi kan, og vi krediterer deg gjerne hvis du ønsker det.
 
 ## Det som allerede er på plass
 
-Se «Sikkerhet» i [README.md](README.md): Row Level Security på alle tabeller, Content-Security-Policy med nonce,
-sikkerhetshoder, begrensede rettigheter i databasen, kvoter per bruker og strenge regler for opplastede bilder.
+Se «Sikkerhet» i [docs/oppsett-og-drift.md](docs/oppsett-og-drift.md): Row Level Security på alle tabeller, Content-Security-Policy med nonce,
+sikkerhetshoder, begrensede rettigheter i databasen, kvoter og hastighetsgrenser per bruker og strenge regler for opplastede bilder.
 Kjente og aksepterte begrensninger står også der, så du ikke bruker tid på dem.

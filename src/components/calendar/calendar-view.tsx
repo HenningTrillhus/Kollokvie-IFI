@@ -230,13 +230,12 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
   // ---- data changes
   async function addEvent(v: NewEvent) {
-    if (!selectedDate) return false;
     setSaveError(false);
     const supabase = createClient();
     const payload: Record<string, unknown> = {
       user_id: currentUserId,
       title: v.title,
-      event_date: selectedDate,
+      event_date: v.date,
       type: v.type,
     };
     if (v.time) payload.event_time = v.time;
@@ -248,7 +247,12 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       return false;
     }
     const created = data as CalendarEvent;
-    setEvents((prev) => [...prev, created].sort((a, b) => a.event_date.localeCompare(b.event_date)));
+    // Only keep it in the list if it falls in the range on screen.
+    setEvents((prev) =>
+      [...prev, created]
+        .filter((e) => e.event_date >= rangeStart && e.event_date <= rangeEnd)
+        .sort((a, b) => a.event_date.localeCompare(b.event_date))
+    );
     if (created.type !== "other" && created.event_date >= todayKey) {
       setUpcoming((prev) =>
         [...prev, created].sort(
@@ -263,6 +267,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       setExtraCourses((prev) => (prev.some((c) => c.code === course.code) ? prev : [...prev, course]));
     }
     setAddOpen(false);
+    // In the month view, jump to the new event's day.
+    if (mode === "month") pickDate(created.event_date);
     return true;
   }
 
@@ -403,7 +409,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     <>
       <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-2.5 pt-2.5 md:max-w-3xl md:gap-3 md:px-6 md:pb-4 md:pt-4 lg:max-w-6xl">
         <div className={`shrink-0 space-y-2 p-2.5 lg:flex lg:flex-row-reverse lg:items-center lg:gap-6 lg:space-y-0 lg:px-4 ${cardClass}`}>
-          <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium lg:w-64 lg:shrink-0">
+          <div className="flex items-center gap-2 lg:shrink-0">
+          <div className="grid flex-1 grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium lg:w-64 lg:flex-none">
             {(
               [
                 ["month", t("cal.viewMonth")],
@@ -420,6 +427,20 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
                 {label}
               </button>
             ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSaveError(false);
+              setAddOpen(true);
+            }}
+            aria-label={t("cal.addEvent")}
+            className="flex h-10 w-10 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-accent text-lg font-medium text-white transition hover:bg-accent-hover active:scale-95 lg:w-auto lg:px-4 lg:text-sm"
+          >
+            <span aria-hidden>+</span>
+            <span className="hidden lg:inline">{t("cal.addEvent")}</span>
+          </button>
           </div>
 
           <div className="flex items-center justify-between lg:flex-1">
@@ -591,13 +612,10 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
         </div>
       </div>
 
-      {addOpen && selectedDate && (
-        <BottomSheet
-          tall
-          title={`${t("cal.addHeading")} · ${dateFmt(selectedDate)}`}
-          onClose={() => setAddOpen(false)}
-        >
+      {addOpen && (
+        <BottomSheet tall title={t("cal.addHeading")} onClose={() => setAddOpen(false)}>
           <AddEventForm
+            defaultDate={selectedDate ?? ""}
             saveError={saveError}
             priorityCodes={myCourses.map((c) => c.code)}
             onSubmit={addEvent}

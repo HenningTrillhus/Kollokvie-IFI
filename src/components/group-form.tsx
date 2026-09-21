@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n/client";
 import { cleanLine, cleanText } from "@/lib/sanitize";
 import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import TimePicker from "@/components/time-picker";
+import DatePicker from "@/components/date-picker";
 import type { Course } from "@/lib/courses";
 import { VISIBILITY_KEYS, type Visibility } from "@/lib/groups";
 
@@ -176,12 +177,10 @@ export default function GroupForm({
 
         <div className="grid grid-cols-2 gap-3">
           <Field label={t("group.date")} htmlFor="date">
-            <input
+            <DatePicker
               id="date"
-              type="date"
               value={values.eventDate}
-              onChange={(e) => set("eventDate", e.target.value)}
-              className={inputClass}
+              onChange={(v) => set("eventDate", v)}
             />
           </Field>
           <Field label={t("group.time")} htmlFor="time-trigger">

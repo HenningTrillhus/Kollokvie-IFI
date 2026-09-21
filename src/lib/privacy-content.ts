@@ -44,13 +44,14 @@ const no: Policy = {
         "Profil (valgfritt): studielinje, årstrinn, emner, GitHub- og LinkedIn-lenke, bio, profilbilde (et ferdig ikon eller et bilde du laster opp) og en farge.",
         "Bruk: hvem du følger og hvem som følger deg (også forespørsler), kollokviegrupper du lager, er med i eller blir invitert til, og hendelser du legger i kalenderen (for eksempel eksamener og innleveringer).",
         "Tekniske opplysninger: en innloggingsøkt i en informasjonskapsel, og valg av språk og tema. Leverandørene våre kan i tillegg logge IP-adresse og tekniske data for drift og sikkerhet.",
+        "Misbruksvern: for å stoppe skript og oversvømmelse teller vi hvor mange handlinger hver bruker gjør per minutt og time (for eksempel nye hendelser eller følgeforespørsler), og serveren teller forespørsler per IP-adresse og innloggingsøkt i minnet i under ett minutt. Innloggingsøkten brukes bare som en kortlivet, uleselig etikett i telleren og lagres ikke. Grensene er satt høyt, så vanlig bruk aldri merker dem.",
       ],
     },
     {
       heading: "3. Formål og rettslig grunnlag",
       paragraphs: [
         "Vi bruker opplysningene til å levere tjenesten: la deg finne og delta i kollokviegrupper, følge andre studenter, holde oversikt i en kalender og vise deg til dem du velger å dele med.",
-        "Rettslig grunnlag er samtykket ditt (GDPR artikkel 6 nr. 1 bokstav a), som du gir når du oppretter konto eller godtar denne erklæringen. Du kan trekke samtykket når som helst ved å slette kontoen din i Innstillinger. Å trekke samtykket påvirker ikke lovligheten av behandlingen frem til det tidspunktet.",
+        "Rettslig grunnlag er samtykket ditt (GDPR artikkel 6 nr. 1 bokstav a), som du gir når du oppretter konto eller godtar denne erklæringen. Misbruksvernet over bygger på berettiget interesse i å holde tjenesten trygg og tilgjengelig (artikkel 6 nr. 1 bokstav f); det er lite inngripende og lagrer ingenting varig. Du kan trekke samtykket når som helst ved å slette kontoen din i Innstillinger. Å trekke samtykket påvirker ikke lovligheten av behandlingen frem til det tidspunktet.",
       ],
     },
     {
@@ -79,7 +80,7 @@ const no: Policy = {
     {
       heading: "6. Hvor lenge vi lagrer opplysningene",
       paragraphs: [
-        "Vi lagrer opplysningene så lenge du har en konto. Når du sletter kontoen din i Innstillinger, slettes profilen, bioen, følgeforhold, medlemskap, kollokviegrupper du eier, kalenderhendelser og et opplastet profilbilde. Kopier i leverandørenes sikkerhetskopier kan ligge igjen i en begrenset periode før de forsvinner.",
+        "Vi lagrer opplysningene så lenge du har en konto. Tellerne for misbruksvern slettes av seg selv etter noen timer (per bruker) eller under ett minutt (per IP-adresse i serverens minne). En IP-adresse som sender ekstremt mange forespørsler, kan stenges ute i noen minutter. Når du sletter kontoen din i Innstillinger, slettes profilen, bioen, følgeforhold, medlemskap, kollokviegrupper du eier, kalenderhendelser og et opplastet profilbilde. Kopier i leverandørenes sikkerhetskopier kan ligge igjen i en begrenset periode før de forsvinner.",
       ],
     },
     {
@@ -167,13 +168,14 @@ const en: Policy = {
         "Profile (optional): study program, year, courses, GitHub and LinkedIn link, bio, profile picture (a ready-made icon or a picture you upload) and a color.",
         "Usage: who you follow and who follows you (including requests), study groups you create, join or are invited to, and events you add to the calendar (for example exams and deadlines).",
         "Technical: a sign-in session in a cookie, and your language and theme choice. Our providers may also log IP addresses and technical data for operation and security.",
+        "Abuse protection: to stop scripts and flooding we count how many actions each user makes per minute and hour (for example new events or follow requests), and the server counts requests per IP address and sign-in session in memory for under a minute. The sign-in session is only used as a short-lived, unreadable label in the counter and is not stored. The limits are high, so normal use never notices them.",
       ],
     },
     {
       heading: "3. Purpose and legal basis",
       paragraphs: [
         "We use the information to provide the service: letting you find and join study groups, follow other students, keep track in a calendar and show you to the people you choose to share with.",
-        "The legal basis is your consent (GDPR Article 6(1)(a)), which you give when you create an account or accept this policy. You can withdraw it at any time by deleting your account in Settings. Withdrawing consent does not affect the lawfulness of processing before that point.",
+        "The legal basis is your consent (GDPR Article 6(1)(a)), which you give when you create an account or accept this policy. The abuse protection above is based on a legitimate interest in keeping the service safe and available (Article 6(1)(f)); it is minimally intrusive and stores nothing permanently. You can withdraw it at any time by deleting your account in Settings. Withdrawing consent does not affect the lawfulness of processing before that point.",
       ],
     },
     {
@@ -202,7 +204,7 @@ const en: Policy = {
     {
       heading: "6. How long we keep the data",
       paragraphs: [
-        "We keep the data for as long as you have an account. When you delete your account in Settings, your profile, bio, follow relationships, memberships, study groups you own, calendar events and an uploaded profile picture are deleted. Copies in our providers' backups may remain for a limited period before they disappear.",
+        "We keep the data for as long as you have an account. The abuse-protection counters delete themselves after a few hours (per user) or in under a minute (per IP address, in the server's memory). An IP address that sends an extreme number of requests may be blocked for a few minutes. When you delete your account in Settings, your profile, bio, follow relationships, memberships, study groups you own, calendar events and an uploaded profile picture are deleted. Copies in our providers' backups may remain for a limited period before they disappear.",
       ],
     },
     {

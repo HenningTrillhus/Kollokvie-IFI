@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CourseSingleSelect from "@/components/course-single-select";
 import TimePicker from "@/components/time-picker";
+import DatePicker from "@/components/date-picker";
 import { Field } from "@/components/form-ui";
 import { EVENT_TYPES, EVENT_TYPE_KEYS, type EventType } from "@/lib/events";
 import type { Course } from "@/lib/courses";
@@ -28,11 +29,14 @@ export default function AddEventForm({
   priorityCodes,
   onSubmit,
   initial,
+  defaultDate,
 }: {
   saveError: boolean;
   priorityCodes: string[];
   // Given when editing an existing event: the fields start filled in.
   initial?: NewEvent;
+  // When adding: the day that is selected in the calendar, if any.
+  defaultDate?: string;
   onSubmit: (values: NewEvent) => Promise<boolean>;
 }) {
   const { t } = useI18n();
@@ -41,7 +45,7 @@ export default function AddEventForm({
   const [type, setType] = useState<EventType>(initial?.type ?? "exam");
   const [course, setCourse] = useState<Course | null>(initial?.course ?? null);
   const [time, setTime] = useState(initial?.time ?? "");
-  const [date, setDate] = useState(initial?.date ?? "");
+  const [date, setDate] = useState(initial?.date ?? defaultDate ?? "");
   const [saving, setSaving] = useState(false);
 
   // An exam or oblig needs no title: it is simply called "Exam" / "Oblig".
@@ -50,7 +54,7 @@ export default function AddEventForm({
   async function submit(event: FormEvent) {
     event.preventDefault();
     const clean = cleanLine(title) || defaultTitle;
-    if (!clean || (editing && !date)) return;
+    if (!clean || !date) return;
     setSaving(true);
     const ok = await onSubmit({ title: clean, type, course, time, date });
     // On success the sheet closes and this form goes away with it.
@@ -93,18 +97,9 @@ export default function AddEventForm({
           </div>
         </div>
 
-        {editing && (
-          <Field label={t("cal.date")} htmlFor="cal-date">
-            <input
-              id="cal-date"
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className={bigInput}
-            />
-          </Field>
-        )}
+        <Field label={t("cal.date")} htmlFor="cal-date">
+          <DatePicker id="cal-date" value={date} onChange={setDate} large />
+        </Field>
 
         <Field label={`${t("cal.course")} (${t("cal.optional")})`}>
           <CourseSingleSelect value={course} onChange={setCourse} priorityCodes={priorityCodes} />
@@ -130,7 +125,7 @@ export default function AddEventForm({
       <div className="sticky bottom-0 border-t border-card-border bg-card px-5 py-2.5 sm:py-3">
         <button
           type="submit"
-          disabled={saving || (!title.trim() && !defaultTitle) || (editing && !date)}
+          disabled={saving || (!title.trim() && !defaultTitle) || !date}
           className="min-h-[3rem] w-full rounded-2xl bg-accent text-base font-semibold text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60"
         >
           {editing

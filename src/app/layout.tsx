@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getPrefs } from "@/lib/i18n/server";
 import { translate } from "@/lib/i18n";
+import RateLimitNotice from "@/components/rate-limit-notice";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <I18nProvider lang={lang} theme={theme}>
           {children}
+          <RateLimitNotice />
         </I18nProvider>
       </body>
     </html>
