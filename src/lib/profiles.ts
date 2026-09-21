@@ -84,7 +84,8 @@ export function escapeLike(value: string) {
 
 // Letters, digits, dot, underscore and hyphen: safe in URLs and unambiguous.
 export const USERNAME_PATTERN = /^[A-Za-z0-9._-]{2,24}$/;
-export const IFI_USERNAME_PATTERN = /^[A-Za-z0-9._-]{1,32}$/;
+// Lowercase only: it's the part before @uio.no.
+export const IFI_USERNAME_PATTERN = /^[a-z0-9._-]{1,32}$/;
 
 export async function getProfileByUsername(
   supabase: SupabaseClient,

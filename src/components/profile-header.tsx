@@ -15,14 +15,12 @@ export default async function ProfileHeader({
   bio,
   courses,
   counts,
-  showIfiUsername,
   actions,
 }: {
   profile: Profile;
   bio: string | null;
   courses: Course[];
   counts: { followers: number; following: number };
-  showIfiUsername?: boolean;
   actions?: ReactNode;
 }) {
   const { t, lang } = await getT();
@@ -37,11 +35,6 @@ export default async function ProfileHeader({
             {profile.full_name}
           </h1>
           <p className="truncate text-sm text-muted">@{profile.username}</p>
-          {showIfiUsername && (
-            <p className="truncate text-xs text-muted">
-              {t("profile.ifi", { name: profile.ifi_username })}
-            </p>
-          )}
         </div>
       </div>
 

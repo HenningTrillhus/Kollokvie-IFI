@@ -65,7 +65,6 @@ export default async function OwnProfilePage() {
         bio={bioRow?.bio ?? null}
         courses={courses}
         counts={counts}
-        showIfiUsername
         actions={
           <>
             <Link

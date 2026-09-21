@@ -10,7 +10,7 @@ import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { EMAIL_VERIFICATION_ENABLED, emailForIfiUsername, ifiEmail } from "@/lib/ifi-auth";
 import VerifyCodeForm from "@/components/verify-code-form";
-import { IFI_USERNAME_PATTERN, USERNAME_PATTERN } from "@/lib/profiles";
+import { IFI_USERNAME_PATTERN } from "@/lib/profiles";
 import { useI18n } from "@/lib/i18n/client";
 
 const MIN_PASSWORD_LENGTH = 6;
@@ -19,7 +19,6 @@ export default function SignupPage() {
   const router = useRouter();
   const { t } = useI18n();
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
   const [ifiUsername, setIfiUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -54,10 +53,6 @@ export default function SignupPage() {
       setErrorMessage(t("auth.consentRequired"));
       return;
     }
-    if (!USERNAME_PATTERN.test(username.trim())) {
-      setErrorMessage(t("auth.usernameInvalid"));
-      return;
-    }
     if (!IFI_USERNAME_PATTERN.test(ifiUsername.trim())) {
       setErrorMessage(t("auth.ifiInvalid"));
       return;
@@ -81,18 +76,8 @@ export default function SignupPage() {
     // database function isn't installed.)
     await supabase.rpc("release_unconfirmed_signup", {
       p_email: email,
-      p_username: username.trim(),
+      p_username: ifiUsername.trim().toLowerCase(),
     });
-
-    // Is the username free? (Only checked if the database function exists.)
-    const { data: free, error: checkError } = await supabase.rpc("username_available", {
-      name: username.trim(),
-    });
-    if (!checkError && free === false) {
-      setLoading(false);
-      setErrorMessage(t("settings.usernameTaken"));
-      return;
-    }
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -100,8 +85,9 @@ export default function SignupPage() {
       options: {
         data: {
           full_name: fullName.trim(),
-          username: username.trim(),
-          ifi_username: ifiUsername.trim(),
+          // The IFI username is the username too.
+          username: ifiUsername.trim().toLowerCase(),
+          ifi_username: ifiUsername.trim().toLowerCase(),
           // Recorded with a timestamp by the database when the account is made.
           privacy_version: PRIVACY_VERSION,
         },
@@ -192,25 +178,6 @@ export default function SignupPage() {
 
             <div>
               <label
-                htmlFor="username"
-                className="mb-1.5 block text-sm font-medium"
-              >
-                {t("auth.username")}
-              </label>
-              <input
-                id="username"
-                type="text"
-                required
-                autoComplete="username"
-                placeholder="olanordmann"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-              />
-            </div>
-
-            <div>
-              <label
                 htmlFor="ifiUsername"
                 className="mb-1.5 block text-sm font-medium"
               >
@@ -220,9 +187,14 @@ export default function SignupPage() {
                 id="ifiUsername"
                 type="text"
                 required
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 placeholder="olan"
                 value={ifiUsername}
-                onChange={(e) => setIfiUsername(e.target.value)}
+                // It's part of an email address: lowercase only, no spaces.
+                onChange={(e) => setIfiUsername(e.target.value.toLowerCase().replace(/\s/g, ""))}
                 className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
               <p className="mt-1 text-xs text-muted">

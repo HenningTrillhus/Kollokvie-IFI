@@ -82,6 +82,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
 | `0022` | Kalender: klokkeslett og emne på hendelser, og `calendar_prefs` (farger og filter per emne) |
 | `0027` | Rydder opp i uferdige registreringer (aldri bekreftet), så de ikke blokkerer e-post eller brukernavn |
+| `0028` | Brukernavn = IFI-brukernavn (ingen egen brukernavn-innstilling lenger) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |

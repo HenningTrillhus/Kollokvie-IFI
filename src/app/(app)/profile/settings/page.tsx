@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ACCENT_COLORS,
   STUDY_PROGRAMS,
-  USERNAME_PATTERN,
   sanitizeExternalUrl,
 } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
@@ -27,7 +26,6 @@ const STUDY_YEARS = [1, 2, 3, 4, 5];
 type Fields = {
   bio: string;
   fullName: string;
-  username: string;
   githubUrl: string;
   linkedinUrl: string;
   studyProgram: string;
@@ -46,7 +44,6 @@ export default function SettingsPage() {
 
   const [bio, setBio] = useState("");
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
@@ -94,7 +91,6 @@ export default function SettingsPage() {
         setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
         setIfiUsername(profile.ifi_username);
         setFullName(profile.full_name);
-        setUsername(profile.username);
         setGithubUrl(profile.github_url ?? "");
         setLinkedinUrl(profile.linkedin_url ?? "");
         setStudyProgram(profile.study_program ?? "");
@@ -105,7 +101,6 @@ export default function SettingsPage() {
       setSaved({
         bio: savedBio,
         fullName: profile?.full_name ?? "",
-        username: profile?.username ?? "",
         githubUrl: profile?.github_url ?? "",
         linkedinUrl: profile?.linkedin_url ?? "",
         studyProgram: profile?.study_program ?? "",
@@ -119,7 +114,6 @@ export default function SettingsPage() {
   const current: Fields = {
     bio,
     fullName,
-    username,
     githubUrl,
     linkedinUrl,
     studyProgram,
@@ -143,14 +137,9 @@ export default function SettingsPage() {
     setErrorMessage("");
 
     const trimmedName = fullName.trim();
-    const trimmedUsername = username.trim();
 
     if (!trimmedName) {
       setErrorMessage(t("settings.nameRequired"));
-      return;
-    }
-    if (!USERNAME_PATTERN.test(trimmedUsername)) {
-      setErrorMessage(t("auth.usernameInvalid"));
       return;
     }
     const github = githubUrl.trim() ? sanitizeExternalUrl(githubUrl) : null;
@@ -171,7 +160,6 @@ export default function SettingsPage() {
       .from("profiles")
       .update({
         full_name: trimmedName,
-        username: trimmedUsername,
         github_url: github,
         linkedin_url: linkedin,
         study_program: studyProgram || null,
@@ -188,7 +176,7 @@ export default function SettingsPage() {
     }
 
     await supabase.auth.updateUser({
-      data: { full_name: trimmedName, username: trimmedUsername },
+      data: { full_name: trimmedName },
     });
 
     const trimmedBio = bio.trim();
@@ -239,13 +227,11 @@ export default function SettingsPage() {
       ...current,
       bio: trimmedBio,
       fullName: trimmedName,
-      username: trimmedUsername,
       githubUrl: github ?? "",
       linkedinUrl: linkedin ?? "",
     });
     setBio(trimmedBio);
     setFullName(trimmedName);
-    setUsername(trimmedUsername);
     setGithubUrl(github ?? "");
     setLinkedinUrl(linkedin ?? "");
     setSaving(false);
@@ -325,7 +311,7 @@ export default function SettingsPage() {
             profile={{
               id: userId,
               full_name: fullName,
-              username,
+              username: ifiUsername,
               accent_color: accentColor,
             }}
             value={avatar}
@@ -343,19 +329,6 @@ export default function SettingsPage() {
               autoComplete="name"
               value={fullName}
               onChange={(e) => edit(setFullName)(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
-
-          <Field label={t("auth.username")} htmlFor="username">
-            <input
-              id="username"
-              type="text"
-              required
-              autoCapitalize="none"
-              autoCorrect="off"
-              value={username}
-              onChange={(e) => edit(setUsername)(e.target.value)}
               className={inputClass}
             />
           </Field>
