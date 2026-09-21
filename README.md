@@ -22,7 +22,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
-  blant 45 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
+  blant 60 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
   En kort bio (160 tegn) er bare synlig for de som følger deg.
 - **Personvern og samtykke.** Fullstendig personvernerklæring (`/personvern`, norsk og engelsk), obligatorisk
   samtykke ved registrering, en samtykkeside (`/samtykke`) for eksisterende brukere, og «Last ned dataene mine»
@@ -84,6 +84,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0027` | Rydder opp i uferdige registreringer (aldri bekreftet), så de ikke blokkerer e-post eller brukernavn |
 | `0028` | Brukernavn = IFI-brukernavn (ingen egen brukernavn-innstilling lenger) |
 | `0029` | `suggested_profiles`: søket viser alle brukere når feltet er tomt, med felles kontakter først |
+| `0030` | Profilikoner 01–60 (var 01–45) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
