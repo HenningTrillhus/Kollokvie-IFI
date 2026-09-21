@@ -95,7 +95,7 @@ export default function AddEventForm({
 
         <Field label={`${t("cal.time")} (${t("cal.optional")})`} htmlFor="time-hour">
           <div className="max-w-[12rem]">
-            <QuarterTimePicker value={time} onChange={setTime} />
+            <QuarterTimePicker value={time} onChange={setTime} anyMinute={type === "deadline"} />
           </div>
         </Field>
 

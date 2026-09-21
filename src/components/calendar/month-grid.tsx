@@ -59,8 +59,12 @@ export default function MonthGrid({
         : "";
 
   return (
-    <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="touch-pan-y">
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted">
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="flex h-full min-h-0 touch-pan-y flex-col"
+    >
+      <div className="grid shrink-0 grid-cols-7 gap-1 text-center text-xs font-medium text-muted">
         {weekdays.map((day) => (
           <div key={day} className="pb-1">
             {day}
@@ -70,7 +74,8 @@ export default function MonthGrid({
 
       <div
         key={`${year}-${month}`}
-        className={`mt-0.5 grid grid-cols-7 gap-1 transition-opacity ${slide} ${
+        style={{ gridTemplateRows: `repeat(${cells.length / 7}, minmax(0, 1fr))` }}
+        className={`mt-0.5 grid min-h-0 flex-1 grid-cols-7 gap-0.5 transition-opacity ${slide} ${
           loading ? "opacity-60" : ""
         }`}
       >
@@ -85,7 +90,7 @@ export default function MonthGrid({
             <button
               key={dateKey}
               onClick={() => onSelect(dateKey)}
-              className={`flex h-10 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 sm:h-12 ${
+              className={`flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 ${
                 isSelected
                   ? "border-accent bg-accent-soft"
                   : "border-transparent hover:bg-accent-soft/60"

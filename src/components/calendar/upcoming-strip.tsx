@@ -20,7 +20,7 @@ export default function UpcomingStrip({
 
   return (
     <section aria-label={t("cal.upcoming")} className="shrink-0">
-      <h2 className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+      <h2 className="mb-1 px-1 text-[10px] [@media(max-height:780px)]:hidden font-semibold uppercase tracking-wide text-muted">
         {t("cal.upcoming")}
       </h2>
       <div className="no-scrollbar -mx-4 flex scroll-px-4 snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain px-4">
@@ -38,7 +38,7 @@ export default function UpcomingStrip({
             <button
               key={item.key}
               onClick={() => onPick(item.date)}
-              className="flex h-[64px] w-[15rem] shrink-0 snap-start items-center gap-3 overflow-hidden rounded-2xl border border-card-border bg-card pr-3 text-left transition active:scale-[0.98]"
+              className="flex h-[58px] w-[14.5rem] shrink-0 snap-start items-center gap-3 overflow-hidden rounded-2xl border border-card-border bg-card pr-3 text-left transition active:scale-[0.98]"
             >
               <span
                 aria-hidden

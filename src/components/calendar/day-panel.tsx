@@ -23,7 +23,7 @@ export default function DayPanel({
 
   if (!date) {
     return (
-      <section className={`flex min-h-[8rem] flex-1 items-center justify-center p-5 text-center ${cardClass}`}>
+      <section className={`flex min-h-[6rem] flex-[3] items-center justify-center p-4 text-center ${cardClass}`}>
         <p className="text-sm text-muted">{t("cal.hint")}</p>
       </section>
     );
@@ -38,7 +38,7 @@ export default function DayPanel({
   });
 
   return (
-    <section className={`flex min-h-[8rem] flex-1 flex-col overflow-hidden ${cardClass}`}>
+    <section className={`flex min-h-[6rem] flex-[3] flex-col overflow-hidden ${cardClass}`}>
       <div className="flex shrink-0 items-center justify-between border-b border-card-border px-4 py-2.5">
         <h2 className="text-sm font-semibold">{heading}</h2>
         <button

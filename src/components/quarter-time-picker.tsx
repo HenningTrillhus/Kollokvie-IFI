@@ -2,19 +2,27 @@ import { inputClass } from "@/components/form-ui";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const QUARTERS = ["00", "15", "30", "45"];
+const EVERY_MINUTE = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
 
 // Time in 15-minute steps. Native time inputs let you pick any minute (and
 // mobile pickers ignore the step attribute), so use two plain selects.
 export default function QuarterTimePicker({
   value,
   onChange,
+  anyMinute = false,
 }: {
   value: string;
   onChange: (value: string) => void;
+  // Offer every minute (00-59) instead of quarters: for exact deadlines.
+  anyMinute?: boolean;
 }) {
   const [hour = "", minute = ""] = value ? value.slice(0, 5).split(":") : [];
   // A time saved before quarter-steps existed keeps its odd minute as an option.
-  const minutes = minute && !QUARTERS.includes(minute) ? [...QUARTERS, minute].sort() : QUARTERS;
+  const minutes = anyMinute
+    ? EVERY_MINUTE
+    : minute && !QUARTERS.includes(minute)
+      ? [...QUARTERS, minute].sort()
+      : QUARTERS;
 
   const selectClass = `${inputClass} appearance-none px-2 text-center`;
 

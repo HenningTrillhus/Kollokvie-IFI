@@ -30,7 +30,7 @@ import { localeFor } from "@/lib/i18n";
 type Mode = "month" | "semester";
 
 const navButton =
-  "flex h-9 w-9 items-center justify-center rounded-xl text-lg text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90";
+  "flex h-8 w-8 items-center justify-center rounded-xl text-lg text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90";
 
 // The calendar fills the space between the top bar and the tab bar. Nothing
 // here makes the page scroll: swipeable rows and scrollable boxes do the work.
@@ -312,8 +312,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
   return (
     <>
-      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 pb-3 pt-3">
-        <div className={`shrink-0 space-y-2.5 p-3 ${cardClass}`}>
+      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-2.5 pt-2.5">
+        <div className={`shrink-0 space-y-2 p-2.5 ${cardClass}`}>
           <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
             {(
               [
@@ -324,7 +324,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
               <button
                 key={value}
                 onClick={() => switchMode(value)}
-                className={`rounded-lg px-3 py-1 transition ${
+                className={`rounded-lg px-3 py-0.5 transition ${
                   mode === value ? "bg-accent text-white" : "text-muted"
                 }`}
               >
@@ -388,7 +388,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
         {mode === "month" ? (
           <>
-            <div className={`shrink-0 p-3 ${cardClass}`}>
+            <div className={`flex min-h-[14rem] flex-[5] flex-col p-2.5 ${cardClass}`}>
               <MonthGrid
                 year={year}
                 month={month}
