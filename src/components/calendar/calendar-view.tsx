@@ -48,6 +48,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [editing, setEditing] = useState<CalItem | null>(null);
 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [upcoming, setUpcoming] = useState<CalendarEvent[]>([]);
@@ -260,6 +261,60 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     return true;
   }
 
+  // Save changes to an existing event (title, type, course, time, even the day).
+  async function updateEvent(v: NewEvent) {
+    if (!editing) return false;
+    setSaveError(false);
+    const supabase = createClient();
+    const patch: Record<string, unknown> = {
+      title: v.title,
+      event_date: v.date,
+      event_time: v.time || null,
+      type: v.type,
+      course_code: v.course?.code ?? null,
+    };
+    // Exams can't be "done", so changing an oblig into an exam clears it.
+    if (v.type === "exam") patch.completed_at = null;
+
+    const { data, error } = await supabase
+      .from("events")
+      .update(patch)
+      .eq("id", editing.id)
+      .select()
+      .single();
+    if (error || !data) {
+      setSaveError(true);
+      return false;
+    }
+    const updated = data as CalendarEvent;
+    const original = editing;
+
+    setEvents((prev) =>
+      prev
+        .map((e) => (e.id === updated.id ? updated : e))
+        .filter((e) => e.event_date >= rangeStart && e.event_date <= rangeEnd)
+        .sort((a, b) => a.event_date.localeCompare(b.event_date))
+    );
+    setUpcoming((prev) => {
+      const rest = prev.filter((e) => e.id !== updated.id);
+      const next =
+        updated.type !== "other" && updated.event_date >= todayKey ? [...rest, updated] : rest;
+      return next.sort(
+        (a, b) =>
+          a.event_date.localeCompare(b.event_date) ||
+          (a.event_time ?? "").localeCompare(b.event_time ?? "")
+      );
+    });
+    if (v.course) {
+      const course = v.course;
+      setExtraCourses((prev) => (prev.some((c) => c.code === course.code) ? prev : [...prev, course]));
+    }
+    setEditing(null);
+    // Moved to another day: follow it there.
+    if (updated.event_date !== original.date) pickDate(updated.event_date);
+    return true;
+  }
+
   // Mark an oblig / other event as done (or undo it). Optimistic: it moves and
   // the confetti fires at once; if saving fails it goes back.
   async function toggleDone(item: CalItem, source?: HTMLElement) {
@@ -456,6 +511,10 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
                   setSaveError(false);
                   setAddOpen(true);
                 }}
+                onEdit={(item) => {
+                  setSaveError(false);
+                  setEditing(item);
+                }}
                 onDelete={deleteEvent}
                 onToggleDone={toggleDone}
               />
@@ -498,6 +557,34 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
             saveError={saveError}
             priorityCodes={myCourses.map((c) => c.code)}
             onSubmit={addEvent}
+          />
+        </BottomSheet>
+      )}
+
+      {editing && (
+        <BottomSheet
+          tall
+          title={`${t("cal.editHeading")} · ${dateFmt(editing.date)}`}
+          onClose={() => setEditing(null)}
+        >
+          <AddEventForm
+            key={editing.id}
+            saveError={saveError}
+            priorityCodes={myCourses.map((c) => c.code)}
+            onSubmit={updateEvent}
+            initial={{
+              title: editing.title,
+              type: editing.type ?? "other",
+              time: editing.time ?? "",
+              date: editing.date,
+              course: editing.courseCode
+                ? [...extraCourses, ...myCourses].find((c) => c.code === editing.courseCode) ?? {
+                    code: editing.courseCode,
+                    name: editing.courseCode,
+                    is_custom: false,
+                  }
+                : null,
+            }}
           />
         </BottomSheet>
       )}

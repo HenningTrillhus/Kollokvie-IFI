@@ -16,12 +16,14 @@ export default function DayPanel({
   date,
   items,
   onAdd,
+  onEdit,
   onDelete,
   onToggleDone,
 }: {
   date: string | null;
   items: CalItem[];
   onAdd: () => void;
+  onEdit: (item: CalItem) => void;
   onDelete: (id: string) => void;
   onToggleDone: (item: CalItem, source: HTMLElement) => void;
 }) {
@@ -103,12 +105,32 @@ export default function DayPanel({
                       {body}
                     </Link>
                   ) : (
-                    body
+                    // Your own events open for editing.
+                    <button
+                      type="button"
+                      onClick={() => onEdit(item)}
+                      aria-label={t("cal.editEvent", { title: item.title })}
+                      className="flex min-w-0 flex-1 rounded-lg text-left transition hover:opacity-80 active:opacity-60"
+                    >
+                      {body}
+                    </button>
                   )}
                   {item.done && (
                     <span className="shrink-0 rounded-md bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-600">
                       {t("cal.done")}
                     </span>
+                  )}
+                  {item.kind === "event" && (
+                    <button
+                      type="button"
+                      onClick={() => onEdit(item)}
+                      aria-label={t("cal.editEvent", { title: item.title })}
+                      className="shrink-0 rounded-lg p-1.5 text-muted transition hover:bg-accent-soft hover:text-accent active:scale-90"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+                        <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
                   )}
                   {item.kind === "event" && (
                     <button

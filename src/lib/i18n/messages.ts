@@ -136,6 +136,11 @@ export const messages = {
     no: "Du har nådd grensen for hvor mange kollokviegrupper du kan opprette.",
     en: "You have reached the limit for how many study groups you can create.",
   },
+  "cal.editHeading": { no: "Rediger", en: "Edit" },
+  "cal.editEvent": { no: "Rediger {title}", en: "Edit {title}" },
+  "cal.date": { no: "Dato", en: "Date" },
+  "cal.save": { no: "Lagre endringer", en: "Save changes" },
+  "cal.saving": { no: "Lagrer…", en: "Saving…" },
   "follow.confirmUnfollow": { no: "Slutt å følge?", en: "Unfollow?" },
   "group.confirmLeave": { no: "Trykk igjen for å forlate", en: "Tap again to leave" },
   "pw.hint": {
