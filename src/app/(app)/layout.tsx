@@ -9,6 +9,7 @@ import AppShell from "@/components/app-shell";
 import AutoRefresh from "@/components/auto-refresh";
 import SignedInToast from "@/components/signed-in-toast";
 import { PRIVACY_VERSION } from "@/lib/privacy";
+import { EMAIL_VERIFICATION_ENABLED, isLegacyEmail } from "@/lib/ifi-auth";
 
 export default async function AppLayout({
   children,
@@ -19,6 +20,11 @@ export default async function AppLayout({
 
   if (!user) {
     redirect("/login");
+  }
+
+  // Accounts from before email codes verify their IFI address once.
+  if (EMAIL_VERIFICATION_ENABLED && isLegacyEmail(user.email)) {
+    redirect("/bekreft");
   }
 
   const supabase = await createClient();

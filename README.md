@@ -81,6 +81,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
 | `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
 | `0022` | Kalender: klokkeslett og emne på hendelser, og `calendar_prefs` (farger og filter per emne) |
+| `0024` | Bare IFI-e-poster kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
 | `0023` | «Ferdig» på hendelser (`events.completed_at`) og ikon 01–45 |
 
 ### 4. Skru av e-postbekreftelse
@@ -103,6 +104,25 @@ Andre kommandoer: `npm run lint` og `npm run build`.
 Valgfritt: sett `NEXT_PUBLIC_CONTACT_EMAIL` (lokalt og i Vercel) for å vise en kontakt-e-post nederst i
 personvernerklæringen. Når personvernerklæringen endres på en måte som krever nytt samtykke, øk
 `PRIVACY_VERSION` i `src/lib/privacy.ts`, så blir alle spurt på nytt.
+
+## E-postkode ved registrering (valgfritt, men anbefalt)
+
+Uten dette kan hvem som helst registrere seg med et hvilket som helst IFI-brukernavn. Med det må man ha
+tilgang til `brukernavn@ifi.uio.no` og skrive inn en kode på seks siffer.
+
+1. Opprett en konto hos [Resend](https://resend.com) (velg EU-region), legg til domenet ditt og legg
+   DNS-oppføringene inn hos domeneleverandøren. Lag en API-nøkkel med «Sending access».
+2. Supabase → **Authentication → SMTP Settings**: skru på egen SMTP med vert `smtp.resend.com`,
+   port `465`, bruker `resend`, passord = API-nøkkelen, og avsender `no-reply@ditt-domene`.
+3. Supabase → **Authentication → Sign In / Providers → Email**: skru på **Confirm email**, skru av
+   **Secure email change**, og sett kodelengde til 6 og gyldighet til rundt 10 minutter.
+4. Supabase → **Authentication → Email Templates**: bytt «Confirm signup» og «Change Email Address» til
+   maler som viser `{{ .Token }}` (koden) i stedet for en lenke.
+5. Kjør `0024_verified_ifi_email.sql` i SQL Editor.
+6. Sett `NEXT_PUBLIC_EMAIL_VERIFICATION=1` i Vercel og deploy på nytt.
+
+Eksisterende brukere (laget før dette) blir bedt om å bekrefte IFI-e-posten sin én gang på `/bekreft`.
+Gjør stegene i rekkefølge: appen ber ikke om kode før steg 6.
 
 ## Deploy (Vercel)
 

@@ -7,7 +7,8 @@ import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { emailForIfiUsername } from "@/lib/ifi-auth";
+import { loginEmails } from "@/lib/ifi-auth";
+import VerifyCodeForm from "@/components/verify-code-form";
 import { useI18n } from "@/lib/i18n/client";
 
 export default function LoginPage() {
@@ -17,24 +18,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // If the address was never confirmed, we send a code and ask for it here.
+  const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    setLoading(true);
-    setErrorMessage("");
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: emailForIfiUsername(ifiUsername),
-      password,
-    });
-
-    if (error) {
-      setLoading(false);
-      setErrorMessage(t("auth.badCredentials"));
-      return;
-    }
-
+  function finish() {
     try {
       sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
     } catch {
@@ -42,6 +29,51 @@ export default function LoginPage() {
     }
     router.push("/dashboard");
     router.refresh();
+  }
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setLoading(true);
+    setErrorMessage("");
+
+    const supabase = createClient();
+    let unconfirmed: string | null = null;
+    let signedIn = false;
+
+    // The IFI address first, then the made-up one older accounts still use.
+    for (const email of loginEmails(ifiUsername)) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (!error) {
+        signedIn = true;
+        break;
+      }
+      if (error.message.toLowerCase().includes("not confirmed")) {
+        unconfirmed = email;
+        break;
+      }
+    }
+
+    if (signedIn) {
+      finish();
+      return;
+    }
+
+    if (unconfirmed) {
+      await supabase.auth.resend({ type: "signup", email: unconfirmed });
+      setConfirmEmail(unconfirmed);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    setErrorMessage(t("auth.badCredentials"));
+  }
+
+  async function resendCode() {
+    if (!confirmEmail) return false;
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({ type: "signup", email: confirmEmail });
+    return !error;
   }
 
   return (
@@ -54,7 +86,7 @@ export default function LoginPage() {
             <Logo className="h-16 w-16" />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {t("auth.login")}
+            {confirmEmail ? t("verify.title") : t("auth.login")}
           </h1>
           <p className="mt-2 text-sm text-muted">
             Kollokvie<span className="text-accent">@IFI</span>
@@ -62,6 +94,15 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-card-border bg-card p-8 shadow-sm">
+          {confirmEmail ? (
+            <VerifyCodeForm
+              email={confirmEmail}
+              type="signup"
+              onVerified={finish}
+              onResend={resendCode}
+              onBack={() => setConfirmEmail(null)}
+            />
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -122,6 +163,7 @@ export default function LoginPage() {
               </Link>
             </p>
           </form>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-muted">

@@ -8,7 +8,8 @@ import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { emailForIfiUsername } from "@/lib/ifi-auth";
+import { EMAIL_VERIFICATION_ENABLED, emailForIfiUsername, ifiEmail } from "@/lib/ifi-auth";
+import VerifyCodeForm from "@/components/verify-code-form";
 import { IFI_USERNAME_PATTERN, USERNAME_PATTERN } from "@/lib/profiles";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -25,6 +26,25 @@ export default function SignupPage() {
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // After the form: enter the code we emailed to the IFI address.
+  const [step, setStep] = useState<"form" | "code">("form");
+  const [pendingEmail, setPendingEmail] = useState("");
+
+  function finish() {
+    try {
+      sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
+    } catch {
+      // ignore
+    }
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  async function resendCode() {
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({ type: "signup", email: pendingEmail });
+    return !error;
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -53,8 +73,9 @@ export default function SignupPage() {
 
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
-      email: emailForIfiUsername(ifiUsername),
+    const email = emailForIfiUsername(ifiUsername);
+    const { data, error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
         data: {
@@ -69,21 +90,36 @@ export default function SignupPage() {
 
     if (error) {
       setLoading(false);
+      const message = error.message.toLowerCase();
       setErrorMessage(
-        error.message.includes("already registered")
+        message.includes("already registered")
           ? t("auth.alreadyRegistered")
-          : error.message
+          : message.includes("rate limit")
+            ? t("verify.tooMany")
+            : message.includes("database error")
+              ? t("auth.signupFailed")
+              : error.message
       );
       return;
     }
 
-    try {
-      sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
-    } catch {
-      // ignore
+    // Supabase hides whether an address exists: an "empty" identity list means
+    // this IFI username already has an account.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setLoading(false);
+      setErrorMessage(t("auth.alreadyRegistered"));
+      return;
     }
-    router.push("/dashboard");
-    router.refresh();
+
+    // Signed in straight away (email confirmation is off): nothing to verify.
+    if (data.session) {
+      finish();
+      return;
+    }
+
+    setPendingEmail(email);
+    setStep("code");
+    setLoading(false);
   }
 
   return (
@@ -96,7 +132,7 @@ export default function SignupPage() {
             <Logo className="h-16 w-16" />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {t("auth.signup")}
+            {step === "code" ? t("verify.title") : t("auth.signup")}
           </h1>
           <p className="mt-2 text-sm text-muted">
             Kollokvie<span className="text-accent">@IFI</span>
@@ -104,6 +140,15 @@ export default function SignupPage() {
         </div>
 
         <div className="rounded-2xl border border-card-border bg-card p-8 shadow-sm">
+          {step === "code" ? (
+            <VerifyCodeForm
+              email={pendingEmail}
+              type="signup"
+              onVerified={finish}
+              onResend={resendCode}
+              onBack={() => setStep("form")}
+            />
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -161,7 +206,9 @@ export default function SignupPage() {
                 className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
               <p className="mt-1 text-xs text-muted">
-                {t("auth.ifiHint")}
+                {EMAIL_VERIFICATION_ENABLED
+                  ? t("auth.ifiEmailHint", { email: ifiEmail(ifiUsername || "brukernavn") })
+                  : t("auth.ifiHint")}
               </p>
             </div>
 
@@ -243,6 +290,7 @@ export default function SignupPage() {
               </Link>
             </p>
           </form>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-muted">

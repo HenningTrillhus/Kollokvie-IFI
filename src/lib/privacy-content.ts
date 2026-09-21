@@ -23,7 +23,7 @@ const no: Policy = {
     "Her forklarer vi hvilke opplysninger Kollokvie@IFI samler inn, hvorfor, hvor de lagres og hvilke rettigheter du har. Vi behandler opplysningene i tråd med personopplysningsloven og EUs personvernforordning (GDPR).",
   summaryTitle: "Kort fortalt",
   summary: [
-    "Vi lagrer navn, brukernavn, IFI-brukernavn og det du selv fyller inn på profilen din, og hvem du følger, hvilke kollokviegrupper du er med i og kalenderhendelsene dine.",
+    "Vi lagrer navn, brukernavn, IFI-e-postadressen din (bekreftet med en kode) og det du selv fyller inn på profilen din, og hvem du følger, hvilke kollokviegrupper du er med i og kalenderhendelsene dine.",
     "Alt lagres hos Supabase (database i EU, Irland), og nettstedet drives av Vercel. Vi selger ikke opplysningene dine og bruker dem ikke til reklame eller sporing.",
     "Andre innloggede brukere ser deler av profilen din: navn, brukernavn, studielinje, emner og profilbilde. Bioen din ser bare de som følger deg.",
     "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema).",
@@ -39,7 +39,7 @@ const no: Policy = {
     {
       heading: "2. Hvilke opplysninger vi behandler",
       bullets: [
-        "Konto: fullt navn, brukernavn og IFI-brukernavn. Passordet ditt lagres kryptert (som hash) av Supabase Auth. Vi kan aldri se det.",
+        "Konto: fullt navn, brukernavn og IFI-e-postadressen din (brukernavn@ifi.uio.no). Adressen bekreftes med en kode på seks siffer som sendes til den når du registrerer deg. Passordet ditt lagres kryptert (som hash) av Supabase Auth. Vi kan aldri se det.",
         "Profil (valgfritt): studielinje, årstrinn, emner, GitHub- og LinkedIn-lenke, bio, profilbilde (et ferdig ikon eller et bilde du laster opp) og en farge.",
         "Bruk: hvem du følger og hvem som følger deg (også forespørsler), kollokviegrupper du lager, er med i eller blir invitert til, og hendelser du legger i kalenderen (for eksempel eksamener og innleveringer).",
         "Tekniske opplysninger: en innloggingsøkt i en informasjonskapsel, og valg av språk og tema. Leverandørene våre kan i tillegg logge IP-adresse og tekniske data for drift og sikkerhet.",
@@ -67,9 +67,10 @@ const no: Policy = {
       bullets: [
         "Supabase (Supabase Inc.): database, innlogging og lagring av profilbilder. Vi har valgt datasenter i EU (Irland, AWS eu-west-1).",
         "Vercel (Vercel Inc.): hosting av nettstedet. Serverfunksjonene kjører i Dublin, Irland. Statiske filer leveres via et globalt innholdsnettverk.",
+        "Resend (Resend Inc.): sender e-posten med bekreftelseskoden. Vi har valgt EU-region (Irland). Resend ser IFI-e-postadressen din og innholdet i e-posten, og bare for å levere den.",
       ],
       paragraphs: [
-        "Begge er databehandlere for oss og behandler opplysningene bare på våre vegne. Leverandørene er amerikanske selskaper. Der opplysninger kan bli behandlet utenfor EØS, skjer det med et lovlig overføringsgrunnlag, som EUs standardkontrakter (SCC) eller EU–USAs personvernrammeverk (Data Privacy Framework).",
+        "Alle er databehandlere for oss og behandler opplysningene bare på våre vegne. Leverandørene er amerikanske selskaper. Der opplysninger kan bli behandlet utenfor EØS, skjer det med et lovlig overføringsgrunnlag, som EUs standardkontrakter (SCC) eller EU–USAs personvernrammeverk (Data Privacy Framework).",
         "Vi bruker ingen analyse-, reklame- eller sporingsverktøy, og vi selger eller deler ikke opplysningene dine med andre.",
       ],
     },
@@ -131,7 +132,7 @@ const en: Policy = {
     "This page explains what information Kollokvie@IFI collects, why, where it is stored and what rights you have. We process your data in accordance with the Norwegian Personal Data Act and the EU General Data Protection Regulation (GDPR).",
   summaryTitle: "In short",
   summary: [
-    "We store your name, username, IFI username and what you choose to add to your profile, who you follow, which study groups you are in and your calendar events.",
+    "We store your name, username, your IFI email address (confirmed with a code) and what you choose to add to your profile, who you follow, which study groups you are in and your calendar events.",
     "Everything is stored with Supabase (database in the EU, Ireland) and the site is run by Vercel. We don't sell your data and don't use it for advertising or tracking.",
     "Other signed-in users can see parts of your profile: name, username, study program, courses and profile picture. Only people who follow you can see your bio.",
     "We only use strictly necessary cookies (sign-in, language and theme).",
@@ -147,7 +148,7 @@ const en: Policy = {
     {
       heading: "2. What information we process",
       bullets: [
-        "Account: full name, username and IFI username. Your password is stored encrypted (as a hash) by Supabase Auth. We can never see it.",
+        "Account: full name, username and your IFI email address (username@ifi.uio.no). The address is confirmed with a six-digit code sent to it when you sign up. Your password is stored encrypted (as a hash) by Supabase Auth. We can never see it.",
         "Profile (optional): study program, year, courses, GitHub and LinkedIn link, bio, profile picture (a ready-made icon or a picture you upload) and a color.",
         "Usage: who you follow and who follows you (including requests), study groups you create, join or are invited to, and events you add to the calendar (for example exams and deadlines).",
         "Technical: a sign-in session in a cookie, and your language and theme choice. Our providers may also log IP addresses and technical data for operation and security.",
@@ -175,9 +176,10 @@ const en: Policy = {
       bullets: [
         "Supabase (Supabase Inc.): database, sign-in and storage of profile pictures. We have chosen a data center in the EU (Ireland, AWS eu-west-1).",
         "Vercel (Vercel Inc.): hosting of the site. Server functions run in Dublin, Ireland. Static files are delivered through a global content network.",
+        "Resend (Resend Inc.): sends the email with the confirmation code. We have chosen the EU region (Ireland). Resend sees your IFI email address and the contents of the email, only to deliver it.",
       ],
       paragraphs: [
-        "Both are processors for us and only process the data on our behalf. The providers are US companies. Where data may be processed outside the EEA, this happens on a lawful transfer basis, such as the EU Standard Contractual Clauses (SCCs) or the EU–US Data Privacy Framework.",
+        "All of them are processors for us and only process the data on our behalf. The providers are US companies. Where data may be processed outside the EEA, this happens on a lawful transfer basis, such as the EU Standard Contractual Clauses (SCCs) or the EU–US Data Privacy Framework.",
         "We use no analytics, advertising or tracking tools, and we don't sell or share your data with anyone else.",
       ],
     },
