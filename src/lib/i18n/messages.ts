@@ -98,6 +98,10 @@ export const messages = {
   "verify.resendFailed": { no: "Kunne ikke sende ny kode. Prøv igjen om litt.", en: "Couldn't send a new code. Try again in a moment." },
   "verify.back": { no: "← Tilbake", en: "← Back" },
   "verify.spamHint": { no: "Ser du den ikke? Sjekk søppelpost.", en: "Can't find it? Check your spam folder." },
+  "verify.sendFailed": {
+    no: "Kunne ikke sende koden akkurat nå. Prøv igjen om litt.",
+    en: "Couldn't send the code right now. Try again in a moment.",
+  },
   "verify.tooMany": {
     no: "For mange forsøk. Vent litt og prøv igjen.",
     en: "Too many attempts. Wait a bit and try again.",

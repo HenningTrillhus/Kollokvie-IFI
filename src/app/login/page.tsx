@@ -59,9 +59,21 @@ export default function LoginPage() {
     }
 
     if (unconfirmed) {
-      await supabase.auth.resend({ type: "signup", email: unconfirmed });
-      setConfirmEmail(unconfirmed);
+      const { error: sendError } = await supabase.auth.resend({
+        type: "signup",
+        email: unconfirmed,
+      });
       setLoading(false);
+      // Don't ask for a code that was never sent.
+      if (sendError) {
+        setErrorMessage(
+          sendError.message.toLowerCase().includes("rate limit")
+            ? t("verify.tooMany")
+            : t("verify.sendFailed")
+        );
+        return;
+      }
+      setConfirmEmail(unconfirmed);
       return;
     }
 
