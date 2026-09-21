@@ -103,7 +103,10 @@ export const messages = {
   "verify.resent": { no: "Ny kode er sendt.", en: "A new code has been sent." },
   "verify.resendFailed": { no: "Kunne ikke sende ny kode. Prøv igjen om litt.", en: "Couldn't send a new code. Try again in a moment." },
   "verify.back": { no: "← Tilbake", en: "← Back" },
-  "verify.spamHint": { no: "Ser du den ikke? Sjekk søppelpost.", en: "Can't find it? Check your spam folder." },
+  "verify.spamHint": {
+    no: "E-posten kan bruke opptil ett minutt på å komme fram. Ser du den ikke, sjekk søppelpost.",
+    en: "The email can take up to a minute to arrive. Can't find it? Check your spam folder.",
+  },
   "verify.sendFailed": {
     no: "Kunne ikke sende koden akkurat nå. Prøv igjen om litt.",
     en: "Couldn't send the code right now. Try again in a moment.",
