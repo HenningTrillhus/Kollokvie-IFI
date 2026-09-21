@@ -3,7 +3,8 @@
 import { useState } from "react";
 import GroupCard from "@/components/group-card";
 import RefreshButton from "@/components/refresh-button";
-import { Card, EmptyCard, inputClass } from "@/components/form-ui";
+import { Card, EmptyCard } from "@/components/form-ui";
+import SearchInput from "@/components/search-input";
 import type { GroupCardData } from "@/lib/groups";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -34,12 +35,10 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
     <>
       <Card>
         <div className="flex items-center gap-2">
-          <input
-            type="search"
+          <SearchInput
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={setQuery}
             placeholder={t("explore.searchPlaceholder")}
-            className={inputClass}
           />
           <RefreshButton label={t("explore.refresh")} />
         </div>

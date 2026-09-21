@@ -32,6 +32,7 @@ export const messages = {
   "common.private": { no: "Privat", en: "Private" },
   "common.inviteOnly": { no: "Kun invitasjon", en: "Invite only" },
   "common.searching": { no: "Søker…", en: "Searching…" },
+  "common.clear": { no: "Tøm søket", en: "Clear search" },
   "common.refresh": { no: "Oppdater", en: "Refresh" },
 
   // ---- auth

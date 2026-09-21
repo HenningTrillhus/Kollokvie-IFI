@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
-import { Card, EmptyCard, ListCard, inputClass } from "@/components/form-ui";
+import { Card, EmptyCard, ListCard } from "@/components/form-ui";
+import SearchInput from "@/components/search-input";
 import { escapeLike, type Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
 import { getGroupCardData, withFullGroupsLast, type Group, type GroupCardData } from "@/lib/groups";
@@ -17,11 +18,23 @@ type Mode = "people" | "groups";
 // Results come in pages, so a broad search never loads hundreds of rows.
 const PAGE_SIZE = 30;
 
-export default function SearchClient({ currentUserId }: { currentUserId: string }) {
+const SCROLL_KEY = "kollokvie:search-scroll";
+
+export default function SearchClient({
+  currentUserId,
+  initialQuery = "",
+  initialMode = "people",
+  initialPage = 1,
+}: {
+  currentUserId: string;
+  initialQuery?: string;
+  initialMode?: Mode;
+  initialPage?: number;
+}) {
   const { t } = useI18n();
-  const [query, setQuery] = useState("");
-  const [mode, setMode] = useState<Mode>("people");
-  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState(initialQuery);
+  const [mode, setMode] = useState<Mode>(initialMode);
+  const [page, setPage] = useState(initialPage);
   const [total, setTotal] = useState(0);
   const [results, setResults] = useState<Profile[]>([]);
   const [statuses, setStatuses] = useState<Record<string, FollowStatus>>({});
@@ -29,6 +42,44 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
+  // Where the results were scrolled to when you left (restored after they load).
+  const pendingScroll = useRef<number | null>(null);
+  const needsScroll = useRef(false);
+  const searchKey = `${mode}|${query.trim()}|${page}`;
+
+  // Keep the URL in step with the search, so "back" from a profile returns here.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query);
+    if (mode === "groups") params.set("mode", "groups");
+    if (page > 1) params.set("page", String(page));
+    const qs = params.toString();
+    window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
+  }, [query, mode, page]);
+
+  // On the first load: remember-where-you-were, if it's the same search.
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(SCROLL_KEY) ?? "null") as
+        | { key: string; top: number }
+        | null;
+      if (saved && saved.key === searchKey) pendingScroll.current = saved.top;
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function rememberScroll() {
+    try {
+      sessionStorage.setItem(
+        SCROLL_KEY,
+        JSON.stringify({ key: searchKey, top: scroller.current?.scrollTop ?? 0 })
+      );
+    } catch {
+      // ignore
+    }
+  }
 
   // Focus the box on desktop only: on a phone it would throw the keyboard up
   // every time you open the tab.
@@ -99,7 +150,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
       }
 
       setLoading(false);
-      scroller.current?.scrollTo({ top: 0 });
+      needsScroll.current = true; // applied once the new rows are on screen
     }, 300);
 
     return () => {
@@ -107,6 +158,15 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
       clearTimeout(timeout);
     };
   }, [query, mode, page, currentUserId]);
+
+  // After new results render: back to where you were if you just came back,
+  // otherwise to the top.
+  useEffect(() => {
+    if (!needsScroll.current) return;
+    needsScroll.current = false;
+    scroller.current?.scrollTo({ top: pendingScroll.current ?? 0 });
+    pendingScroll.current = null;
+  }, [results, groupResults]);
 
   const trimmedQuery = query.trim();
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -139,18 +199,16 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
             ))}
           </div>
 
-          <input
-            ref={inputRef}
-            type="search"
+          <SearchInput
+            inputRef={inputRef}
             placeholder={
               mode === "people" ? t("search.peoplePlaceholder") : t("search.groupsPlaceholder")
             }
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
+            onChange={(value) => {
+              setQuery(value);
               setPage(1);
             }}
-            className={inputClass}
           />
         </Card>
       </div>
@@ -168,6 +226,7 @@ export default function SearchClient({ currentUserId }: { currentUserId: string 
           {/* Its own scroll box: the page itself never scrolls. */}
           <div
             ref={scroller}
+            onScroll={rememberScroll}
             className={`min-h-0 flex-1 overflow-y-auto overscroll-contain transition-opacity ${
               loading ? "opacity-60" : ""
             }`}
