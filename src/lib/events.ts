@@ -38,3 +38,10 @@ export function toDateKey(year: number, month: number, day: number) {
 export function shortTime(time: string | null | undefined) {
   return time ? time.slice(0, 5) : null;
 }
+
+// Whole days from `fromKey` to `dateKey` (both "YYYY-MM-DD"); negative if past.
+export function daysUntil(dateKey: string, fromKey: string) {
+  const [y1, m1, d1] = dateKey.split("-").map(Number);
+  const [y2, m2, d2] = fromKey.split("-").map(Number);
+  return Math.round((Date.UTC(y1, m1 - 1, d1) - Date.UTC(y2, m2 - 1, d2)) / 86400000);
+}

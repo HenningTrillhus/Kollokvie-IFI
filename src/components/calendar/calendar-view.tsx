@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Page, cardClass } from "@/components/form-ui";
+import { cardClass } from "@/components/form-ui";
+import BottomSheet from "@/components/bottom-sheet";
 import MonthGrid from "@/components/calendar/month-grid";
-import SemesterOverview, { SemesterAgenda } from "@/components/calendar/semester-view";
+import { SemesterAgenda, SemesterGrid, SemesterPanes } from "@/components/calendar/semester-view";
 import DayPanel, { type NewEvent } from "@/components/calendar/day-panel";
-import CourseFilter, { type FilterCourse } from "@/components/calendar/course-filter";
-import { daysInMonth, toDateKey, type CalendarEvent } from "@/lib/events";
+import CourseFilterPanel, { FilterChips, type FilterCourse } from "@/components/calendar/course-filter";
+import UpcomingStrip from "@/components/calendar/upcoming-strip";
+import { daysInMonth, daysUntil, toDateKey, type CalendarEvent } from "@/lib/events";
 import { buildItems, groupByDate } from "@/lib/calendar-items";
 import type { Pref, Prefs } from "@/lib/calendar-prefs";
 import { getUserCourses, type Course } from "@/lib/courses";
@@ -27,8 +29,10 @@ import { localeFor } from "@/lib/i18n";
 type Mode = "month" | "semester";
 
 const navButton =
-  "flex h-9 w-9 items-center justify-center rounded-xl text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90";
+  "flex h-9 w-9 items-center justify-center rounded-xl text-lg text-muted transition hover:bg-accent-soft hover:text-foreground active:scale-90";
 
+// The calendar fills the space between the top bar and the tab bar. Nothing
+// here makes the page scroll: swipeable rows and scrollable boxes do the work.
 export default function CalendarView({ currentUserId }: { currentUserId: string }) {
   const { t, lang } = useI18n();
   const [now] = useState(() => new Date());
@@ -37,10 +41,13 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [mode, setMode] = useState<Mode>("month");
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
+  const [direction, setDirection] = useState<"next" | "prev" | null>(null);
   const [semester, setSemester] = useState<Semester>(() => currentSemester(now));
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [upcoming, setUpcoming] = useState<CalendarEvent[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [prefs, setPrefs] = useState<Prefs>({});
   const [myCourses, setMyCourses] = useState<Course[]>([]);
@@ -75,22 +82,36 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     }
   }
 
-  // Once: preferences, your courses, and the study groups you're in.
+  // Once: preferences, your courses, study groups and the coming deadlines.
   useEffect(() => {
     (async () => {
       const supabase = createClient();
-      const [{ data: prefRows }, courses, { data: memberRows }] = await Promise.all([
-        supabase.from("calendar_prefs").select("key, color, visible").eq("user_id", currentUserId),
-        getUserCourses(supabase, currentUserId),
-        supabase.from("group_members").select("groups(*)").eq("user_id", currentUserId),
-      ]);
+      const [{ data: prefRows }, courses, { data: memberRows }, { data: upcomingRows }] =
+        await Promise.all([
+          supabase.from("calendar_prefs").select("key, color, visible").eq("user_id", currentUserId),
+          getUserCourses(supabase, currentUserId),
+          supabase.from("group_members").select("groups(*)").eq("user_id", currentUserId),
+          supabase
+            .from("events")
+            .select("*")
+            .eq("user_id", currentUserId)
+            .gte("event_date", todayKey)
+            .in("type", ["exam", "deadline"])
+            .order("event_date", { ascending: true })
+            .limit(40),
+        ]);
 
       const loaded: Prefs = {};
       (prefRows ?? []).forEach((r) => {
-        loaded[r.key as string] = { color: (r.color as string | null) ?? null, visible: r.visible as boolean };
+        loaded[r.key as string] = {
+          color: (r.color as string | null) ?? null,
+          visible: r.visible as boolean,
+        };
       });
       setPrefs(loaded);
       setMyCourses(courses);
+      const upcomingList = (upcomingRows ?? []) as CalendarEvent[];
+      setUpcoming(upcomingList);
 
       const memberGroups = (memberRows ?? [])
         .map((row) => (row as unknown as { groups: Group | null }).groups)
@@ -98,13 +119,13 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       setGroups(memberGroups);
 
       const known = new Set(courses.map((c) => c.code));
-      await loadCourseNames(
-        [...new Set(memberGroups.map((g) => g.course_code).filter((c): c is string => !!c))].filter(
-          (c) => !known.has(c)
-        )
-      );
+      const codes = [
+        ...memberGroups.map((g) => g.course_code),
+        ...upcomingList.map((e) => e.course_code),
+      ].filter((c): c is string => !!c && !known.has(c));
+      await loadCourseNames([...new Set(codes)]);
     })();
-  }, [currentUserId]);
+  }, [currentUserId, todayKey]);
 
   // Events for whatever range is showing.
   useEffect(() => {
@@ -122,14 +143,18 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       const list = (data ?? []) as CalendarEvent[];
       setEvents(list);
       setLoading(false);
-      await loadCourseNames(
-        [...new Set(list.map((e) => e.course_code).filter((c): c is string => !!c))]
-      );
+      await loadCourseNames([...new Set(list.map((e) => e.course_code).filter((c): c is string => !!c))]);
     })();
   }, [rangeStart, rangeEnd, currentUserId]);
 
   const items = useMemo(() => buildItems(events, groups, prefs), [events, groups, prefs]);
   const itemsByDate = useMemo(() => groupByDate(items), [items]);
+  const upcomingItems = useMemo(
+    () => buildItems(upcoming, [], prefs)
+        .filter((i) => i.date >= todayKey && i.type !== "other")
+        .slice(0, 10),
+    [upcoming, prefs, todayKey]
+  );
 
   const filterCourses: FilterCourse[] = useMemo(() => {
     const byCode = new Map<string, FilterCourse>();
@@ -148,12 +173,16 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       nextMonth = 0;
       nextYear += 1;
     }
+    setDirection(delta > 0 ? "next" : "prev");
     setMonth(nextMonth);
     setYear(nextYear);
     setSelectedDate(null);
   }
 
   function goToday() {
+    setDirection(
+      toDateKey(year, month, 1) > toDateKey(now.getFullYear(), now.getMonth(), 1) ? "prev" : "next"
+    );
     setYear(now.getFullYear());
     setMonth(now.getMonth());
     setSelectedDate(todayKey);
@@ -169,14 +198,17 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       setYear(semester.year);
       setMonth(inThisSemester ? now.getMonth() : range.startMonth);
     }
+    setDirection(null);
     setSelectedDate(null);
     setMode(next);
   }
 
-  function pickMonth(y: number, m: number, date: string | null = null) {
+  function pickDate(key: string) {
+    const [y, m] = key.split("-").map(Number);
+    setDirection(null);
     setYear(y);
-    setMonth(m);
-    setSelectedDate(date);
+    setMonth(m - 1);
+    setSelectedDate(key);
     setMode("month");
   }
 
@@ -199,9 +231,17 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       setSaveError(true);
       return false;
     }
-    setEvents((prev) =>
-      [...prev, data as CalendarEvent].sort((a, b) => a.event_date.localeCompare(b.event_date))
-    );
+    const created = data as CalendarEvent;
+    setEvents((prev) => [...prev, created].sort((a, b) => a.event_date.localeCompare(b.event_date)));
+    if (created.type !== "other" && created.event_date >= todayKey) {
+      setUpcoming((prev) =>
+        [...prev, created].sort(
+          (a, b) =>
+            a.event_date.localeCompare(b.event_date) ||
+            (a.event_time ?? "").localeCompare(b.event_time ?? "")
+        )
+      );
+    }
     if (v.course) {
       const course = v.course;
       setExtraCourses((prev) => (prev.some((c) => c.code === course.code) ? prev : [...prev, course]));
@@ -212,7 +252,10 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   async function deleteEvent(id: string) {
     const supabase = createClient();
     const { error } = await supabase.from("events").delete().eq("id", id);
-    if (!error) setEvents((prev) => prev.filter((e) => e.id !== id));
+    if (!error) {
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+      setUpcoming((prev) => prev.filter((e) => e.id !== id));
+    }
   }
 
   async function updatePref(key: string, patch: Partial<Pref>) {
@@ -241,10 +284,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const monthNames = t("cal.months").split("|");
   const dateFmt = (key: string) => {
     const [y, m, d] = key.split("-").map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString(localeFor(lang), {
-      day: "numeric",
-      month: "short",
-    });
+    return new Date(y, m - 1, d).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" });
   };
   const semRange = semesterRange(semester);
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
@@ -254,129 +294,152 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       ? `${monthNames[month]} ${year}`
       : `${t(semester.term === "spring" ? "cal.spring" : "cal.autumn")} ${semester.year}`;
 
+  // How far into the semester we are.
+  const total = Math.max(1, daysUntil(semRange.end, semRange.start));
+  const sinceStart = daysUntil(todayKey, semRange.start);
+  const progress = Math.min(1, Math.max(0, sinceStart / total));
+  const daysLeft = daysUntil(semRange.end, todayKey);
+  const untilStart = daysUntil(semRange.start, todayKey);
+  const semesterNote =
+    untilStart > 0
+      ? t("cal.semesterStartsIn", { n: untilStart })
+      : daysLeft >= 0
+        ? t("cal.semesterEndsIn", { n: daysLeft })
+        : t("cal.semesterOver");
+
   return (
-    <Page width="max-w-xl">
-      <div className={`space-y-4 p-4 ${cardClass}`}>
-        <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
-          {(
-            [
-              ["month", t("cal.viewMonth")],
-              ["semester", t("cal.viewSemester")],
-            ] as const
-          ).map(([value, label]) => (
+    <>
+      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 pb-3 pt-3">
+        <div className={`shrink-0 space-y-2.5 p-3 ${cardClass}`}>
+          <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
+            {(
+              [
+                ["month", t("cal.viewMonth")],
+                ["semester", t("cal.viewSemester")],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => switchMode(value)}
+                className={`rounded-lg px-3 py-1 transition ${
+                  mode === value ? "bg-accent text-white" : "text-muted"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between">
             <button
-              key={value}
-              onClick={() => switchMode(value)}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                mode === value ? "bg-accent text-white" : "text-muted"
-              }`}
+              onClick={() => (mode === "month" ? changeMonth(-1) : setSemester(shiftSemester(semester, -1)))}
+              aria-label={mode === "month" ? t("cal.prevMonth") : t("cal.prevSemester")}
+              className={navButton}
             >
-              {label}
+              ‹
             </button>
-          ))}
+            <div className="text-center">
+              <h1 className="text-lg font-semibold leading-tight">{title}</h1>
+              {mode === "semester" && (
+                <>
+                  <p className="text-xs text-muted">
+                    {dateFmt(semRange.start)} – {dateFmt(semRange.end)} · {semesterNote}
+                  </p>
+                  <div className="mx-auto mt-1.5 h-1 w-40 overflow-hidden rounded-full bg-accent-soft">
+                    <div
+                      className="h-full rounded-full bg-accent transition-[width] duration-500"
+                      style={{ width: `${Math.round(progress * 100)}%` }}
+                    />
+                  </div>
+                </>
+              )}
+              {mode === "month" && !isCurrentMonth && (
+                <button
+                  onClick={goToday}
+                  className="text-xs font-medium text-accent transition hover:text-accent-hover"
+                >
+                  {t("cal.today")}
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => (mode === "month" ? changeMonth(1) : setSemester(shiftSemester(semester, 1)))}
+              aria-label={mode === "month" ? t("cal.nextMonth") : t("cal.nextSemester")}
+              className={navButton}
+            >
+              ›
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() =>
-              mode === "month" ? changeMonth(-1) : setSemester(shiftSemester(semester, -1))
-            }
-            aria-label={mode === "month" ? t("cal.prevMonth") : t("cal.prevSemester")}
-            className={navButton}
-          >
-            ‹
-          </button>
-          <div className="text-center">
-            <h1 className="text-lg font-semibold leading-tight">{title}</h1>
-            {mode === "semester" && (
-              <>
-                <p className="text-xs text-muted">
-                  {dateFmt(semRange.start)} – {dateFmt(semRange.end)}
-                </p>
-                <a
-                  href={UIO_CALENDAR_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] text-muted underline-offset-2 hover:text-foreground hover:underline"
-                >
-                  {t("cal.semesterSource")}
-                </a>
-              </>
-            )}
-            {mode === "month" && !isCurrentMonth && (
-              <button
-                onClick={goToday}
-                className="text-xs font-medium text-accent transition hover:text-accent-hover"
-              >
-                {t("cal.today")}
-              </button>
-            )}
-          </div>
-          <button
-            onClick={() =>
-              mode === "month" ? changeMonth(1) : setSemester(shiftSemester(semester, 1))
-            }
-            aria-label={mode === "month" ? t("cal.nextMonth") : t("cal.nextSemester")}
-            className={navButton}
-          >
-            ›
-          </button>
+        <UpcomingStrip items={upcomingItems} todayKey={todayKey} onPick={pickDate} />
+
+        <div className="shrink-0">
+          <FilterChips
+            courses={filterCourses}
+            prefs={prefs}
+            onChange={updatePref}
+            onOpenColors={() => setSheetOpen(true)}
+          />
         </div>
 
         {mode === "month" ? (
-          <div>
-            <MonthGrid
-              year={year}
-              month={month}
-              itemsByDate={itemsByDate}
-              selectedDate={selectedDate}
-              todayKey={todayKey}
-              loading={loading}
-              onSelect={setSelectedDate}
-              onSwipe={changeMonth}
-            />
-          </div>
-        ) : null}
+          <>
+            <div className={`shrink-0 p-3 ${cardClass}`}>
+              <MonthGrid
+                year={year}
+                month={month}
+                itemsByDate={itemsByDate}
+                selectedDate={selectedDate}
+                todayKey={todayKey}
+                loading={loading}
+                direction={direction}
+                onSelect={setSelectedDate}
+                onSwipe={changeMonth}
+              />
+            </div>
 
-        {mode === "semester" && (
-          <SemesterOverview
-            semester={semester}
-            itemsByDate={itemsByDate}
-            todayKey={todayKey}
-            loading={loading}
-            onPickDay={(key) => {
-              const [y, m] = key.split("-").map(Number);
-              pickMonth(y, m - 1, key);
-            }}
-            onPickMonth={(y, m) => pickMonth(y, m)}
-          />
+            <DayPanel
+              key={selectedDate ?? "none"}
+              date={selectedDate}
+              items={selectedDate ? itemsByDate.get(selectedDate) ?? [] : []}
+              priorityCodes={myCourses.map((c) => c.code)}
+              saveError={saveError}
+              onAdd={addEvent}
+              onDelete={deleteEvent}
+            />
+          </>
+        ) : (
+          <>
+            <SemesterPanes
+              overview={
+                <SemesterGrid
+                  semester={semester}
+                  itemsByDate={itemsByDate}
+                  todayKey={todayKey}
+                  loading={loading}
+                  onPickDay={pickDate}
+                />
+              }
+              list={<SemesterAgenda semester={semester} items={items} onPickDay={pickDate} />}
+            />
+            <a
+              href={UIO_CALENDAR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-center text-[11px] text-muted underline-offset-2 hover:text-foreground hover:underline"
+            >
+              {t("cal.semesterSource")}
+            </a>
+          </>
         )}
       </div>
 
-      {mode === "semester" && (
-        <SemesterAgenda
-          semester={semester}
-          items={items}
-          onPickDay={(key) => {
-            const [y, m] = key.split("-").map(Number);
-            pickMonth(y, m - 1, key);
-          }}
-        />
+      {sheetOpen && (
+        <BottomSheet title={t("cal.filters")} onClose={() => setSheetOpen(false)}>
+          <CourseFilterPanel courses={filterCourses} prefs={prefs} onChange={updatePref} />
+        </BottomSheet>
       )}
-
-      {mode === "month" && (
-        <DayPanel
-          key={selectedDate ?? "none"}
-          date={selectedDate}
-          items={selectedDate ? itemsByDate.get(selectedDate) ?? [] : []}
-          priorityCodes={myCourses.map((c) => c.code)}
-          saveError={saveError}
-          onAdd={addEvent}
-          onDelete={deleteEvent}
-        />
-      )}
-
-      <CourseFilter courses={filterCourses} prefs={prefs} onChange={updatePref} />
-    </Page>
+    </>
   );
 }

@@ -126,6 +126,28 @@ input[type="time"]::-webkit-date-and-time-value {
   animation: fade-in 0.2s ease-out;
 }
 
+/* The month grid slides in from the side you swiped from. */
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes fade-only {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-slide-from-right { animation: slide-from-right 0.22s ease-out both; }
+.animate-slide-from-left { animation: slide-from-left 0.22s ease-out both; }
+.animate-sheet-up { animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.animate-fade-only { animation: fade-only 0.2s ease-out both; }
+
 /* List items rise in one after another (set --i per item). */
 .animate-rise {
   animation: fade-in 0.28s ease-out both;
@@ -134,7 +156,11 @@ input[type="time"]::-webkit-date-and-time-value {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
-  .animate-rise {
+  .animate-rise,
+  .animate-slide-from-right,
+  .animate-slide-from-left,
+  .animate-sheet-up,
+  .animate-fade-only {
     animation: none;
   }
 }

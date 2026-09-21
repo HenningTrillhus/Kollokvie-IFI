@@ -12,6 +12,7 @@ export default function MonthGrid({
   selectedDate,
   todayKey,
   loading,
+  direction,
   onSelect,
   onSwipe,
 }: {
@@ -21,6 +22,7 @@ export default function MonthGrid({
   selectedDate: string | null;
   todayKey: string;
   loading: boolean;
+  direction: "next" | "prev" | null;
   onSelect: (dateKey: string) => void;
   onSwipe: (delta: number) => void;
 }) {
@@ -49,9 +51,16 @@ export default function MonthGrid({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
+  const slide =
+    direction === "next"
+      ? "animate-slide-from-right"
+      : direction === "prev"
+        ? "animate-slide-from-left"
+        : "";
+
   return (
-    <>
-      <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-medium text-muted">
+    <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="touch-pan-y">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted">
         {weekdays.map((day) => (
           <div key={day} className="pb-1">
             {day}
@@ -60,10 +69,9 @@ export default function MonthGrid({
       </div>
 
       <div
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className={`mt-1 grid touch-pan-y grid-cols-7 gap-1.5 transition-opacity ${
-          loading ? "opacity-50" : ""
+        key={`${year}-${month}`}
+        className={`mt-0.5 grid grid-cols-7 gap-1 transition-opacity ${slide} ${
+          loading ? "opacity-60" : ""
         }`}
       >
         {cells.map((day, index) => {
@@ -77,20 +85,20 @@ export default function MonthGrid({
             <button
               key={dateKey}
               onClick={() => onSelect(dateKey)}
-              className={`flex aspect-square flex-col items-center gap-1 rounded-xl border p-1.5 text-sm transition active:scale-95 ${
+              className={`flex h-10 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 sm:h-12 ${
                 isSelected
                   ? "border-accent bg-accent-soft"
-                  : "border-card-border hover:bg-accent-soft/60"
+                  : "border-transparent hover:bg-accent-soft/60"
               }`}
             >
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none ${
                   isToday ? "bg-accent font-semibold text-white" : ""
                 }`}
               >
                 {day}
               </span>
-              <div className="flex flex-wrap justify-center gap-0.5">
+              <span className="flex h-1.5 gap-0.5">
                 {items.slice(0, 4).map((item) => (
                   <span
                     key={item.key}
@@ -98,11 +106,11 @@ export default function MonthGrid({
                     className="h-1.5 w-1.5 rounded-full"
                   />
                 ))}
-              </div>
+              </span>
             </button>
           );
         })}
       </div>
-    </>
+    </div>
   );
 }

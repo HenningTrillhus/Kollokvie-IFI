@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { cardClass } from "@/components/form-ui";
 import {
   GROUPS_KEY,
   NO_COURSE_KEY,
@@ -15,8 +14,66 @@ import { useI18n } from "@/lib/i18n/client";
 
 export type FilterCourse = { code: string; name: string };
 
-// Choose which courses show on the calendar, and what color each one has.
-export default function CourseFilter({
+type Row = { key: string; label: string; sub: string };
+
+function useRows(courses: FilterCourse[]): Row[] {
+  const { t } = useI18n();
+  return [
+    ...courses.map((c) => ({ key: c.code, label: c.code, sub: c.name })),
+    { key: GROUPS_KEY, label: t("cal.groupsLabel"), sub: "" },
+    { key: NO_COURSE_KEY, label: t("cal.noCourseLabel"), sub: "" },
+  ];
+}
+
+// A swipeable row of small toggles: tap one to show or hide that course.
+export function FilterChips({
+  courses,
+  prefs,
+  onChange,
+  onOpenColors,
+}: {
+  courses: FilterCourse[];
+  prefs: Prefs;
+  onChange: (key: string, patch: Partial<Pref>) => void;
+  onOpenColors: () => void;
+}) {
+  const { t } = useI18n();
+  const rows = useRows(courses);
+
+  return (
+    <div className="no-scrollbar -mx-4 flex scroll-px-4 snap-x gap-2 overflow-x-auto overscroll-x-contain px-4">
+      {rows.map((r) => {
+        const on = isVisible(prefs, r.key);
+        return (
+          <button
+            key={r.key}
+            onClick={() => onChange(r.key, { visible: !on })}
+            aria-pressed={on}
+            className={`flex shrink-0 snap-start items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition active:scale-95 ${
+              on ? "border-transparent bg-card" : "border-card-border text-muted"
+            }`}
+            style={on ? { boxShadow: `inset 0 0 0 1.5px ${colorFor(prefs, r.key)}` } : undefined}
+          >
+            <span
+              style={{ backgroundColor: colorFor(prefs, r.key) }}
+              className={`h-2.5 w-2.5 rounded-full ${on ? "" : "opacity-40"}`}
+            />
+            {r.label}
+          </button>
+        );
+      })}
+      <button
+        onClick={onOpenColors}
+        className="flex shrink-0 snap-start items-center gap-1.5 rounded-full border border-card-border bg-card px-3 py-1.5 text-xs font-medium text-accent transition active:scale-95"
+      >
+        {t("cal.colors")}
+      </button>
+    </div>
+  );
+}
+
+// The full list, with colors: shown in a sheet.
+export default function CourseFilterPanel({
   courses,
   prefs,
   onChange,
@@ -26,85 +83,45 @@ export default function CourseFilter({
   onChange: (key: string, patch: Partial<Pref>) => void;
 }) {
   const { t } = useI18n();
-  const [open, setOpen] = useState(false);
-
-  const rows = [
-    ...courses.map((c) => ({ key: c.code, label: c.code, sub: c.name })),
-    { key: GROUPS_KEY, label: t("cal.groupsLabel"), sub: "" },
-    { key: NO_COURSE_KEY, label: t("cal.noCourseLabel"), sub: "" },
-  ];
+  const rows = useRows(courses);
   const shown = rows.filter((r) => isVisible(prefs, r.key)).length;
 
-  function setAll(visible: boolean) {
-    rows.forEach((r) => onChange(r.key, { visible }));
-  }
-
   return (
-    <div className={`overflow-hidden ${cardClass}`}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between px-4 py-3.5 text-left transition hover:bg-accent-soft/60"
-      >
-        <span>
-          <span className="block text-sm font-medium">{t("cal.filters")}</span>
-          <span className="block text-xs text-muted">
-            {t("cal.filtersShown", { shown, total: rows.length })}
-          </span>
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="flex -space-x-1">
-            {rows.slice(0, 5).map((r) => (
-              <span
-                key={r.key}
-                style={{ backgroundColor: colorFor(prefs, r.key) }}
-                className={`h-3.5 w-3.5 rounded-full ring-2 ring-card ${
-                  isVisible(prefs, r.key) ? "" : "opacity-30"
-                }`}
-              />
-            ))}
-          </span>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.75}
-            className={`h-4 w-4 text-muted transition-transform ${open ? "rotate-180" : ""}`}
+    <div>
+      <div className="flex items-center justify-between px-5 pb-1 text-xs">
+        <span className="text-muted">{t("cal.filtersShown", { shown, total: rows.length })}</span>
+        <span className="flex gap-4 font-medium">
+          <button
+            onClick={() => rows.forEach((r) => onChange(r.key, { visible: true }))}
+            className="text-accent hover:text-accent-hover"
           >
-            <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+            {t("cal.showAll")}
+          </button>
+          <button
+            onClick={() => rows.forEach((r) => onChange(r.key, { visible: false }))}
+            className="text-muted hover:text-foreground"
+          >
+            {t("cal.hideAll")}
+          </button>
         </span>
-      </button>
-
-      {open && (
-        <div className="border-t border-card-border">
-          <div className="flex justify-end gap-4 px-4 py-2 text-xs font-medium">
-            <button onClick={() => setAll(true)} className="text-accent hover:text-accent-hover">
-              {t("cal.showAll")}
-            </button>
-            <button onClick={() => setAll(false)} className="text-muted hover:text-foreground">
-              {t("cal.hideAll")}
-            </button>
-          </div>
-          <div className="divide-y divide-card-border">
-            {rows.map((r) => (
-              <PrefRow
-                key={r.key}
-                label={r.label}
-                sub={r.sub}
-                color={colorFor(prefs, r.key)}
-                visible={isVisible(prefs, r.key)}
-                onColor={(color) => onChange(r.key, { color })}
-                onToggle={(visible) => onChange(r.key, { visible })}
-              />
-            ))}
-          </div>
-          {courses.length === 0 && (
-            <p className="border-t border-card-border px-4 py-3 text-xs text-muted">
-              {t("cal.noCoursesHint")}
-            </p>
-          )}
-        </div>
+      </div>
+      <div className="divide-y divide-card-border border-t border-card-border">
+        {rows.map((r) => (
+          <PrefRow
+            key={r.key}
+            label={r.label}
+            sub={r.sub}
+            color={colorFor(prefs, r.key)}
+            visible={isVisible(prefs, r.key)}
+            onColor={(color) => onChange(r.key, { color })}
+            onToggle={(visible) => onChange(r.key, { visible })}
+          />
+        ))}
+      </div>
+      {courses.length === 0 && (
+        <p className="border-t border-card-border px-5 py-3 text-xs text-muted">
+          {t("cal.noCoursesHint")}
+        </p>
       )}
     </div>
   );
@@ -129,7 +146,7 @@ function PrefRow({
   const [picking, setPicking] = useState(false);
 
   return (
-    <div className="px-4 py-2.5">
+    <div className="px-5 py-2.5">
       <div className="flex items-center gap-3">
         <button
           onClick={() => setPicking((v) => !v)}

@@ -31,7 +31,8 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med måneds- og semestervisning. Semestrene følger UiOs datoer (høst og vår, med kilde-lenke),
-  og du kan bla mellom dem. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Du velger
+  og du kan bla mellom dem. En rad viser hvor lenge det er til de neste eksamenene og obligene. Hele
+  kalenderen fyller skjermen uten at siden scroller: bokser og rader du sveiper i gjør jobben. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Du velger
   hvilke emner som vises og hvilken farge hvert emne har. Kollokviegruppene dine står på riktig dato.
 - **Søk** etter folk og kollokviegrupper.
 - **Lyst og mørkt tema** (hvitt og lyseblått, eller mørkt), og **norsk og engelsk**.

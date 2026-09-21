@@ -40,7 +40,7 @@ export default function AppShell({
         ref={scroller}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain"
       >
-        <div key={pathname} className="flex flex-1 flex-col animate-fade-in">
+        <div key={pathname} className="flex min-h-0 flex-1 flex-col animate-fade-in">
           {children}
         </div>
       </main>
