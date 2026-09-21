@@ -30,8 +30,9 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   melding sier «Logget inn som …» når appen åpnes.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
-- **Kalender** med månedsvisning, egne hendelser (eksamen, innlevering, annet) og
-  kollokviegruppene dine på riktig dato.
+- **Kalender** med måneds- og semestervisning. Semestrene følger UiOs datoer (høst og vår, med kilde-lenke),
+  og du kan bla mellom dem. Hendelser er eksamen, oblig eller annet, med klokkeslett og emne. Du velger
+  hvilke emner som vises og hvilken farge hvert emne har. Kollokviegruppene dine står på riktig dato.
 - **Søk** etter folk og kollokviegrupper.
 - **Lyst og mørkt tema** (hvitt og lyseblått, eller mørkt), og **norsk og engelsk**.
   Begge velges nederst i Innstillinger.
@@ -78,6 +79,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 30 ikonene |
 | `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
 | `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
+| `0022` | Kalender: klokkeslett og emne på hendelser, og `calendar_prefs` (farger og filter per emne) |
 
 ### 4. Skru av e-postbekreftelse
 

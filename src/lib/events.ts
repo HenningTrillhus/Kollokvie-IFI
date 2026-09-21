@@ -1,3 +1,4 @@
+// "deadline" is shown as "Oblig" (assignment); the stored value stays the same.
 export type EventType = "exam" | "deadline" | "other";
 
 export type CalendarEvent = {
@@ -5,21 +6,19 @@ export type CalendarEvent = {
   user_id: string;
   title: string;
   event_date: string;
+  event_time: string | null;
+  course_code: string | null;
   type: EventType;
   created_at: string;
 };
 
+export const EVENT_TYPES: EventType[] = ["exam", "deadline", "other"];
+
 export const EVENT_TYPE_KEYS = {
   exam: "cal.exam",
-  deadline: "cal.deadline",
+  deadline: "cal.oblig",
   other: "cal.other",
 } as const;
-
-export const EVENT_TYPE_COLORS: Record<EventType, string> = {
-  exam: "#dc2626",
-  deadline: "#d97706",
-  other: "#3f6f5e",
-};
 
 export function daysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -33,4 +32,9 @@ export function firstWeekdayMondayIndex(year: number, month: number) {
 
 export function toDateKey(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+// "14:30:00" -> "14:30"
+export function shortTime(time: string | null | undefined) {
+  return time ? time.slice(0, 5) : null;
 }
