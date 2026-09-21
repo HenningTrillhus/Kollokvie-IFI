@@ -1,12 +1,12 @@
 // Sign-in is email + password under the hood, but people only ever type their
-// IFI username. The account's email is <ifi username>@ifi.uio.no, and since a
-// 6-digit code is sent to that address when you sign up, having an account
-// proves you have access to that IFI mailbox.
+// IFI username. The account's email is <username>@uio.no, and since a 6-digit
+// code is sent to that address when you sign up, having an account proves you
+// have access to that UiO mailbox.
 
-export const IFI_EMAIL_DOMAIN = "ifi.uio.no";
+export const IFI_EMAIL_DOMAIN = "uio.no";
 
 // Accounts made before email verification existed use a made-up address.
-// They keep working, and are asked to verify their real IFI email once.
+// They keep working, and are asked to verify their real UiO email once.
 export const LEGACY_EMAIL_DOMAIN = "kollokvie.internal";
 
 // Turned on (NEXT_PUBLIC_EMAIL_VERIFICATION=1) once Supabase is set up to send

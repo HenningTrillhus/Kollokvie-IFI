@@ -102,10 +102,10 @@ export const messages = {
     no: "For mange forsøk. Vent litt og prøv igjen.",
     en: "Too many attempts. Wait a bit and try again.",
   },
-  "verify.legacyTitle": { no: "Bekreft IFI-e-posten din", en: "Confirm your IFI email" },
+  "verify.legacyTitle": { no: "Bekreft UiO-e-posten din", en: "Confirm your UiO email" },
   "verify.legacyText": {
-    no: "Vi bekrefter nå at alle brukere faktisk har tilgang til IFI-e-posten sin. Vi sender en kode til {email}.",
-    en: "We now confirm that everyone has access to their IFI email. We'll send a code to {email}.",
+    no: "Vi bekrefter nå at alle brukere faktisk har tilgang til UiO-e-posten sin. Vi sender en kode til {email}.",
+    en: "We now confirm that everyone has access to their UiO email. We'll send a code to {email}.",
   },
   "verify.sendCode": { no: "Send kode", en: "Send code" },
   "verify.sending": { no: "Sender…", en: "Sending…" },

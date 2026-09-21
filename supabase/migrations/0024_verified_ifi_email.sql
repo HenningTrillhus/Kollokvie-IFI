@@ -1,5 +1,5 @@
--- Only IFI email addresses can create an account, and the IFI username is
--- read from the verified address (not from what the client claims).
+-- Only UiO email addresses (username@uio.no) can create an account, and the
+-- IFI username is read from the verified address (not from what the client claims).
 --
 -- Run this at the same time as switching on email codes
 -- (NEXT_PUBLIC_EMAIL_VERIFICATION=1). Before that, sign-ups still use the old
@@ -12,8 +12,8 @@ security definer
 set search_path = public
 as $$
 begin
-  if lower(coalesce(new.email, '')) !~ '^[a-z0-9._-]+@ifi\.uio\.no$' then
-    raise exception 'Only IFI email addresses can register';
+  if lower(coalesce(new.email, '')) !~ '^[a-z0-9._-]+@uio\.no$' then
+    raise exception 'Only UiO email addresses can register';
   end if;
   return new;
 end;

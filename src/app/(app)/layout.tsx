@@ -22,7 +22,7 @@ export default async function AppLayout({
     redirect("/login");
   }
 
-  // Accounts from before email codes verify their IFI address once.
+  // Accounts from before email codes verify their UiO address once.
   if (EMAIL_VERIFICATION_ENABLED && isLegacyEmail(user.email)) {
     redirect("/bekreft");
   }

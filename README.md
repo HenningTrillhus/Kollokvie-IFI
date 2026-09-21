@@ -81,7 +81,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
 | `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
 | `0022` | Kalender: klokkeslett og emne på hendelser, og `calendar_prefs` (farger og filter per emne) |
-| `0024` | Bare IFI-e-poster kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
+| `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
 | `0023` | «Ferdig» på hendelser (`events.completed_at`) og ikon 01–45 |
 
 ### 4. Skru av e-postbekreftelse
@@ -108,7 +108,7 @@ personvernerklæringen. Når personvernerklæringen endres på en måte som krev
 ## E-postkode ved registrering (valgfritt, men anbefalt)
 
 Uten dette kan hvem som helst registrere seg med et hvilket som helst IFI-brukernavn. Med det må man ha
-tilgang til `brukernavn@ifi.uio.no` og skrive inn en kode på seks siffer.
+tilgang til `brukernavn@uio.no` og skrive inn en kode på seks siffer.
 
 1. Opprett en konto hos [Resend](https://resend.com) (velg EU-region), legg til domenet ditt og legg
    DNS-oppføringene inn hos domeneleverandøren. Lag en API-nøkkel med «Sending access».
@@ -121,7 +121,7 @@ tilgang til `brukernavn@ifi.uio.no` og skrive inn en kode på seks siffer.
 5. Kjør `0024_verified_ifi_email.sql` i SQL Editor.
 6. Sett `NEXT_PUBLIC_EMAIL_VERIFICATION=1` i Vercel og deploy på nytt.
 
-Eksisterende brukere (laget før dette) blir bedt om å bekrefte IFI-e-posten sin én gang på `/bekreft`.
+Eksisterende brukere (laget før dette) blir bedt om å bekrefte UiO-e-posten sin én gang på `/bekreft`.
 Gjør stegene i rekkefølge: appen ber ikke om kode før steg 6.
 
 ## Deploy (Vercel)
