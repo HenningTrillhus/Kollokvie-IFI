@@ -148,6 +148,24 @@ export const messages = {
   "cal.date": { no: "Dato", en: "Date" },
   "cal.save": { no: "Lagre endringer", en: "Save changes" },
   "cal.saving": { no: "Lagrer…", en: "Saving…" },
+  "settings.secVisibility": { no: "Hvem kan se profilen din", en: "Who can see your profile" },
+  "settings.visibility": { no: "Profilsynlighet", en: "Profile visibility" },
+  "settings.visOpen": { no: "Åpen", en: "Open" },
+  "settings.visPrivate": { no: "Privat", en: "Private" },
+  "settings.visOpenText": {
+    no: "Alle innloggede kan se IFI-brukernavnet, studielinjen, årstrinnet, emnene, bioen og GitHub- og LinkedIn-lenkene dine. Du kan bytte tilbake når som helst.",
+    en: "All signed-in users can see your IFI username, study program, year, courses, bio and GitHub and LinkedIn links. You can switch back any time.",
+  },
+  "settings.visPrivateText": {
+    no: "Andre ser bare navn og ikon. De som følger deg ser alt, og du ser alltid alt selv.",
+    en: "Others only see your name and icon. People who follow you see everything, and you always see it all yourself.",
+  },
+  "profile.privateBadge": { no: "Privat profil", en: "Private profile" },
+  "profile.privateNotice": {
+    no: "Denne profilen er privat. Følg {name} for å se mer.",
+    en: "This profile is private. Follow {name} to see more.",
+  },
+  "search.privateProfile": { no: "Privat profil", en: "Private profile" },
   "follow.confirmUnfollow": { no: "Slutt å følge?", en: "Unfollow?" },
   "group.confirmLeave": { no: "Trykk igjen for å forlate", en: "Tap again to leave" },
   "pw.hint": {
@@ -444,12 +462,12 @@ export const messages = {
   "profile.noFollowers": { no: "Ingen følgere ennå.", en: "No followers yet." },
   "profile.followNobody": { no: "Du følger ingen ennå.", en: "You're not following anyone yet." },
   "profile.userFollowsNobody": {
-    no: "@{username} følger ingen ennå.",
-    en: "@{username} isn't following anyone yet.",
+    no: "{username} følger ingen ennå.",
+    en: "{username} isn't following anyone yet.",
   },
   "profile.followToSee": {
-    no: "Følg @{username} for å se bio, hvem de følger og blir fulgt av.",
-    en: "Follow @{username} to see their bio and who they follow and who follows them.",
+    no: "Følg {username} for å se hvem de følger og blir fulgt av.",
+    en: "Follow {username} to see who they follow and who follows them.",
   },
   "follow.follow": { no: "Følg", en: "Follow" },
   "follow.following": { no: "Følger", en: "Following" },
@@ -491,7 +509,10 @@ export const messages = {
   "settings.exportError": { no: "Kunne ikke hente dataene. Prøv igjen.", en: "Couldn't fetch your data. Try again." },
   "settings.bio": { no: "Bio", en: "Bio" },
   "settings.bioPlaceholder": { no: "Fortell litt om deg selv…", en: "Tell people a bit about yourself…" },
-  "settings.bioHint": { no: "Bare folk som følger deg kan se bioen din.", en: "Only people who follow you can see your bio." },
+  "settings.bioHint": {
+    no: "Åpen profil: alle innloggede ser bioen. Privat profil: bare de som følger deg.",
+    en: "Open profile: all signed-in users see your bio. Private profile: only people who follow you.",
+  },
   "settings.nameRequired": { no: "Navn kan ikke være tomt.", en: "Name can't be empty." },
   "settings.iconLabel": { no: "Ikon {n}", en: "Icon {n}" },
   "settings.colorHint": {

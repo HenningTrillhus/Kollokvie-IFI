@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
-import { escapeLike, type Profile } from "@/lib/profiles";
+import { escapeLike, PROFILE_VIEW, type Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
 import { Card, inputClass } from "@/components/form-ui";
 
@@ -34,8 +34,8 @@ export default function GroupInvitePanel({
       setLoading(true);
       const supabase = createClient();
       const [{ data: byUsername }, { data: byName }] = await Promise.all([
-        supabase.from("profiles").select("*").ilike("username", `%${escapeLike(trimmed)}%`).limit(20),
-        supabase.from("profiles").select("*").ilike("full_name", `%${escapeLike(trimmed)}%`).limit(20),
+        supabase.from(PROFILE_VIEW).select("*").ilike("username", `%${escapeLike(trimmed)}%`).limit(20),
+        supabase.from(PROFILE_VIEW).select("*").ilike("full_name", `%${escapeLike(trimmed)}%`).limit(20),
       ]);
 
       const merged = new Map<string, Profile>();
@@ -109,7 +109,9 @@ export default function GroupInvitePanel({
                   <Avatar profile={profile} className="h-9 w-9 text-sm" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{profile.full_name}</p>
-                    <p className="truncate text-xs text-muted">@{profile.username}</p>
+                    {profile.username && (
+                      <p className="truncate text-xs text-muted">@{profile.username}</p>
+                    )}
                   </div>
                 </div>
                 <button

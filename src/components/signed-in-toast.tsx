@@ -50,7 +50,7 @@ export default function SignedInToast({ profile }: { profile: Profile | null }) 
       <div className="flex items-center gap-2.5 rounded-full border border-card-border bg-card py-1.5 pl-1.5 pr-4 shadow-lg">
         <Avatar profile={profile} className="h-7 w-7 text-xs" />
         <span className="whitespace-nowrap text-sm font-medium">
-          {t("toast.signedInAs", { name: profile.full_name || profile.username })}
+          {t("toast.signedInAs", { name: profile.full_name || profile.username || "" })}
         </span>
       </div>
     </div>

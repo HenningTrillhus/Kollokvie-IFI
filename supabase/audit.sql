@@ -60,3 +60,15 @@ select id, public, file_size_limit, allowed_mime_types from storage.buckets;
 -- 9. Brukere som aldri bekreftet e-posten (kan slettes hvis de er gamle).
 select count(*) as unconfirmed_users, min(created_at) as oldest
 from auth.users where email_confirmed_at is null;
+
+-- 10. Åpen/privat profil (etter 0035 og 0036).
+--     a) Hvilke kolonner i profiles innloggede kan lese direkte. Forventet: bare
+--        id, full_name, accent_color, avatar, created_at, is_private.
+select string_agg(column_name, ', ' order by column_name) as readable_profile_columns
+from information_schema.column_privileges
+where table_schema = 'public' and table_name = 'profiles'
+  and grantee = 'authenticated' and privilege_type = 'SELECT';
+--     b) Antall profiler som er åpne. Forventet: 0 til noen velger «Åpen» selv.
+select count(*) filter (where is_private) as private_profiles,
+       count(*) filter (where not is_private) as open_profiles
+from public.profiles;

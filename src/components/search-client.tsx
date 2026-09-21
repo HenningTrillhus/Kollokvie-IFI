@@ -8,7 +8,7 @@ import FollowButton from "@/components/follow-button";
 import GroupCard from "@/components/group-card";
 import { Card, EmptyCard, ListCard } from "@/components/form-ui";
 import SearchInput from "@/components/search-input";
-import { escapeLike, type Profile } from "@/lib/profiles";
+import { PROFILE_VIEW, escapeLike, type Profile } from "@/lib/profiles";
 import Avatar from "@/components/avatar";
 import { getGroupCardData, withFullGroupsLast, type Group, type GroupCardData } from "@/lib/groups";
 
@@ -137,7 +137,7 @@ export default function SearchClient({
           } else {
             // The database function is not installed yet: plain A-Z.
             const res = await supabase
-              .from("profiles")
+              .from(PROFILE_VIEW)
               .select("*", { count: "exact" })
               .neq("id", currentUserId)
               .order("full_name", { ascending: true })
@@ -147,7 +147,7 @@ export default function SearchClient({
           }
         } else {
           const res = await supabase
-            .from("profiles")
+            .from(PROFILE_VIEW)
             .select("*", { count: "exact" })
             .neq("id", currentUserId)
             .or(`username.ilike.%${term}%,full_name.ilike.%${term}%`)
@@ -307,14 +307,14 @@ export default function SearchClient({
                   className="animate-rise flex items-center justify-between gap-3 px-4 py-3 transition hover:bg-accent-soft/50"
                 >
                   <Link
-                    href={`/profile/${encodeURIComponent(profile.username)}`}
+                    href={`/profile/${profile.id}`}
                     className="flex min-w-0 items-center gap-3"
                   >
                     <Avatar profile={profile} className="h-10 w-10 text-sm" />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{profile.full_name}</p>
                       <p className="truncate text-xs text-muted">
-                        @{profile.username}
+                        {profile.username ? `@${profile.username}` : t("search.privateProfile")}
                         {mutuals[profile.id] ? (
                           <span className="text-accent">
                             {" · "}

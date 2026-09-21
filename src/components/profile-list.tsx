@@ -19,13 +19,15 @@ export default function ProfileList({
       {profiles.map((profile, i) => (
         <li key={profile.id} style={{ ["--i" as string]: i }} className="animate-rise">
           <Link
-            href={`/profile/${encodeURIComponent(profile.username)}`}
+            href={`/profile/${profile.id}`}
             className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent-soft active:bg-accent-soft"
           >
             <Avatar profile={profile} className="h-9 w-9 text-sm" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{profile.full_name}</p>
-              <p className="truncate text-xs text-muted">@{profile.username}</p>
+              {profile.username && (
+                <p className="truncate text-xs text-muted">@{profile.username}</p>
+              )}
             </div>
           </Link>
         </li>

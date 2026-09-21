@@ -30,7 +30,7 @@ export default async function VerifyEmailPage() {
         <h1 className="text-xl font-semibold tracking-tight">{t("verify.legacyTitle")}</h1>
       </div>
       <div className="rounded-2xl border border-card-border bg-card p-6 shadow-sm">
-        <LegacyVerify email={ifiEmail(profile.ifi_username)} />
+        <LegacyVerify email={ifiEmail(profile.ifi_username ?? "")} />
       </div>
     </main>
   );

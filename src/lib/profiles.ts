@@ -3,8 +3,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type Profile = {
   id: string;
   full_name: string;
-  username: string;
-  ifi_username: string;
+  // The IFI username. Hidden (null) on a private profile you don't follow.
+  username: string | null;
+  ifi_username: string | null;
   github_url: string | null;
   linkedin_url: string | null;
   study_program: string | null;
@@ -14,8 +15,18 @@ export type Profile = {
   avatar: string | null;
   // Which privacy policy version the user consented to (see lib/privacy.ts).
   privacy_version?: string | null;
+  // Open or private profile, and whether the details are hidden from *you*.
+  is_private?: boolean;
+  details_hidden?: boolean;
   created_at: string;
 };
+
+// Everything about other people is read through this view. It hides the
+// details of private profiles from anyone who doesn't follow them.
+export const PROFILE_VIEW = "visible_profiles";
+
+export const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const ACCENT_COLORS = [
   { key: "color.sage", value: "#3f6f5e" },
@@ -103,7 +114,7 @@ export async function getProfileByUsername(
   username: string
 ) {
   const { data } = await supabase
-    .from("profiles")
+    .from(PROFILE_VIEW)
     .select("*")
     .ilike("username", escapeLike(username))
     .maybeSingle();
@@ -112,7 +123,7 @@ export async function getProfileByUsername(
 
 export async function getProfileById(supabase: SupabaseClient, id: string) {
   const { data } = await supabase
-    .from("profiles")
+    .from(PROFILE_VIEW)
     .select("*")
     .eq("id", id)
     .maybeSingle();
@@ -121,7 +132,7 @@ export async function getProfileById(supabase: SupabaseClient, id: string) {
 
 export async function getProfilesByIds(supabase: SupabaseClient, ids: string[]) {
   if (ids.length === 0) return [] as Profile[];
-  const { data } = await supabase.from("profiles").select("*").in("id", ids);
+  const { data } = await supabase.from(PROFILE_VIEW).select("*").in("id", ids);
   return (data ?? []) as Profile[];
 }
 

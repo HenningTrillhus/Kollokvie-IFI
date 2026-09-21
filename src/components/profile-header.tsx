@@ -3,6 +3,7 @@ import Avatar from "@/components/avatar";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
 import { Card } from "@/components/form-ui";
+import { LockIcon } from "@/components/meta-icons";
 import type { Course } from "@/lib/courses";
 import { programLabel } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
@@ -20,7 +21,8 @@ export default async function ProfileHeader({
   profile: Profile;
   bio: string | null;
   courses: Course[];
-  counts: { followers: number; following: number };
+  // Left out when the profile's details are hidden from the viewer.
+  counts?: { followers: number; following: number };
   actions?: ReactNode;
 }) {
   const { t, lang } = await getT();
@@ -34,7 +36,15 @@ export default async function ProfileHeader({
           <h1 className="truncate text-lg font-semibold leading-tight">
             {profile.full_name}
           </h1>
-          <p className="truncate text-sm text-muted">@{profile.username}</p>
+          {profile.username && (
+            <p className="truncate text-sm text-muted">@{profile.username}</p>
+          )}
+          {profile.details_hidden && (
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
+              <LockIcon className="h-3 w-3" />
+              {t("profile.privateBadge")}
+            </p>
+          )}
         </div>
       </div>
 
@@ -54,6 +64,7 @@ export default async function ProfileHeader({
         </div>
       )}
 
+      {counts && (
       <div className="grid grid-cols-2 divide-x divide-card-border rounded-xl bg-accent-soft/60 py-2.5 text-center">
         <div>
           <p className="text-lg font-semibold leading-tight">{counts.followers}</p>
@@ -64,6 +75,7 @@ export default async function ProfileHeader({
           <p className="text-xs text-muted">{t("profile.following")}</p>
         </div>
       </div>
+      )}
 
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </Card>

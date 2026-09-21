@@ -14,6 +14,7 @@ import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
 import ChangePasswordCard from "@/components/change-password-card";
+import ProfileVisibility from "@/components/profile-visibility";
 import AvatarPicker from "@/components/avatar-picker";
 import { Card, Field, SectionTitle, StickyBar, inputClass } from "@/components/form-ui";
 import { ChevronRightIcon } from "@/components/meta-icons";
@@ -44,6 +45,7 @@ export default function SettingsPage() {
   const [userId, setUserId] = useState("");
   const [ifiUsername, setIfiUsername] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [isPrivate, setIsPrivate] = useState(true);
   const [accentColor, setAccentColor] = useState<string>(ACCENT_COLORS[0].value);
 
   const [bio, setBio] = useState("");
@@ -80,7 +82,7 @@ export default function SettingsPage() {
       }
 
       const { data: profile } = await supabase
-        .from("profiles")
+        .from("visible_profiles")
         .select("*")
         .eq("id", user.id)
         .single();
@@ -97,7 +99,8 @@ export default function SettingsPage() {
       if (profile) {
         setAvatar(profile.avatar ?? null);
         setAccentColor(profile.accent_color ?? ACCENT_COLORS[0].value);
-        setIfiUsername(profile.ifi_username);
+        setIfiUsername(profile.ifi_username ?? "");
+        setIsPrivate(profile.is_private ?? true);
         setFullName(profile.full_name);
         setGithubUrl(profile.github_url ?? "");
         setLinkedinUrl(profile.linkedin_url ?? "");
@@ -188,9 +191,7 @@ export default function SettingsPage() {
 
     if (error) {
       setSaving(false);
-      setErrorMessage(
-        error.message.includes("duplicate") ? t("settings.usernameTaken") : error.message
-      );
+      setErrorMessage(t("common.somethingWrong"));
       return;
     }
 
@@ -412,6 +413,11 @@ export default function SettingsPage() {
           </section>
 
           <section style={rise(1)} className="animate-rise">
+            <SectionTitle>{t("settings.secVisibility")}</SectionTitle>
+            <ProfileVisibility userId={userId} initialPrivate={isPrivate} />
+          </section>
+
+          <section style={rise(2)} className="animate-rise">
             <SectionTitle>{t("settings.secStudy")}</SectionTitle>
             <Card>
               <Field label={t("settings.program")}>

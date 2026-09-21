@@ -73,13 +73,15 @@ export default function FollowRequestsInbox({
             className="space-y-3 px-4 py-3"
           >
             <Link
-              href={`/profile/${encodeURIComponent(r.profile.username)}`}
+              href={`/profile/${r.profile.id}`}
               className="flex min-w-0 items-center gap-3"
             >
               <Avatar profile={r.profile} className="h-10 w-10 text-sm" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{r.profile.full_name}</p>
-                <p className="truncate text-xs text-muted">@{r.profile.username}</p>
+                {r.profile.username && (
+                  <p className="truncate text-xs text-muted">@{r.profile.username}</p>
+                )}
               </div>
             </Link>
             <div className="grid grid-cols-2 gap-2">

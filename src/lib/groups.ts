@@ -89,7 +89,7 @@ export async function getGroupCardData(
     list.push({
       id: row.user_id,
       full_name: row.full_name,
-      username: row.username,
+      username: row.username ?? null,
       accent_color: row.accent_color,
       avatar: row.avatar ?? null,
     });

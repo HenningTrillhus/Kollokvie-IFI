@@ -24,7 +24,7 @@ export async function downloadMyData() {
     events,
     calendarPrefs,
   ] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+    supabase.from("visible_profiles").select("*").eq("id", uid).maybeSingle(),
     supabase.from("profile_bios").select("bio, updated_at").eq("user_id", uid).maybeSingle(),
     supabase.from("user_courses").select("course_code, created_at").eq("user_id", uid),
     supabase.from("follows").select("followee_id, status, created_at").eq("follower_id", uid),

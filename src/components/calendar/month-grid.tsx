@@ -81,7 +81,7 @@ export default function MonthGrid({
       <div
         key={`${year}-${month}`}
         style={{ gridTemplateRows: `repeat(${cells.length / 7}, minmax(0, 1fr))` }}
-        className={`mt-0.5 grid min-h-0 flex-1 grid-cols-7 gap-0.5 transition-opacity ${slide} ${
+        className={`mt-0.5 grid min-h-0 flex-1 grid-cols-7 gap-1 transition-opacity lg:gap-0.5 ${slide} ${
           loading ? "opacity-60" : ""
         }`}
       >
@@ -124,8 +124,8 @@ export default function MonthGrid({
                 {top && (
                   // The kind of thing that's on this day, in small print.
                   <span
-                    className={`max-w-full truncate text-[8px] font-bold uppercase leading-none tracking-tight [@media(max-height:700px)]:hidden lg:text-[10px] ${
-                      strong ? "text-foreground" : "text-muted"
+                    className={`max-w-full truncate text-[9px] font-semibold uppercase leading-none tracking-wide [@media(max-height:700px)]:hidden lg:text-[10px] ${
+                      strong ? "text-foreground/80" : "text-muted"
                     }`}
                   >
                     {label}
@@ -150,7 +150,7 @@ export default function MonthGrid({
                   <span className="px-1 text-[10px] text-muted">+{items.length - 3}</span>
                 )}
               </span>
-              <span className="flex h-1.5 gap-0.5 lg:hidden">
+              <span className="hidden h-1.5 gap-0.5 [@media(max-height:700px)_and_(max-width:1023px)]:flex">
                 {items.slice(0, 4).map((item) => (
                   <span
                     key={item.key}

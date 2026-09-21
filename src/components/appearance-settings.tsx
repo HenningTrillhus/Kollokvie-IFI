@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { Card } from "@/components/form-ui";
+import Segmented from "@/components/segmented";
 import { useI18n } from "@/lib/i18n/client";
 import { setLanguage, setTheme } from "@/lib/i18n/actions";
 import { LANGS, THEMES, type Lang, type Theme } from "@/lib/i18n";
@@ -55,59 +56,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     <div className="flex items-center justify-between gap-3">
       <span className="text-sm font-medium">{label}</span>
       {children}
-    </div>
-  );
-}
-
-// A pill switcher whose highlight slides to the chosen option.
-function Segmented<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-  disabled,
-}: {
-  label: string;
-  options: { value: T; label: string }[];
-  value: T;
-  onChange: (value: T) => void;
-  disabled?: boolean;
-}) {
-  const index = Math.max(
-    0,
-    options.findIndex((o) => o.value === value)
-  );
-
-  return (
-    <div
-      role="radiogroup"
-      aria-label={label}
-      className="relative grid rounded-xl border border-card-border p-0.5 text-sm font-medium"
-      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
-    >
-      <span
-        aria-hidden
-        className="absolute inset-y-0.5 left-0.5 rounded-lg bg-accent-soft transition-transform duration-300 ease-out motion-reduce:transition-none"
-        style={{
-          width: `calc((100% - 4px) / ${options.length})`,
-          transform: `translateX(${index * 100}%)`,
-        }}
-      />
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={value === option.value}
-          disabled={disabled}
-          onClick={() => onChange(option.value)}
-          className={`relative rounded-lg px-3.5 py-1.5 transition-colors disabled:opacity-70 ${
-            value === option.value ? "text-accent" : "text-muted hover:text-foreground"
-          }`}
-        >
-          {option.label}
-        </button>
-      ))}
     </div>
   );
 }

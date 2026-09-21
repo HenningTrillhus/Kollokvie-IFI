@@ -25,7 +25,7 @@ const no: Policy = {
   summary: [
     "Vi lagrer navn, brukernavn, UiO-e-postadressen din (bekreftet med en kode) og det du selv fyller inn på profilen din, og hvem du følger, hvilke kollokviegrupper du er med i og kalenderhendelsene dine.",
     "Alt lagres hos Supabase (database i EU, Irland), og nettstedet drives av Vercel. Vi selger ikke opplysningene dine og bruker dem ikke til reklame eller sporing.",
-    "Andre innloggede brukere ser deler av profilen din: navn, brukernavn, studielinje, emner og profilbilde. Bioen din ser bare de som følger deg.",
+    "Du velger selv om profilen din er åpen eller privat. På en privat profil ser andre innloggede bare navnet og ikonet ditt. På en åpen profil ser de også IFI-brukernavn, studielinje, årstrinn, emner, bio og lenker. De som følger deg ser alltid alt.",
     "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema).",
     "Du kan når som helst laste ned dataene dine, endre dem eller slette kontoen, og dermed trekke samtykket ditt.",
     "Bruken din er også omfattet av bruksvilkårene.",
@@ -56,8 +56,9 @@ const no: Policy = {
     {
       heading: "4. Hvem kan se hva",
       bullets: [
-        "Alle innloggede brukere kan se navn, brukernavn, studielinje, årstrinn, emner, lenker, profilbilde og antall følgere og følger.",
-        "Bioen din og listene over hvem du følger og hvem som følger deg kan bare ses av de som følger deg.",
+        "Alle innloggede brukere kan alltid se navnet og profilbildet ditt (ikonet).",
+        "Er profilen din åpen, kan alle innloggede også se IFI-brukernavn, studielinje, årstrinn, emner, bio, GitHub- og LinkedIn-lenke og antall følgere og følger. Er den privat, kan bare de som følger deg (godkjent) se dette. Du bytter mellom åpen og privat i Innstillinger, og nye og eksisterende profiler er private til du selv velger noe annet.",
+        "Listene over hvem du følger og hvem som følger deg kan bare ses av de som følger deg.",
         "Offentlige kollokviegrupper kan ses av alle innloggede brukere. Private kollokviegrupper kan ses av folk som følger eieren eller blir fulgt av eieren. Kollokviegrupper med «kun invitasjon» kan bare ses av medlemmer og inviterte.",
         "Kalenderhendelsene dine er bare synlige for deg.",
         "Ingen som ikke er innlogget kan se profiler eller kollokviegrupper.",
@@ -147,7 +148,7 @@ const en: Policy = {
   summary: [
     "We store your name, username, your UiO email address (confirmed with a code) and what you choose to add to your profile, who you follow, which study groups you are in and your calendar events.",
     "Everything is stored with Supabase (database in the EU, Ireland) and the site is run by Vercel. We don't sell your data and don't use it for advertising or tracking.",
-    "Other signed-in users can see parts of your profile: name, username, study program, courses and profile picture. Only people who follow you can see your bio.",
+    "You choose whether your profile is open or private. On a private profile other signed-in users only see your name and icon. On an open profile they also see your IFI username, study program, year, courses, bio and links. People who follow you always see everything.",
     "We only use strictly necessary cookies (sign-in, language and theme).",
     "You can download your data, change it or delete your account at any time, which also withdraws your consent.",
     "Your use of the service is also covered by the terms of service.",
@@ -178,8 +179,9 @@ const en: Policy = {
     {
       heading: "4. Who can see what",
       bullets: [
-        "All signed-in users can see your name, username, study program, year, courses, links, profile picture and follower counts.",
-        "Your bio and the lists of who you follow and who follows you can only be seen by people who follow you.",
+        "All signed-in users can always see your name and profile picture (icon).",
+        "If your profile is open, all signed-in users can also see your IFI username, study program, year, courses, bio, GitHub and LinkedIn links and follower counts. If it is private, only people who follow you (approved) can see this. You switch between open and private in Settings, and new and existing profiles are private until you choose otherwise.",
+        "The lists of who you follow and who follows you can only be seen by people who follow you.",
         "Public study groups can be seen by all signed-in users. Private study groups can be seen by people who follow the owner or are followed by the owner. Invite-only study groups can only be seen by members and invited people.",
         "Your calendar events are only visible to you.",
         "People who are not signed in cannot see any profiles or study groups.",

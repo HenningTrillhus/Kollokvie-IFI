@@ -20,6 +20,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
 - **Kollokviegrupper.** Lag, rediger, bli med, forlat og slett. Synlighet er *offentlig*,
   *privat* (bare folk du følger eller som følger deg) eller *kun invitasjon*. Emne, rom,
   dato, tid (i kvarter) og maks antall deltakere kan settes. Tid velges med appens egen tidsvelger (ikke nettleserens); i kalenderen kan du velge hvilket som helst minutt. Medlemmer kan invitere.
+- **Åpen eller privat profil** (Innstillinger). Privat: andre ser bare navn og ikon; åpen: også IFI-brukernavn, studielinje, årstrinn, emner, bio og lenker. De som følger deg ser alltid alt. Håndheves i databasen (visningen `visible_profiles`), ikke bare i appen. Alle er private til de selv velger. Profiladressen er `/profile/<id>`, siden IFI-brukernavnet er skjult på private profiler.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
@@ -98,6 +99,8 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0032` | Profilikoner 01–65 (var 01–60) |
 | `0033` | Sikkerhet 2: skjulte tegn avvises, kvoter per bruker, smalere skrivetilgang, egendefinerte emner merkes med hvem som la dem til |
 | `0034` | Slår av GraphQL-endepunktet (valgfritt, appen bruker det ikke) |
+| `0035` | Åpen/privat profil, del 1: `is_private`, visningen `visible_profiles`, nye regler for bio og emner |
+| `0036` | Åpen/privat profil, del 2 (kjør etter at appen er oppdatert): stenger direkte lesing av profiltabellen |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
