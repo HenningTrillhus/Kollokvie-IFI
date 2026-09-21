@@ -71,7 +71,10 @@ export default function SettingsPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -277,7 +280,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div
-        className="mx-auto w-full max-w-md px-6 pt-5"
+        className="mx-auto w-full max-w-md px-6 pt-5 md:max-w-xl md:pt-7"
         role="status"
         aria-label={t("common.loadingAria")}
       >
@@ -297,7 +300,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-6 pt-5">
+    <div className="mx-auto w-full max-w-md px-6 pt-5 md:max-w-xl md:pt-7">
       <Link
         href="/profile"
         className="text-sm font-medium text-muted transition hover:text-foreground"
@@ -328,6 +331,7 @@ export default function SettingsPage() {
               id="fullName"
               type="text"
               required
+              maxLength={100}
               autoComplete="name"
               value={fullName}
               onChange={(e) => edit(setFullName)(e.target.value)}
@@ -400,6 +404,7 @@ export default function SettingsPage() {
             <input
               id="githubUrl"
               type="text"
+              maxLength={250}
               inputMode="url"
               autoCapitalize="none"
               autoCorrect="off"
@@ -414,6 +419,7 @@ export default function SettingsPage() {
             <input
               id="linkedinUrl"
               type="text"
+              maxLength={250}
               inputMode="url"
               autoCapitalize="none"
               autoCorrect="off"

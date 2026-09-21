@@ -22,6 +22,7 @@ export async function downloadMyData() {
     invitesReceived,
     invitesSent,
     events,
+    calendarPrefs,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
     supabase.from("profile_bios").select("bio, updated_at").eq("user_id", uid).maybeSingle(),
@@ -33,6 +34,7 @@ export async function downloadMyData() {
     supabase.from("group_invites").select("*").eq("invitee_id", uid),
     supabase.from("group_invites").select("*").eq("inviter_id", uid),
     supabase.from("events").select("*").eq("user_id", uid),
+    supabase.from("calendar_prefs").select("key, color, visible").eq("user_id", uid),
   ]);
 
   const data = {
@@ -48,6 +50,7 @@ export async function downloadMyData() {
     group_invites_received: invitesReceived.data ?? [],
     group_invites_sent: invitesSent.data ?? [],
     calendar_events: events.data ?? [],
+    calendar_preferences: calendarPrefs.data ?? [],
   };
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });

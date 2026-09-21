@@ -80,7 +80,7 @@ export default function SwipeTabs({ tabs }: { tabs: Tab[] }) {
       >
         {tabs.map((tab) => (
           <div key={tab.label} role="tabpanel" aria-label={tab.label} className="w-full shrink-0 snap-start snap-always">
-            <div className="max-h-80 overflow-y-auto overscroll-contain p-2">
+            <div className="max-h-80 overflow-y-auto overscroll-contain p-2 lg:max-h-[30rem]">
               {tab.content}
             </div>
           </div>

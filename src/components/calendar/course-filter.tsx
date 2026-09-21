@@ -42,7 +42,7 @@ export function FilterChips({
   const rows = useRows(courses);
 
   return (
-    <div className="no-scrollbar -mx-4 flex scroll-px-4 snap-x gap-2 overflow-x-auto overscroll-x-contain px-4">
+    <div className="no-scrollbar -mx-4 flex scroll-px-4 snap-x gap-2 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
       {rows.map((r) => {
         const on = isVisible(prefs, r.key);
         return (

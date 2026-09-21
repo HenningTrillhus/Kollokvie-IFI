@@ -53,6 +53,7 @@ export default function AddEventForm({
             id="cal-title"
             type="text"
             autoFocus
+            maxLength={200}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("cal.titlePlaceholder")}

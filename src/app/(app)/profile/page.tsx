@@ -59,7 +59,9 @@ export default async function OwnProfilePage() {
   const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
 
   return (
-    <Page>
+    <Page width="wide">
+      <div className="space-y-4 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start lg:gap-5 lg:space-y-0">
+      <div className="space-y-4">
       <ProfileHeader
         profile={profile}
         bio={bioRow?.bio ?? null}
@@ -96,6 +98,7 @@ export default async function OwnProfilePage() {
           </span>
         </Link>
       </ListCard>
+      </div>
 
       <SwipeTabs
         tabs={[
@@ -121,6 +124,7 @@ export default async function OwnProfilePage() {
           },
         ]}
       />
+      </div>
     </Page>
   );
 }

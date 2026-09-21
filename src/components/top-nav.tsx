@@ -18,7 +18,8 @@ export default function TopNav({
   const pathname = usePathname();
   const { t } = useI18n();
   return (
-    <header className="flex shrink-0 items-center gap-6 border-b border-card-border bg-background px-4 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:px-6 sm:py-4">
+    <header className="shrink-0 border-b border-card-border bg-background pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:py-3.5">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-4 sm:px-6">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5">
         <Logo className="h-8 w-8" />
         <span className="font-semibold tracking-tight">
@@ -56,6 +57,7 @@ export default function TopNav({
           <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 ring-2 ring-background" />
         )}
       </Link>
+      </div>
     </header>
   );
 }

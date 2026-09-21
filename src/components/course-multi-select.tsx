@@ -119,7 +119,7 @@ export default function CourseMultiSelect({
       />
 
       {open && (
-        <div className="absolute z-10 mt-1.5 max-h-72 w-full overflow-y-auto rounded-xl border border-card-border bg-card shadow-lg">
+        <div className="animate-pop absolute z-10 mt-1.5 max-h-72 w-full overflow-y-auto rounded-xl border border-card-border bg-card shadow-lg">
           {filtered.map((course) => (
             <button
               key={course.code}

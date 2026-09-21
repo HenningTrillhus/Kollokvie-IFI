@@ -41,6 +41,13 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   Begge velges nederst i Innstillinger.
 - **Appfølelse på mobil.** Fast topp- og bunnmeny, låst side, PWA som kan legges til på hjemskjermen.
   Innlogging og registrering fyller skjermen uten å scrolle. Nettleser-zoom er tillatt (tilgjengelighet).
+- **Fungerer på alle skjermer.** Mobil: bunnmeny og én kolonne. Nettbrett: toppmeny og to kolonner med kort.
+  PC: bredt innhold med tre kolonner med kort, kalender i to kolonner (måned til venstre, frister og valgt dag
+  til høyre, med hendelsestitler i rutene), profil og kollokviegruppe i to kolonner, og snarveien «/» for å søke.
+  Innlogging og registrering scroller på liggende mobil der det ikke er plass.
+- **Små animasjoner** (av hvis du har valgt «reduser bevegelse»): sider og lister glir inn, kort løfter seg ved
+  hover, nedtrekksmenyer «popper» opp, og knapper bytter form når tilstanden endres. «Slutt å følge» og «Forlat
+  kollokviegruppe» krever to trykk, så man ikke gjør det ved uhell.
 - **Oppdaterer seg selv.** Nye kollokviegrupper og innboksvarsler hentes automatisk
   hvert 30. sekund og når du kommer tilbake til appen, og det er en oppdater-knapp på
   Utforsk.

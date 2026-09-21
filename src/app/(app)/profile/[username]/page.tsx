@@ -83,9 +83,10 @@ export default async function PublicProfilePage({
   }
 
   return (
-    <Page>
+    <Page width="wide">
       <BackButton />
 
+      <div className="space-y-4 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start lg:gap-5 lg:space-y-0">
       <ProfileHeader
         profile={profile}
         bio={bio}
@@ -132,6 +133,7 @@ export default async function PublicProfilePage({
       ) : (
         <EmptyCard>{t("profile.followToSee", { username: profile.username })}</EmptyCard>
       )}
+      </div>
     </Page>
   );
 }

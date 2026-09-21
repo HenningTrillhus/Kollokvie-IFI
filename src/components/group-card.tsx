@@ -28,7 +28,7 @@ export default function GroupCard({
     <Link
       href={`/groups/${group.id}`}
       style={{ ["--i" as string]: index }}
-      className={`animate-rise relative block overflow-hidden rounded-2xl border border-card-border p-4 transition duration-200 hover:border-accent/40 hover:shadow-sm active:scale-[0.99] ${
+      className={`animate-rise relative block overflow-hidden rounded-2xl border border-card-border p-4 transition duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md active:translate-y-0 active:scale-[0.99] ${
         full ? "bg-accent-soft/40" : "bg-card"
       }`}
     >

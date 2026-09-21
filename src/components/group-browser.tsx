@@ -3,7 +3,7 @@
 import { useState } from "react";
 import GroupCard from "@/components/group-card";
 import RefreshButton from "@/components/refresh-button";
-import { Card, EmptyCard } from "@/components/form-ui";
+import { Card, CardGrid, EmptyCard } from "@/components/form-ui";
 import SearchInput from "@/components/search-input";
 import type { GroupCardData } from "@/lib/groups";
 import { useI18n } from "@/lib/i18n/client";
@@ -33,8 +33,9 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
 
   return (
     <>
-      <Card>
-        <div className="flex items-center gap-2">
+      <Card className="lg:space-y-3">
+        <div className="space-y-4 lg:flex lg:items-center lg:gap-3 lg:space-y-0">
+        <div className="flex items-center gap-2 lg:flex-1">
           <SearchInput
             value={query}
             onChange={setQuery}
@@ -43,7 +44,7 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
           <RefreshButton label={t("explore.refresh")} />
         </div>
 
-        <div className="grid grid-cols-3 rounded-xl border border-card-border p-1 text-sm font-medium">
+        <div className="grid grid-cols-3 rounded-xl border border-card-border p-1 text-sm font-medium lg:w-[26rem] lg:shrink-0">
           {(
             [
               ["all", t("explore.all")],
@@ -63,9 +64,10 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
             </button>
           ))}
         </div>
+        </div>
 
         {courses.length > 0 && (
-          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
             <Chip active={activeCourse === null} onClick={() => setCourse(null)}>
               {t("explore.all")}
             </Chip>
@@ -89,9 +91,22 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
             : items.length === 0
               ? t("explore.empty")
               : t("explore.noMatch")}
+          {items.length > 0 && (query || activeCourse || visibility !== "all") && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setCourse(null);
+                setVisibility("all");
+              }}
+              className="mt-3 block w-full text-sm font-medium text-accent transition hover:text-accent-hover"
+            >
+              {t("explore.reset")}
+            </button>
+          )}
         </EmptyCard>
       ) : (
-        <div className="space-y-3">
+        <CardGrid>
           {visible.map(({ group, memberCount, members }, i) => (
             <GroupCard
               key={group.id}
@@ -101,7 +116,7 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
               index={i}
             />
           ))}
-        </div>
+        </CardGrid>
       )}
     </>
   );

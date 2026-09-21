@@ -221,7 +221,7 @@ export function SemesterPanes({ overview, list }: { overview: ReactNode; list: R
 
   return (
     <div className={`flex min-h-[16rem] flex-1 flex-col overflow-hidden ${cardClass}`}>
-      <div role="tablist" className="relative flex shrink-0 border-b border-card-border">
+      <div role="tablist" className="relative flex shrink-0 border-b border-card-border lg:hidden">
         {labels.map((label, i) => (
           <button
             key={label}
@@ -247,12 +247,12 @@ export function SemesterPanes({ overview, list }: { overview: ReactNode; list: R
       <div
         ref={scroller}
         onScroll={handleScroll}
-        className="no-scrollbar flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        className="no-scrollbar flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain lg:grid lg:snap-none lg:grid-cols-2 lg:divide-x lg:divide-card-border lg:overflow-x-hidden"
       >
-        <div className="h-full w-full shrink-0 snap-start snap-always overflow-y-auto overscroll-contain">
+        <div className="h-full w-full shrink-0 snap-start snap-always overflow-y-auto overscroll-contain lg:w-auto lg:min-w-0">
           {overview}
         </div>
-        <div className="h-full w-full shrink-0 snap-start snap-always overflow-y-auto overscroll-contain">
+        <div className="h-full w-full shrink-0 snap-start snap-always overflow-y-auto overscroll-contain lg:w-auto lg:min-w-0">
           {list}
         </div>
       </div>

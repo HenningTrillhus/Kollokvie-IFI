@@ -55,9 +55,7 @@ body {
 /* Inside the app shell the document itself must never scroll: header and tab
    bar stay pinned and only designated scroll boxes move. */
 html:has(.app-shell),
-html:has(.app-shell) body,
-html:has(.auth-shell),
-html:has(.auth-shell) body {
+html:has(.app-shell) body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
@@ -163,6 +161,37 @@ input[type="search"]::-webkit-search-decoration {
 .animate-sheet-up { animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
 .animate-fade-only { animation: fade-only 0.2s ease-out both; }
 
+/* A control that just changed state (Follow -> Requested) settles in. */
+@keyframes swap-in {
+  from {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-swap {
+  animation: swap-in 0.2s ease-out both;
+}
+
+/* Menus and popovers scale in from their top edge. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-pop {
+  animation: pop-in 0.16s ease-out both;
+  transform-origin: top center;
+}
+
 /* List items rise in one after another (set --i per item). */
 .animate-rise {
   animation: fade-in 0.28s ease-out both;
@@ -176,6 +205,8 @@ input[type="search"]::-webkit-search-decoration {
   .animate-slide-from-left,
   .animate-sheet-up,
   .animate-check-pop,
+  .animate-pop,
+  .animate-swap,
   .animate-fade-only {
     animation: none;
   }
@@ -237,5 +268,61 @@ html[data-theme="dark"] .text-red-500 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+
+/* ---- Desktop polish ------------------------------------------------- */
+
+/* Tailwind resets buttons to the default arrow: make clickable things look it. */
+button:not(:disabled),
+[role="button"],
+[role="tab"],
+[role="option"],
+summary,
+label:has(input[type="checkbox"]),
+select {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Slim, themed scrollbars where a mouse is used (phones keep their overlay ones). */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--card-border) transparent;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+/* Colors ease when you switch between light and dark. */
+body {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Text is easier to read in a wide column when it isn't stretched edge to edge. */
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Login and sign-up fit the screen without scrolling. On a short screen (a
+   phone on its side) there isn't room, so they scroll like a normal page. */
+.auth-shell {
+  min-height: 100dvh;
+}
+@media (min-height: 640px) {
+  html:has(.auth-shell),
+  html:has(.auth-shell) body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  .auth-shell {
+    height: 100dvh;
+    overflow: hidden;
   }
 }

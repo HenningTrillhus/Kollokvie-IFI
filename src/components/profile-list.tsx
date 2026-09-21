@@ -16,8 +16,8 @@ export default function ProfileList({
 
   return (
     <ul className="divide-y divide-card-border">
-      {profiles.map((profile) => (
-        <li key={profile.id}>
+      {profiles.map((profile, i) => (
+        <li key={profile.id} style={{ ["--i" as string]: i }} className="animate-rise">
           <Link
             href={`/profile/${encodeURIComponent(profile.username)}`}
             className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent-soft active:bg-accent-soft"

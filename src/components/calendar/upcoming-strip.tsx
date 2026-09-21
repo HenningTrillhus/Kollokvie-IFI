@@ -34,7 +34,7 @@ export default function UpcomingStrip({
       </h2>
       <div
         ref={scroller}
-        className="no-scrollbar relative -mx-4 flex scroll-px-4 snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain px-4"
+        className="no-scrollbar relative -mx-4 flex scroll-px-4 snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:px-0 lg:max-h-[15rem] lg:snap-none lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:px-0"
       >
         {items.map((item) => {
           const days = daysUntil(item.date, todayKey);
@@ -50,7 +50,7 @@ export default function UpcomingStrip({
             <div
               key={item.key}
               data-flip={item.key}
-              className="relative h-[58px] w-[14.5rem] shrink-0 snap-start"
+              className="relative h-[58px] w-[14.5rem] shrink-0 snap-start lg:w-full"
             >
               <button
                 onClick={() => onPick(item.date)}

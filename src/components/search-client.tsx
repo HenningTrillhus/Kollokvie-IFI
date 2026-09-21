@@ -87,6 +87,17 @@ export default function SearchClient({
   // every time you open the tab.
   useEffect(() => {
     if (window.matchMedia("(hover: hover)").matches) inputRef.current?.focus();
+
+    // Keyboard shortcut: "/" focuses the search box (like most sites).
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && /^(input|textarea|select)$/i.test(target.tagName)) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   useEffect(() => {
@@ -210,7 +221,7 @@ export default function SearchClient({
   const shown = mode === "people" ? results.length : groupResults.length;
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-2.5 px-4 pb-2.5 pt-2.5">
+    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-2.5 px-4 pb-2.5 pt-2.5 md:max-w-3xl md:gap-3 md:px-6 md:pb-4 md:pt-5">
       <div className="shrink-0">
         <Card className="space-y-3">
           <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
@@ -276,7 +287,7 @@ export default function SearchClient({
               {mode === "people" ? t("search.noUsers") : t("search.noGroups")}
             </EmptyCard>
           ) : mode === "groups" ? (
-            <div className="space-y-3 pb-1">
+            <div className="grid gap-3 pb-1 md:grid-cols-2">
               {groupResults.map(({ group, memberCount, members }, i) => (
                 <GroupCard
                   key={group.id}
@@ -289,10 +300,11 @@ export default function SearchClient({
             </div>
           ) : (
             <ListCard>
-              {results.map((profile) => (
+              {results.map((profile, i) => (
                 <div
                   key={profile.id}
-                  className="flex items-center justify-between gap-3 px-4 py-3"
+                  style={{ ["--i" as string]: i }}
+                  className="animate-rise flex items-center justify-between gap-3 px-4 py-3 transition hover:bg-accent-soft/50"
                 >
                   <Link
                     href={`/profile/${encodeURIComponent(profile.username)}`}

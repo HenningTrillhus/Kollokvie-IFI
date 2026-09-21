@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const items = withFullGroupsLast(await getGroupCardData(supabase, groups));
 
   return (
-    <Page>
+    <Page width="wide">
       <GroupBrowser items={items} />
     </Page>
   );

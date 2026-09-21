@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getGroupCardData, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
-import { EmptyCard, Page } from "@/components/form-ui";
+import { CardGrid, EmptyCard, Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
 
 export default async function GroupsPage() {
@@ -25,7 +25,7 @@ export default async function GroupsPage() {
   const items = await getGroupCardData(supabase, groups);
 
   return (
-    <Page>
+    <Page width="wide">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{t("nav.myGroups")}</h1>
         <Link
@@ -37,9 +37,17 @@ export default async function GroupsPage() {
       </div>
 
       {items.length === 0 ? (
-        <EmptyCard>{t("group.none")}</EmptyCard>
+        <EmptyCard>
+          {t("group.none")}
+          <Link
+            href="/dashboard"
+            className="mt-3 block font-medium text-accent transition hover:text-accent-hover"
+          >
+            {t("group.findOne")}
+          </Link>
+        </EmptyCard>
       ) : (
-        <div className="space-y-3">
+        <CardGrid>
           {items.map(({ group, memberCount, members }, i) => (
             <GroupCard
               key={group.id}
@@ -49,7 +57,7 @@ export default async function GroupsPage() {
               index={i}
             />
           ))}
-        </div>
+        </CardGrid>
       )}
     </Page>
   );

@@ -90,20 +90,37 @@ export default function MonthGrid({
             <button
               key={dateKey}
               onClick={() => onSelect(dateKey)}
-              className={`flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 ${
+              className={`flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-1.5 lg:active:scale-[0.99] ${
                 isSelected
                   ? "border-accent bg-accent-soft"
-                  : "border-transparent hover:bg-accent-soft/60"
+                  : "border-transparent hover:bg-accent-soft/60 lg:border-card-border/60"
               }`}
             >
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none ${
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs leading-none lg:self-start ${
                   isToday ? "bg-accent font-semibold text-white" : ""
                 }`}
               >
                 {day}
               </span>
-              <span className="flex h-1.5 gap-0.5">
+              {/* Wide screens have room for the titles themselves. */}
+              <span className="hidden min-h-0 flex-col gap-0.5 text-left lg:flex">
+                {items.slice(0, 3).map((item) => (
+                  <span
+                    key={item.key}
+                    style={{ borderLeft: `3px solid ${item.color}` }}
+                    className={`truncate rounded-sm bg-accent-soft/70 px-1 text-[11px] leading-4 ${
+                      item.done ? "text-muted line-through" : ""
+                    }`}
+                  >
+                    {item.title}
+                  </span>
+                ))}
+                {items.length > 3 && (
+                  <span className="px-1 text-[10px] text-muted">+{items.length - 3}</span>
+                )}
+              </span>
+              <span className="flex h-1.5 gap-0.5 lg:hidden">
                 {items.slice(0, 4).map((item) => (
                   <span
                     key={item.key}

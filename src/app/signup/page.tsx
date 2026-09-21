@@ -151,6 +151,7 @@ export default function SignupPage() {
                 type="text"
                 required
                 autoFocus
+                maxLength={100}
                 autoComplete="name"
                 placeholder="Ola Nordmann"
                 value={fullName}

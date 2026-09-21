@@ -46,7 +46,7 @@ export default function StudyProgramSelect({
       </button>
 
       {open && (
-        <div className="absolute z-10 mt-1.5 w-full overflow-hidden rounded-xl border border-card-border bg-card shadow-lg">
+        <div className="animate-pop absolute z-10 mt-1.5 w-full overflow-hidden rounded-xl border border-card-border bg-card shadow-lg">
           <input
             type="text"
             autoFocus

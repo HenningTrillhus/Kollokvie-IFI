@@ -56,7 +56,7 @@ export default async function GroupDetailPage({
   const canInvite = isMember && (typedGroup.visibility !== "invite" || isOwner);
 
   return (
-    <Page>
+    <Page width="wide">
       <Link
         href="/groups"
         className="inline-block text-sm font-medium text-muted transition hover:text-foreground"
@@ -64,6 +64,7 @@ export default async function GroupDetailPage({
         {t("group.backToMine")}
       </Link>
 
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-5 lg:space-y-0">
       <Card>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -146,6 +147,7 @@ export default async function GroupDetailPage({
         </div>
       </Card>
 
+      <div className="space-y-4">
       {canInvite && <GroupInvitePanel groupId={typedGroup.id} excludeIds={memberIds} />}
 
       <section>
@@ -161,6 +163,8 @@ export default async function GroupDetailPage({
           />
         </div>
       </section>
+      </div>
+      </div>
     </Page>
   );
 }

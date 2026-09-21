@@ -8,17 +8,31 @@ export const inputClass =
 
 export const cardClass = "rounded-2xl border border-card-border bg-card";
 
-// Page container: a centered column with a card stack inside.
+// Page container: a centered column with a card stack inside. "form" pages
+// (settings, inbox) stay narrow on a big screen; "wide" pages (browsing,
+// profiles) spread out and lay their cards in a grid.
+const PAGE_WIDTHS = {
+  form: "max-w-md md:max-w-xl",
+  wide: "max-w-md md:max-w-3xl xl:max-w-6xl",
+} as const;
+
 export function Page({
   children,
-  width = "max-w-md",
+  width = "form",
 }: {
   children: ReactNode;
-  width?: "max-w-md" | "max-w-lg" | "max-w-xl";
+  width?: keyof typeof PAGE_WIDTHS;
 }) {
   return (
-    <div className={`mx-auto w-full ${width} space-y-4 px-6 pb-6 pt-5`}>{children}</div>
+    <div className={`mx-auto w-full ${PAGE_WIDTHS[width]} space-y-4 px-6 pb-8 pt-5 md:pt-7`}>
+      {children}
+    </div>
   );
+}
+
+// Cards in one column on a phone, two on a tablet, three on a big screen.
+export function CardGrid({ children }: { children: ReactNode }) {
+  return <div className="grid gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3">{children}</div>;
 }
 
 // A padded card with vertical spacing between its children.

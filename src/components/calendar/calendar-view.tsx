@@ -132,6 +132,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
   // Events for whatever range is showing.
   useEffect(() => {
+    // A slow answer for a month you already left must not overwrite the one on screen.
+    let cancelled = false;
     (async () => {
       setLoading(true);
       const supabase = createClient();
@@ -142,12 +144,16 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
         .gte("event_date", rangeStart)
         .lte("event_date", rangeEnd)
         .order("event_date", { ascending: true });
+      if (cancelled) return;
 
       const list = (data ?? []) as CalendarEvent[];
       setEvents(list);
       setLoading(false);
       await loadCourseNames([...new Set(list.map((e) => e.course_code).filter((c): c is string => !!c))]);
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [rangeStart, rangeEnd, currentUserId]);
 
   const items = useMemo(() => buildItems(events, groups, prefs), [events, groups, prefs]);
@@ -335,9 +341,9 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
   return (
     <>
-      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-2.5 pt-2.5">
-        <div className={`shrink-0 space-y-2 p-2.5 ${cardClass}`}>
-          <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">
+      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-2.5 pt-2.5 md:max-w-3xl md:gap-3 md:px-6 md:pb-4 md:pt-4 lg:max-w-6xl">
+        <div className={`shrink-0 space-y-2 p-2.5 lg:flex lg:flex-row-reverse lg:items-center lg:gap-6 lg:space-y-0 lg:px-4 ${cardClass}`}>
+          <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium lg:w-64 lg:shrink-0">
             {(
               [
                 ["month", t("cal.viewMonth")],
@@ -356,7 +362,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
             ))}
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between lg:flex-1">
             <button
               onClick={() => (mode === "month" ? changeMonth(-1) : setSemester(shiftSemester(semester, -1)))}
               aria-label={mode === "month" ? t("cal.prevMonth") : t("cal.prevSemester")}
@@ -398,14 +404,25 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
           </div>
         </div>
 
-        <UpcomingStrip
-          items={upcomingItems}
-          todayKey={todayKey}
-          onPick={pickDate}
-          onToggleDone={toggleDone}
-        />
+        {/* Phone: one column. Wide screen, month view: the month on the left,
+            deadlines, filters and the selected day on the right. */}
+        <div
+          className={
+            mode === "month"
+              ? "flex min-h-0 flex-1 flex-col gap-2 md:gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:grid-rows-[auto_auto_minmax(0,1fr)] lg:gap-x-4 lg:gap-y-3"
+              : "flex min-h-0 flex-1 flex-col gap-2 md:gap-3"
+          }
+        >
+        <div className={`contents empty:hidden ${mode === "month" ? "lg:col-start-2 lg:row-start-1 lg:block" : ""}`}>
+          <UpcomingStrip
+            items={upcomingItems}
+            todayKey={todayKey}
+            onPick={pickDate}
+            onToggleDone={toggleDone}
+          />
+        </div>
 
-        <div className="shrink-0">
+        <div className={`shrink-0 ${mode === "month" ? "lg:col-start-2 lg:row-start-2" : ""}`}>
           <FilterChips
             courses={filterCourses}
             prefs={prefs}
@@ -416,7 +433,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
         {mode === "month" ? (
           <>
-            <div className={`flex min-h-[14rem] flex-[5] flex-col p-2.5 ${cardClass}`}>
+            <div className={`flex min-h-[14rem] flex-[5] flex-col p-2.5 md:min-h-[22rem] md:p-4 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 ${cardClass}`}>
               <MonthGrid
                 year={year}
                 month={month}
@@ -430,17 +447,19 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
               />
             </div>
 
-            <DayPanel
-              key={selectedDate ?? "none"}
-              date={selectedDate}
-              items={selectedDate ? itemsByDate.get(selectedDate) ?? [] : []}
-              onAdd={() => {
-                setSaveError(false);
-                setAddOpen(true);
-              }}
-              onDelete={deleteEvent}
-              onToggleDone={toggleDone}
-            />
+            <div className="contents lg:col-start-2 lg:row-start-3 lg:flex lg:min-h-0 lg:flex-col lg:[&>*]:min-h-0 lg:[&>*]:flex-1">
+              <DayPanel
+                key={selectedDate ?? "none"}
+                date={selectedDate}
+                items={selectedDate ? itemsByDate.get(selectedDate) ?? [] : []}
+                onAdd={() => {
+                  setSaveError(false);
+                  setAddOpen(true);
+                }}
+                onDelete={deleteEvent}
+                onToggleDone={toggleDone}
+              />
+            </div>
           </>
         ) : (
           <>
@@ -466,6 +485,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
             </a>
           </>
         )}
+        </div>
       </div>
 
       {addOpen && selectedDate && (

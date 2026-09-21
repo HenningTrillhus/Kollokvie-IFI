@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
+import { useConfirm } from "@/lib/use-confirm";
 
 export default function GroupJoinButton({
   groupId,
@@ -25,6 +26,7 @@ export default function GroupJoinButton({
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const confirm = useConfirm();
 
   async function join() {
     setBusy(true);
@@ -70,11 +72,15 @@ export default function GroupJoinButton({
     <div className="w-full">
       {isMember ? (
         <button
-          onClick={leave}
+          onClick={() => confirm.ask(leave)}
           disabled={busy}
-          className={`${base} border border-card-border hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500`}
+          className={`${base} border ${
+            confirm.armed
+              ? "border-red-500/40 bg-red-500/10 text-red-500"
+              : "border-card-border hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500"
+          }`}
         >
-          {busy ? "…" : t("group.leave")}
+          {busy ? "…" : confirm.armed ? t("group.confirmLeave") : t("group.leave")}
         </button>
       ) : (
         <button
@@ -85,7 +91,11 @@ export default function GroupJoinButton({
           {isFull ? t("group.joinFull") : busy ? "…" : t("group.join")}
         </button>
       )}
-      {errorMessage && <p className="mt-2 text-xs text-red-500">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="mt-2 text-xs text-red-500">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

@@ -85,6 +85,7 @@ export default function GroupForm({
             id="name"
             type="text"
             required
+            maxLength={120}
             placeholder={t("group.namePlaceholder")}
             value={values.name}
             onChange={(e) => set("name", e.target.value)}
@@ -104,6 +105,7 @@ export default function GroupForm({
           <textarea
             id="description"
             rows={3}
+            maxLength={2000}
             placeholder={t("group.descriptionPlaceholder")}
             value={values.description}
             onChange={(e) => set("description", e.target.value)}
@@ -114,7 +116,7 @@ export default function GroupForm({
 
       <Card>
         <p className="text-sm font-medium">{t("group.visibility")}</p>
-        <div role="radiogroup" className="space-y-2">
+        <div role="radiogroup" aria-label={t("group.visibility")} className="space-y-2">
           {(["public", "private", "invite"] as const).map((value) => {
             const active = values.visibility === value;
             return (
@@ -158,6 +160,7 @@ export default function GroupForm({
           <input
             id="location"
             type="text"
+            maxLength={200}
             placeholder={t("group.roomPlaceholder")}
             value={values.location}
             onChange={(e) => set("location", e.target.value)}
@@ -197,7 +200,11 @@ export default function GroupForm({
         </Field>
       </Card>
 
-      {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="text-sm text-red-500">
+          {errorMessage}
+        </p>
+      )}
       {showSaved && saved && <p className="text-sm text-accent">{t("common.saved")}</p>}
 
       <StickyBar>

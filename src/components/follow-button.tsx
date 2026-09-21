@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
+import { useConfirm } from "@/lib/use-confirm";
 
 type Status = "none" | "pending" | "accepted" | "loading";
 
@@ -22,6 +23,7 @@ export default function FollowButton({
   const { t } = useI18n();
   const [status, setStatus] = useState<Status>(initialStatus ?? "loading");
   const [busy, setBusy] = useState(false);
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (initialStatus) return;
@@ -83,7 +85,7 @@ export default function FollowButton({
     size === "lg"
       ? "h-10 flex-1 rounded-xl px-4 text-sm"
       : "rounded-lg px-3 py-1.5 text-xs";
-  const base = `${shape} font-medium transition active:scale-[0.97] disabled:opacity-60`;
+  const base = `${shape} animate-swap font-medium transition active:scale-[0.97] disabled:opacity-60`;
   const danger = "hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500";
 
   if (status === "loading") {
@@ -99,11 +101,16 @@ export default function FollowButton({
   if (status === "accepted") {
     return (
       <button
-        onClick={unfollow}
+        key="accepted"
+        onClick={() => confirm.ask(unfollow)}
         disabled={busy}
-        className={`${base} border border-card-border ${danger}`}
+        className={`${base} border ${
+          confirm.armed
+            ? "border-red-500/40 bg-red-500/10 text-red-500"
+            : `border-card-border ${danger}`
+        }`}
       >
-        {t("follow.following")}
+        {confirm.armed ? t("follow.confirmUnfollow") : t("follow.following")}
       </button>
     );
   }
@@ -111,6 +118,7 @@ export default function FollowButton({
   if (status === "pending") {
     return (
       <button
+        key="pending"
         onClick={unfollow}
         disabled={busy}
         className={`${base} border border-card-border text-muted ${danger}`}
@@ -122,6 +130,7 @@ export default function FollowButton({
 
   return (
     <button
+      key="none"
       onClick={follow}
       disabled={busy}
       className={`${base} bg-accent text-white hover:bg-accent-hover`}
