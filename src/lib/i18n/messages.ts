@@ -211,6 +211,23 @@ export const messages = {
   "privacy.link": { no: "Personvern", en: "Privacy" },
   "terms.link": { no: "Vilkår", en: "Terms" },
   "cookies.link": { no: "Informasjonskapsler", en: "Cookies" },
+  "cookies.short": { no: "Cookies", en: "Cookies" },
+  "a11y.link": { no: "Tilgjengelighet", en: "Accessibility" },
+  "terms.contactLead": { no: "Spørsmål om vilkårene kan sendes til ", en: "Questions about the terms can be sent to " },
+  "terms.contactNone": {
+    no: "Spørsmål om vilkårene rettes til utvikleren av appen (Henning Trillhus).",
+    en: "Questions about the terms can be directed to the developer of the app (Henning Trillhus).",
+  },
+  "cookies.contactLead": { no: "Spørsmål om informasjonskapsler kan sendes til ", en: "Questions about cookies can be sent to " },
+  "cookies.contactNone": {
+    no: "Spørsmål om informasjonskapsler rettes til utvikleren av appen (Henning Trillhus).",
+    en: "Questions about cookies can be directed to the developer of the app (Henning Trillhus).",
+  },
+  "a11y.contactLead": { no: "Tilbakemeldinger om tilgjengelighet kan sendes til ", en: "Accessibility feedback can be sent to " },
+  "a11y.contactNone": {
+    no: "Tilbakemeldinger om tilgjengelighet rettes til utvikleren av appen (Henning Trillhus).",
+    en: "Accessibility feedback can be directed to the developer of the app (Henning Trillhus).",
+  },
   "legal.nav": { no: "Juridisk informasjon", en: "Legal information" },
   "cookies.noticeTitle": { no: "Informasjon om informasjonskapsler", en: "Cookie information" },
   "cookies.notice": {

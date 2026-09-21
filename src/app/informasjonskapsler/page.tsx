@@ -9,7 +9,7 @@ export default async function CookiesPage() {
   const { lang } = await getT();
   return (
     <LegalPage>
-      <LegalDocument policy={getCookiePolicy(lang)} />
+      <LegalDocument policy={getCookiePolicy(lang)} topic="cookies" />
     </LegalPage>
   );
 }

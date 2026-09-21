@@ -11,7 +11,7 @@ export default function LegalLinks({ className = "" }: { className?: string }) {
   return (
     <nav
       aria-label={t("legal.nav")}
-      className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted ${className}`}
+      className={`flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted sm:gap-x-3 sm:text-xs ${className}`}
     >
       <Link href="/personvern" className={link}>
         {t("privacy.link")}
@@ -20,7 +20,10 @@ export default function LegalLinks({ className = "" }: { className?: string }) {
         {t("terms.link")}
       </Link>
       <Link href="/informasjonskapsler" className={link}>
-        {t("cookies.link")}
+        {t("cookies.short")}
+      </Link>
+      <Link href="/tilgjengelighet" className={link}>
+        {t("a11y.link")}
       </Link>
     </nav>
   );

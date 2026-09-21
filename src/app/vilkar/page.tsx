@@ -10,7 +10,7 @@ export default async function TermsPage() {
   const { lang } = await getT();
   return (
     <LegalPage>
-      <LegalDocument policy={getTerms(lang)} />
+      <LegalDocument policy={getTerms(lang)} topic="terms" />
     </LegalPage>
   );
 }

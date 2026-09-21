@@ -25,8 +25,8 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
   blant 65 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
   En kort bio (160 tegn) er bare synlig for de som følger deg.
-- **Personvern og samtykke.** Personvernerklæring (`/personvern`), bruksvilkår (`/vilkar`) og erklæring om
-  informasjonskapsler (`/informasjonskapsler`), alle på norsk og engelsk. Obligatorisk, ikke forhåndskrysset
+- **Personvern og samtykke.** Personvernerklæring (`/personvern`), bruksvilkår (`/vilkar`), erklæring om
+  informasjonskapsler (`/informasjonskapsler`) og tilgjengelighetserklæring (`/tilgjengelighet`), alle på norsk og engelsk. Obligatorisk, ikke forhåndskrysset
   samtykke ved registrering, en samtykkeside (`/samtykke`) for eksisterende brukere, og «Last ned dataene mine»
   og «Slett bruker» i Innstillinger. Se [Personvern, juridisk og tilgjengelighet](#personvern-juridisk-og-tilgjengelighet).
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
@@ -155,6 +155,7 @@ Gjør stegene i rekkefølge: appen ber ikke om kode før steg 6.
 | `/personvern` | `src/lib/privacy-content.ts` | Personvernerklæring (GDPR): hvem, hva, hvorfor, hvem ser hva, databehandlere, lagringstid, rettigheter |
 | `/vilkar` | `src/lib/legal-content.ts` | Bruksvilkår: uavhengig av UiO, regler for bruk, innhold, fjerning, ansvar, norsk rett |
 | `/informasjonskapsler` | `src/lib/legal-content.ts` | Alle informasjonskapsler og lokal lagring, med varighet |
+| `/tilgjengelighet` | `src/lib/accessibility-content.ts` | Tilgjengelighetserklæring (WCAG 2.1 AA, delvis samsvar), kjente mangler, tilbakemelding og tilsyn |
 
 Endrer du personvernerklæringen på en måte som krever nytt samtykke, endre `PRIVACY_VERSION` i `src/lib/privacy.ts`.
 Alle blir da bedt om å godta på nytt (`/samtykke`), og hvert samtykke lagres med versjon og tidspunkt.
@@ -188,6 +189,8 @@ i nettleseren (skriftene hostes selv via `next/font`). Avhengighetene i `package
 Legger du til en ny tjeneste: oppdater personvernerklæringen (§ 5), cookie-erklæringen, og denne tabellen.
 
 ### Tilgjengelighet
+
+Tilgjengelighetserklæringen (`/tilgjengelighet`) er en egenvurdering, ikke en revisjon. Oppdater listen over kjente mangler når noe rettes eller du finner noe nytt, og ikke skriv «fullt i samsvar» før noen uavhengig har testet.
 
 - «Hopp til innholdet»-lenke, riktige landemerker (`main`, `nav`, `header`), `lang`-attributt på siden.
 - Synlig fokusramme for tastaturbrukere, tastaturnavigasjon i faner (piltaster), dialoger (Escape, fokus fanges og

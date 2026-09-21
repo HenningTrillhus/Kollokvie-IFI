@@ -551,6 +551,7 @@ export default function SettingsPage() {
                   ["/personvern", t("settings.privacy")],
                   ["/vilkar", t("terms.link")],
                   ["/informasjonskapsler", t("cookies.link")],
+                  ["/tilgjengelighet", t("a11y.link")],
                 ] as const
               ).map(([href, label]) => (
                 <Link

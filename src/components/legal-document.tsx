@@ -1,11 +1,27 @@
 import type { Policy } from "@/lib/privacy-content";
 import { CONTACT_EMAIL, PRIVACY_UPDATED } from "@/lib/privacy";
 import { getT } from "@/lib/i18n/server";
+import type { MessageKey } from "@/lib/i18n";
+
+// Which "questions about ..." wording the contact box uses.
+const CONTACT_KEYS: Record<string, { lead: MessageKey; none: MessageKey }> = {
+  privacy: { lead: "privacy.contactEmailLead", none: "privacy.contactNone" },
+  terms: { lead: "terms.contactLead", none: "terms.contactNone" },
+  cookies: { lead: "cookies.contactLead", none: "cookies.contactNone" },
+  a11y: { lead: "a11y.contactLead", none: "a11y.contactNone" },
+};
 
 // Renders one legal text (privacy policy, terms, cookie policy) in the user's
 // language, with the contact details at the bottom.
-export default async function LegalDocument({ policy }: { policy: Policy }) {
+export default async function LegalDocument({
+  policy,
+  topic = "privacy",
+}: {
+  policy: Policy;
+  topic?: keyof typeof CONTACT_KEYS;
+}) {
   const { t, lang } = await getT();
+  const contact = CONTACT_KEYS[topic];
 
   return (
     <article className="space-y-6">
@@ -51,7 +67,7 @@ export default async function LegalDocument({ policy }: { policy: Policy }) {
         <p className="text-sm leading-relaxed text-muted">
           {CONTACT_EMAIL ? (
             <>
-              {t("privacy.contactEmailLead")}
+              {t(contact.lead)}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
                 className="font-medium text-accent hover:text-accent-hover"
@@ -61,7 +77,7 @@ export default async function LegalDocument({ policy }: { policy: Policy }) {
               .
             </>
           ) : (
-            t("privacy.contactNone")
+            t(contact.none)
           )}
         </p>
       </section>
