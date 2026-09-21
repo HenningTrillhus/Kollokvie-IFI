@@ -73,6 +73,17 @@ export default function SignupPage() {
 
     setLoading(true);
     const supabase = createClient();
+
+    // Is the username free? (Only checked if the database function exists.)
+    const { data: free, error: checkError } = await supabase.rpc("username_available", {
+      name: username.trim(),
+    });
+    if (!checkError && free === false) {
+      setLoading(false);
+      setErrorMessage(t("settings.usernameTaken"));
+      return;
+    }
+
     const email = emailForIfiUsername(ifiUsername);
     const { data, error } = await supabase.auth.signUp({
       email,

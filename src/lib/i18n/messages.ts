@@ -80,8 +80,8 @@ export const messages = {
     en: "We'll send a code to {email}. You need access to it to sign up.",
   },
   "auth.signupFailed": {
-    no: "Kunne ikke opprette bruker. Brukernavnet kan allerede være tatt.",
-    en: "Couldn't create the account. The username may already be taken.",
+    no: "Kunne ikke opprette bruker akkurat nå. Prøv igjen, eller ta kontakt hvis det fortsetter.",
+    en: "Couldn't create the account right now. Try again, or get in touch if it keeps happening.",
   },
   "verify.title": { no: "Bekreft e-posten din", en: "Confirm your email" },
   "verify.sent": {
