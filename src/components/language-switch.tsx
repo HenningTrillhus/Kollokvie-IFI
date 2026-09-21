@@ -13,7 +13,7 @@ export default function LanguageSwitch({ inline = false }: { inline?: boolean })
   return (
     <div
       className={`flex rounded-lg border border-card-border p-0.5 text-xs font-medium ${
-        inline ? "" : "absolute right-4 top-4"
+        inline ? "" : "absolute right-4 top-[calc(env(safe-area-inset-top,0px)+1rem)] z-10"
       }`}
       role="radiogroup"
       aria-label="Language"
@@ -26,7 +26,7 @@ export default function LanguageSwitch({ inline = false }: { inline?: boolean })
           aria-checked={lang === value}
           disabled={pending}
           onClick={() => startTransition(() => setLanguage(value))}
-          className={`rounded-md px-2.5 py-1.5 uppercase transition ${
+          className={`rounded-md px-3 py-2 uppercase transition ${
             lang === value ? "bg-accent text-white" : "text-muted"
           }`}
         >
