@@ -10,7 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { EMAIL_VERIFICATION_ENABLED, emailForIfiUsername, ifiEmail } from "@/lib/ifi-auth";
 import VerifyCodeForm from "@/components/verify-code-form";
 import { IFI_USERNAME_PATTERN } from "@/lib/profiles";
-import { MIN_PASSWORD_LENGTH } from "@/lib/passwords";
+import { MIN_PASSWORD_LENGTH, checkPassword } from "@/lib/passwords";
+import { StrengthBar, StrengthLabel } from "@/components/password-strength";
 import { useI18n } from "@/lib/i18n/client";
 
 
@@ -44,6 +45,8 @@ export default function SignupPage() {
     return !error;
   }
 
+  const strength = checkPassword(password, { username: ifiUsername, name: fullName });
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setErrorMessage("");
@@ -56,8 +59,9 @@ export default function SignupPage() {
       setErrorMessage(t("auth.ifiInvalid"));
       return;
     }
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
+    const strength = checkPassword(password, { username: ifiUsername, name: fullName });
+    if (!strength.ok) {
+      setErrorMessage(t(strength.problem ?? "pw.simple", { min: MIN_PASSWORD_LENGTH }));
       return;
     }
     if (password !== confirmPassword) {
@@ -189,21 +193,25 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="mb-1 block text-sm font-medium"
-              >
-                {t("auth.password")}
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
-              />
+              <div className="mb-1 flex items-baseline justify-between">
+                <label htmlFor="password" className="text-sm font-medium">
+                  {t("auth.password")}
+                </label>
+                <StrengthLabel check={strength} />
+              </div>
+              <div className="relative">
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  placeholder={t("pw.hint")}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
+                />
+                <StrengthBar check={strength} />
+              </div>
             </div>
 
             <div>

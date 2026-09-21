@@ -8,7 +8,8 @@ import VerifyCodeForm from "@/components/verify-code-form";
 import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
 import { createClient } from "@/lib/supabase/client";
 import { EMAIL_VERIFICATION_ENABLED, ifiEmail } from "@/lib/ifi-auth";
-import { MIN_PASSWORD_LENGTH } from "@/lib/passwords";
+import { MIN_PASSWORD_LENGTH, checkPassword } from "@/lib/passwords";
+import { StrengthBar, StrengthLabel } from "@/components/password-strength";
 import { IFI_USERNAME_PATTERN } from "@/lib/profiles";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -30,6 +31,7 @@ export default function ForgotPasswordPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const email = ifiEmail(ifiUsername);
+  const strength = checkPassword(password, { username: ifiUsername });
 
   async function sendCode(): Promise<"ok" | "limited" | "failed"> {
     const supabase = createClient();
@@ -59,8 +61,9 @@ export default function ForgotPasswordPage() {
   async function handleSave(event: FormEvent) {
     event.preventDefault();
     setErrorMessage("");
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
+    const strength = checkPassword(password, { username: ifiUsername });
+    if (!strength.ok) {
+      setErrorMessage(t(strength.problem ?? "pw.simple", { min: MIN_PASSWORD_LENGTH }));
       return;
     }
     if (password !== confirmPassword) {
@@ -163,19 +166,26 @@ export default function ForgotPasswordPage() {
       {step === "password" && (
         <form onSubmit={handleSave} className="space-y-3">
           <div>
-            <label htmlFor="newPassword" className="mb-1 block text-sm font-medium">
-              {t("reset.newPassword")}
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              required
-              autoFocus
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputClass}
-            />
+            <div className="mb-1 flex items-baseline justify-between">
+              <label htmlFor="newPassword" className="text-sm font-medium">
+                {t("reset.newPassword")}
+              </label>
+              <StrengthLabel check={strength} />
+            </div>
+            <div className="relative">
+              <input
+                id="newPassword"
+                type="password"
+                required
+                autoFocus
+                autoComplete="new-password"
+                placeholder={t("pw.hint")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={inputClass}
+              />
+              <StrengthBar check={strength} />
+            </div>
           </div>
           <div>
             <label htmlFor="confirmNewPassword" className="mb-1 block text-sm font-medium">

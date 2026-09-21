@@ -4,7 +4,8 @@ import { useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Collapsible from "@/components/collapsible";
 import { Card, Field, inputClass } from "@/components/form-ui";
-import { MIN_PASSWORD_LENGTH } from "@/lib/passwords";
+import { MIN_PASSWORD_LENGTH, checkPassword } from "@/lib/passwords";
+import { StrengthBar, StrengthLabel } from "@/components/password-strength";
 import { useI18n } from "@/lib/i18n/client";
 
 // "Change password" for a signed-in user. Hidden until you ask for it, and it
@@ -18,6 +19,7 @@ export default function ChangePasswordCard() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const firstField = useRef<HTMLInputElement>(null);
+  const strength = checkPassword(password);
 
   function openForm() {
     setDone(false);
@@ -38,8 +40,9 @@ export default function ChangePasswordCard() {
     event.preventDefault();
     setError("");
 
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
+    const strength = checkPassword(password);
+    if (!strength.ok) {
+      setError(t(strength.problem ?? "pw.simple", { min: MIN_PASSWORD_LENGTH }));
       return;
     }
     if (password !== confirm) {
@@ -93,17 +96,27 @@ export default function ChangePasswordCard() {
 
       <Collapsible open={open}>
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-          <Field label={t("reset.newPassword")} htmlFor="changePassword">
-            <input
-              ref={firstField}
-              id="changePassword"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
+          <div>
+            <div className="mb-1.5 flex items-baseline justify-between">
+              <label htmlFor="changePassword" className="text-sm font-medium">
+                {t("reset.newPassword")}
+              </label>
+              <StrengthLabel check={strength} />
+            </div>
+            <div className="relative">
+              <input
+                ref={firstField}
+                id="changePassword"
+                type="password"
+                autoComplete="new-password"
+                placeholder={t("pw.hint")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={inputClass}
+              />
+              <StrengthBar check={strength} />
+            </div>
+          </div>
           <Field label={t("auth.confirmPassword")} htmlFor="changePasswordConfirm">
             <input
               id="changePasswordConfirm"

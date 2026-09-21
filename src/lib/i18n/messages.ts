@@ -131,6 +131,30 @@ export const messages = {
   "explore.reset": { no: "Nullstill filtre", en: "Clear filters" },
   "follow.confirmUnfollow": { no: "Slutt å følge?", en: "Unfollow?" },
   "group.confirmLeave": { no: "Trykk igjen for å forlate", en: "Tap again to leave" },
+  "pw.hint": {
+    no: "Minst 8 tegn med bokstaver og tall",
+    en: "At least 8 characters with letters and numbers",
+  },
+  "pw.weak": { no: "Svakt", en: "Weak" },
+  "pw.ok": { no: "Greit", en: "Fine" },
+  "pw.good": { no: "Bra", en: "Good" },
+  "pw.strong": { no: "Sterkt", en: "Strong" },
+  "pw.common": {
+    no: "Det passordet er altfor vanlig. Velg noe mer personlig.",
+    en: "That password is far too common. Pick something more personal.",
+  },
+  "pw.personal": {
+    no: "Passordet kan ikke inneholde brukernavnet eller navnet ditt.",
+    en: "The password can't contain your username or your name.",
+  },
+  "pw.pattern": {
+    no: "Unngå gjentakelser og rekker som «aaaaaaaa» eller «12345678».",
+    en: "Avoid repeats and sequences like “aaaaaaaa” or “12345678”.",
+  },
+  "pw.simple": {
+    no: "Bruk bokstaver og tall (minst 8 tegn), eller et lengre passord på minst 12 tegn.",
+    en: "Use letters and numbers (at least 8 characters), or a longer password of 12+ characters.",
+  },
   "auth.forgot": { no: "Glemt passord?", en: "Forgot password?" },
   "reset.title": { no: "Glemt passord", en: "Forgot password" },
   "reset.newTitle": { no: "Velg nytt passord", en: "Choose a new password" },
