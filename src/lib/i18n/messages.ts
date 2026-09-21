@@ -547,16 +547,20 @@ export const messages = {
   "settings.githubPlaceholder": { no: "ditt-brukernavn", en: "your-username" },
   "settings.linkedinPlaceholder": { no: "ditt-navn-123abc", en: "your-name-123abc" },
   "settings.linkHint": {
-    no: "Skriv bare brukernavnet ditt, så lager vi lenken. Bare GitHub og LinkedIn er mulig.",
-    en: "Just type your username and we build the link. Only GitHub and LinkedIn are possible.",
+    no: "Skriv bare brukernavnet ditt, så lager vi veien til profilen din. Lenker kan ikke legges inn.",
+    en: "Just type your username and we build the way to your profile. Links can't be added.",
   },
   "settings.invalidGithub": {
-    no: "GitHub-brukernavnet er ugyldig. Bruk bare bokstaver, tall og bindestrek, eller lim inn lenken til github.com-profilen din.",
-    en: "The GitHub username is not valid. Use only letters, numbers and hyphens, or paste the link to your github.com profile.",
+    no: "GitHub-brukernavnet er ugyldig. Bruk bare bokstaver, tall og bindestrek.",
+    en: "The GitHub username is not valid. Use only letters, numbers and hyphens.",
   },
   "settings.invalidLinkedin": {
-    no: "LinkedIn-navnet er ugyldig. Skriv det som står etter linkedin.com/in/, eller lim inn lenken til LinkedIn-profilen din.",
-    en: "The LinkedIn name is not valid. Type what comes after linkedin.com/in/, or paste the link to your LinkedIn profile.",
+    no: "LinkedIn-navnet er ugyldig. Skriv det som står etter linkedin.com/in/ (bokstaver, tall og bindestrek, minst 3 tegn).",
+    en: "The LinkedIn name is not valid. Type what comes after linkedin.com/in/ (letters, numbers and hyphens, at least 3 characters).",
+  },
+  "settings.noLinks": {
+    no: "Skriv bare brukernavnet, ikke en hel lenke.",
+    en: "Just type the username, not a whole link.",
   },
   "year.clear": { no: "Fjern valg", en: "Clear" },
   "settings.ifiLocked": {

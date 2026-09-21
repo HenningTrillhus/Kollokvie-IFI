@@ -7,7 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ACCENT_COLORS,
   STUDY_PROGRAMS,
+  handleFromUrl,
   linkUrl,
+  looksLikeLink,
   parseLinkHandle,
 } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
@@ -104,8 +106,8 @@ export default function SettingsPage() {
         setIfiUsername(profile.ifi_username ?? "");
         setIsPrivate(profile.is_private ?? true);
         setFullName(profile.full_name);
-        setGithubHandle(parseLinkHandle("github", profile.github_url ?? "") ?? "");
-        setLinkedinHandle(parseLinkHandle("linkedin", profile.linkedin_url ?? "") ?? "");
+        setGithubHandle(handleFromUrl("github", profile.github_url));
+        setLinkedinHandle(handleFromUrl("linkedin", profile.linkedin_url));
         setStudyProgram(profile.study_program ?? "");
         setStudyYear(profile.study_year ? String(profile.study_year) : "");
       }
@@ -115,8 +117,8 @@ export default function SettingsPage() {
       setSaved({
         bio: savedBio,
         fullName: profile?.full_name ?? "",
-        githubHandle: parseLinkHandle("github", profile?.github_url ?? "") ?? "",
-        linkedinHandle: parseLinkHandle("linkedin", profile?.linkedin_url ?? "") ?? "",
+        githubHandle: handleFromUrl("github", profile?.github_url),
+        linkedinHandle: handleFromUrl("linkedin", profile?.linkedin_url),
         studyProgram: profile?.study_program ?? "",
         studyYear: profile?.study_year ? String(profile.study_year) : "",
         courseCodes: userCourses.map((c) => c.code),
@@ -166,15 +168,19 @@ export default function SettingsPage() {
       setErrorMessage(t("settings.nameRequired"));
       return;
     }
-    // Only a username (or a link to that site's profile) is accepted.
+    // Only a username is accepted, never a link.
     const github = parseLinkHandle("github", githubHandle);
     const linkedin = parseLinkHandle("linkedin", linkedinHandle);
     if (github === null) {
-      setErrorMessage(t("settings.invalidGithub"));
+      setErrorMessage(
+        looksLikeLink(githubHandle) ? t("settings.noLinks") : t("settings.invalidGithub")
+      );
       return;
     }
     if (linkedin === null) {
-      setErrorMessage(t("settings.invalidLinkedin"));
+      setErrorMessage(
+        looksLikeLink(linkedinHandle) ? t("settings.noLinks") : t("settings.invalidLinkedin")
+      );
       return;
     }
 

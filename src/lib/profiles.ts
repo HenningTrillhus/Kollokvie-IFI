@@ -73,45 +73,25 @@ export const STUDY_PROGRAMS = [
   "Informatikk: språkteknologi (master)",
 ] as const;
 
-// Profile links can only point to GitHub or LinkedIn. People give a username
-// (or paste their profile link), and the address is built here, so nothing
-// else can ever be stored or shown as a link.
+// Profile links can only point to GitHub or LinkedIn, and nobody types a
+// link: people give only their username, and the address is built here. So
+// nothing else can ever be stored or shown as a link.
 const GITHUB_HANDLE = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
 const LINKEDIN_HANDLE = /^[A-Za-z0-9-]{3,100}$/;
 
-type LinkKind = "github" | "linkedin";
+export type LinkKind = "github" | "linkedin";
 
 // "" for nothing typed, the username if it is valid, or null if it is not.
+// A pasted link is never accepted (it contains "/", "." or ":").
 export function parseLinkHandle(kind: LinkKind, input: string): string | null {
-  let v = input.trim().replace(/^@/, "");
+  const v = input.trim().replace(/^@/, "");
   if (!v) return "";
-
-  // Something that looks like an address: it must be that site's profile page.
-  if (/[/.:]/.test(v)) {
-    let url: URL;
-    try {
-      url = new URL(/^https?:\/\//i.test(v) ? v : `https://${v}`);
-    } catch {
-      return null;
-    }
-    const host = url.hostname.toLowerCase().replace(/^www\./, "");
-    const parts = url.pathname.split("/").filter(Boolean);
-    if (kind === "github") {
-      if (host !== "github.com" || parts.length !== 1) return null;
-      v = parts[0];
-    } else {
-      // (LinkedIn also uses country addresses such as no.linkedin.com.)
-      if (
-        !/^(?:[a-z]{2,3}.)?linkedin.com$/.test(host) ||
-        parts.length !== 2 ||
-        parts[0].toLowerCase() !== "in"
-      ) {
-        return null;
-      }
-      v = parts[1];
-    }
-  }
   return (kind === "github" ? GITHUB_HANDLE : LINKEDIN_HANDLE).test(v) ? v : null;
+}
+
+// True when someone typed or pasted an address instead of just a username.
+export function looksLikeLink(input: string): boolean {
+  return /[/.:]/.test(input);
 }
 
 export function linkUrl(kind: LinkKind, handle: string): string {
@@ -120,11 +100,21 @@ export function linkUrl(kind: LinkKind, handle: string): string {
     : `https://www.linkedin.com/in/${handle}`;
 }
 
+// The username inside a stored address, or "" if the stored value is not
+// exactly the proper GitHub / LinkedIn address.
+export function handleFromUrl(kind: LinkKind, stored: string | null | undefined): string {
+  if (!stored) return "";
+  const match =
+    kind === "github"
+      ? /^https:\/\/github\.com\/([A-Za-z0-9-]+)$/.exec(stored)
+      : /^https:\/\/www\.linkedin\.com\/in\/([A-Za-z0-9-]+)$/.exec(stored);
+  return match ? (parseLinkHandle(kind, match[1]) ?? "") : "";
+}
+
 // A stored address, checked again before it is shown: the proper GitHub or
 // LinkedIn address, or null.
 export function safeLinkUrl(kind: LinkKind, stored: string | null | undefined): string | null {
-  if (!stored) return null;
-  const handle = parseLinkHandle(kind, stored);
+  const handle = handleFromUrl(kind, stored);
   return handle ? linkUrl(kind, handle) : null;
 }
 
