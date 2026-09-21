@@ -7,11 +7,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
 import ColorSwatchInput from "@/components/color-swatch-input";
 import {
-  AVATAR_BUCKET,
+  AvatarImageError,
+  AvatarUploadError,
   PRESET_AVATARS,
   avatarSrc,
   prepareAvatarImage,
-  uploadedAvatarPath,
+  uploadAvatar,
 } from "@/lib/avatars";
 import { ACCENT_COLORS, type Profile } from "@/lib/profiles";
 
@@ -52,8 +53,29 @@ export default function AvatarPicker({
     setError("");
     try {
       await action();
-    } catch {
-      setError(t("settings.photoError"));
+    } catch (e) {
+      // Say what was wrong with the picture, in plain words.
+      const reason =
+        e instanceof AvatarImageError
+          ? e.reason
+          : e instanceof AvatarUploadError
+            ? e.status === 413
+              ? "too-large"
+              : e.status === 415
+                ? "type"
+                : e.status === 429
+                  ? "rate"
+                  : null
+            : null;
+      setError(
+        reason === "too-large" || reason === "pixels"
+          ? t("settings.photoTooLarge")
+          : reason === "type" || reason === "corrupt"
+            ? t("settings.photoBadType")
+            : reason === "rate"
+              ? t("rate.limited")
+              : t("settings.photoError")
+      );
     } finally {
       setBusy(false);
     }
@@ -91,16 +113,9 @@ export default function AvatarPicker({
     if (!file) return;
 
     await run(async () => {
+      // Checked and shrunk here, checked again and re-encoded on the server.
       const blob = await prepareAvatarImage(file);
-      const supabase = createClient();
-      const { error: uploadError } = await supabase.storage
-        .from(AVATAR_BUCKET)
-        .upload(uploadedAvatarPath(profile.id), blob, {
-          contentType: "image/jpeg",
-          upsert: true,
-          cacheControl: "31536000",
-        });
-      if (uploadError) throw uploadError;
+      await uploadAvatar(blob);
       setShowIcons(false);
       await save(`upload:${Date.now()}`);
     });

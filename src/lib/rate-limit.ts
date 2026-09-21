@@ -89,3 +89,18 @@ export function clientIp(headers: Headers): string {
   if (forwarded) return forwarded.split(",")[0].trim() || "unknown";
   return headers.get("x-real-ip") ?? "unknown";
 }
+
+// A simple per-key limit for a single route (for example uploads per user).
+// Returns false when the key has used up its allowance in the window.
+const keyed = new Map<string, Counter>();
+export function limitKey(key: string, max: number, windowMs: number): boolean {
+  const now = Date.now();
+  const c = keyed.get(key);
+  if (!c || now - c.windowStart >= windowMs) {
+    keyed.set(key, { count: 1, windowStart: now });
+    if (keyed.size > 20_000) keyed.clear();
+    return true;
+  }
+  c.count += 1;
+  return c.count <= max;
+}

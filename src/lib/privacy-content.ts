@@ -69,7 +69,7 @@ const no: Policy = {
       heading: "5. Databehandlere og hvor dataene lagres",
       bullets: [
         "Supabase (Supabase Inc.): database, innlogging og lagring av profilbilder. Vi har valgt datasenter i EU (Irland, AWS eu-west-1).",
-        "Vercel (Vercel Inc.): hosting av nettstedet. Serverfunksjonene kjører i Dublin, Irland. Statiske filer leveres via et globalt innholdsnettverk.",
+        "Vercel (Vercel Inc.): hosting av nettstedet. Serverfunksjonene kjører i Dublin, Irland, og skalerer ned og kontrollerer profilbildet du laster opp før det lagres. Statiske filer leveres via et globalt innholdsnettverk.",
         "Resend (Resend Inc.): sender e-postene med koder (bekreftelse og tilbakestilling av passord). Vi har valgt EU-region (Irland). Resend ser UiO-e-postadressen din og innholdet i e-posten, og bare for å levere den.",
       ],
       paragraphs: [
@@ -193,7 +193,7 @@ const en: Policy = {
       heading: "5. Processors and where data is stored",
       bullets: [
         "Supabase (Supabase Inc.): database, sign-in and storage of profile pictures. We have chosen a data center in the EU (Ireland, AWS eu-west-1).",
-        "Vercel (Vercel Inc.): hosting of the site. Server functions run in Dublin, Ireland. Static files are delivered through a global content network.",
+        "Vercel (Vercel Inc.): hosting of the site. Server functions run in Dublin, Ireland, and shrink and check the profile picture you upload before it is stored. Static files are delivered through a global content network.",
         "Resend (Resend Inc.): sends the emails with codes (confirmation and password reset). We have chosen the EU region (Ireland). Resend sees your UiO email address and the contents of the email, only to deliver it.",
       ],
       paragraphs: [

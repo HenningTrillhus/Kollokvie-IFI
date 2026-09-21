@@ -507,6 +507,14 @@ export const messages = {
   },
   "settings.title": { no: "Innstillinger", en: "Settings" },
   "settings.photo": { no: "Profilbilde", en: "Profile picture" },
+  "settings.photoTooLarge": {
+    no: "Bildet er for stort. Velg et bilde under 8 MB.",
+    en: "The picture is too large. Choose one under 8 MB.",
+  },
+  "settings.photoBadType": {
+    no: "Den filen er ikke et bilde vi kan bruke. Velg et JPEG-, PNG- eller WebP-bilde.",
+    en: "That file is not a picture we can use. Choose a JPEG, PNG or WebP picture.",
+  },
   "settings.photoUpload": { no: "Last opp bilde", en: "Upload photo" },
   "settings.photoChoose": { no: "Velg ikon", en: "Choose an icon" },
   "settings.photoRemove": { no: "Bruk forbokstav", en: "Use initial" },
