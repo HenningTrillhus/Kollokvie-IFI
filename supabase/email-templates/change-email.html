@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="nb" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Bekreft e-postadressen</title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .bg { background-color: #0f1720 !important; }
+      .card { background-color: #17212c !important; border-color: #263442 !important; }
+      .h, .brand-name { color: #eef3f8 !important; }
+      .t { color: #b7c4d1 !important; }
+      .muted { color: #8393a3 !important; }
+      .code-box { background-color: #1d3554 !important; border-color: #2c4c78 !important; }
+      .code { color: #cfe3fb !important; }
+      .divider { border-top-color: #263442 !important; }
+    }
+    @media only screen and (max-width: 480px) {
+      .card-td { padding: 26px 20px !important; }
+      .code { font-size: 28px !important; letter-spacing: 5px !important; }
+    }
+  </style>
+</head>
+<body class="bg" style="margin:0;padding:0;background-color:#f1f5f9;-webkit-text-size-adjust:100%;">
+  <!-- Preheader: the grey preview text in the inbox list -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Koden din er {{ .Token }}&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="bg" style="background-color:#f1f5f9;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
+
+          <!-- Brand -->
+          <tr>
+            <td align="center" style="padding:0 0 18px 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" valign="middle" bgcolor="#2b74c7" style="width:38px;height:38px;border-radius:11px;background-color:#2b74c7;color:#ffffff;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:19px;font-weight:700;">K</td>
+                  <td valign="middle" class="brand-name" style="padding-left:10px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.2px;color:#0f1720;">Kollokvie<span style="color:#2b74c7;">@IFI</span></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td class="card card-td" style="background-color:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:32px 30px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="h" style="padding:0 0 10px 0;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-0.3px;color:#0f1720;text-align:center;">Bekreft e-postadressen</td>
+                </tr>
+                <tr>
+                  <td class="t" style="padding:0 0 22px 0;font-size:15px;line-height:23px;color:#475569;text-align:center;">Skriv inn koden under i appen for å bekrefte <strong>{{ .NewEmail }}</strong> som e-postadressen din.</td>
+                </tr>
+              <tr>
+                <td align="center" style="padding:6px 0 4px 0;">
+                  <div class="code-box" style="display:inline-block;background-color:#e2effc;border:1px solid #c5dcf3;border-radius:14px;padding:16px 26px;">
+                    <span class="code" style="font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;font-size:34px;line-height:40px;font-weight:700;letter-spacing:8px;color:#1b4f8f;">{{ .Token }}</span>
+                  </div>
+                </td>
+              </tr>
+                <tr>
+                  <td class="t" style="padding:22px 0 0 0;font-size:14px;line-height:21px;color:#475569;text-align:center;">Var det ikke du som ba om dette, kan du ignorere denne e-posten. Ingenting endres uten koden.</td>
+                </tr>
+                <tr>
+                  <td style="padding:22px 0 0 0;">
+                    <div class="divider" style="border-top:1px solid #e2e8f0;line-height:1px;font-size:1px;">&nbsp;</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="muted" style="padding:14px 0 0 0;font-size:12px;line-height:18px;color:#8493a5;text-align:center;">Enter the code above in the app to confirm your email address. If this wasn't you, ignore this email.</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" class="muted" style="padding:20px 10px 0 10px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;color:#8493a5;">
+              Kollokvie@IFI &middot; kollokviegrupper for studenter ved IFI, UiO<br>
+              Dette er en automatisk e-post, du trenger ikke svare.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
