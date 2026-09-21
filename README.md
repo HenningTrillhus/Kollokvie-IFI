@@ -19,7 +19,7 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   fire første medlemmene.
 - **Kollokviegrupper.** Lag, rediger, bli med, forlat og slett. Synlighet er *offentlig*,
   *privat* (bare folk du følger eller som følger deg) eller *kun invitasjon*. Emne, rom,
-  dato, tid (i kvarter) og maks antall deltakere kan settes. Medlemmer kan invitere.
+  dato, tid (i kvarter) og maks antall deltakere kan settes. Tid velges med appens egen tidsvelger (ikke nettleserens); i kalenderen kan du velge hvilket som helst minutt. Medlemmer kan invitere.
 - **Profiler og følgere.** Følgeforespørsler må godkjennes. Følger- og følgerlister er
   låst til folk som følger deg tilbake. Linje, årstrinn, emner, GitHub og LinkedIn.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg

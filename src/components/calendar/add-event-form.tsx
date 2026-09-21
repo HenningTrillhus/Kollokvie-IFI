@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import CourseSingleSelect from "@/components/course-single-select";
-import QuarterTimePicker from "@/components/quarter-time-picker";
+import TimePicker from "@/components/time-picker";
 import { Field } from "@/components/form-ui";
 import { EVENT_TYPES, EVENT_TYPE_KEYS, type EventType } from "@/lib/events";
 import type { Course } from "@/lib/courses";
@@ -116,10 +116,9 @@ export default function AddEventForm({
           )}
         </Field>
 
-        <Field label={`${t("cal.time")} (${t("cal.optional")})`} htmlFor="time-hour">
-          <div className="max-w-[12rem]">
-            <QuarterTimePicker value={time} onChange={setTime} anyMinute={type === "deadline"} />
-          </div>
+        <Field label={`${t("cal.time")} (${t("cal.optional")})`} htmlFor="time-trigger">
+          {/* Any minute, for every kind of event. */}
+          <TimePicker id="time-trigger" value={time} onChange={setTime} anyMinute large />
         </Field>
 
         {saveError && <p className="text-sm text-red-500">{t("cal.saveError")}</p>}

@@ -36,9 +36,12 @@ export default function BottomSheet({
         return;
       }
       if (e.key !== "Tab" || !dialog.current) return;
-      const focusable = dialog.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
+      // Skip anything inside a closed (inert) panel, such as a collapsed time picker.
+      const focusable = [
+        ...dialog.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ),
+      ].filter((el) => !el.closest("[inert]") && el.tabIndex >= 0);
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];

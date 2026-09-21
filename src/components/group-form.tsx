@@ -5,7 +5,7 @@ import CourseSingleSelect from "@/components/course-single-select";
 import { useI18n } from "@/lib/i18n/client";
 import { cleanLine, cleanText } from "@/lib/sanitize";
 import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
-import QuarterTimePicker from "@/components/quarter-time-picker";
+import TimePicker from "@/components/time-picker";
 import type { Course } from "@/lib/courses";
 import { VISIBILITY_KEYS, type Visibility } from "@/lib/groups";
 
@@ -184,8 +184,10 @@ export default function GroupForm({
               className={inputClass}
             />
           </Field>
-          <Field label={t("group.time")} htmlFor="time-hour">
-            <QuarterTimePicker
+          <Field label={t("group.time")} htmlFor="time-trigger">
+            {/* Study group sessions start on the quarter hour. */}
+            <TimePicker
+              id="time-trigger"
               value={values.eventTime}
               onChange={(v) => set("eventTime", v)}
             />
