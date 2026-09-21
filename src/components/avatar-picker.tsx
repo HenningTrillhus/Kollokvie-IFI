@@ -157,10 +157,13 @@ export default function AvatarPicker({
       />
 
       {showIcons && (
+        // Its own scroll box. The grid sits inside it at its natural size, so the
+        // icons never get squeezed to fit.
+        <div className="mt-3 max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-card-border bg-background p-3">
         <div
           role="listbox"
           aria-label={t("settings.photoChoose")}
-          className="mt-3 grid max-h-64 grid-cols-5 gap-2.5 overflow-y-auto overscroll-contain p-1.5 sm:grid-cols-7"
+          className="grid grid-cols-5 gap-3 sm:grid-cols-7"
         >
           {PRESET_AVATARS.map((preset, i) => {
             const selected = value === preset;
@@ -173,7 +176,7 @@ export default function AvatarPicker({
                 aria-label={t("settings.iconLabel", { n: i + 1 })}
                 disabled={busy}
                 onClick={() => choosePreset(preset)}
-                className={`aspect-square overflow-hidden rounded-full transition active:scale-90 ${
+                className={`aspect-square w-full shrink-0 overflow-hidden rounded-full transition active:scale-90 ${
                   selected
                     ? "ring-2 ring-accent ring-offset-2 ring-offset-background"
                     : "hover:scale-105"
@@ -192,6 +195,7 @@ export default function AvatarPicker({
               </button>
             );
           })}
+        </div>
         </div>
       )}
 
