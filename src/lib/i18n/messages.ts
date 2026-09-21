@@ -132,6 +132,10 @@ export const messages = {
   },
   "group.findOne": { no: "Finn en kollokviegruppe å bli med i →", en: "Find a study group to join →" },
   "explore.reset": { no: "Nullstill filtre", en: "Clear filters" },
+  "group.quotaError": {
+    no: "Du har nådd grensen for hvor mange kollokviegrupper du kan opprette.",
+    en: "You have reached the limit for how many study groups you can create.",
+  },
   "follow.confirmUnfollow": { no: "Slutt å følge?", en: "Unfollow?" },
   "group.confirmLeave": { no: "Trykk igjen for å forlate", en: "Tap again to leave" },
   "pw.hint": {

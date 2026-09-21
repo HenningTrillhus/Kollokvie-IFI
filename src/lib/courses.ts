@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cleanLine } from "@/lib/sanitize";
 
 export type Course = {
   code: string;
@@ -33,7 +34,7 @@ export async function addCustomCourse(
   await supabase
     .from("courses")
     .upsert(
-      { code: normalizedCode, name: name.trim(), is_custom: true },
+      { code: normalizedCode, name: cleanLine(name), is_custom: true },
       { onConflict: "code", ignoreDuplicates: true }
     );
 

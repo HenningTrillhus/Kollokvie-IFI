@@ -7,6 +7,7 @@ import { Field } from "@/components/form-ui";
 import { EVENT_TYPES, EVENT_TYPE_KEYS, type EventType } from "@/lib/events";
 import type { Course } from "@/lib/courses";
 import { useI18n } from "@/lib/i18n/client";
+import { cleanLine } from "@/lib/sanitize";
 
 export type NewEvent = {
   title: string;
@@ -38,9 +39,10 @@ export default function AddEventForm({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!title.trim()) return;
+    const clean = cleanLine(title);
+    if (!clean) return;
     setSaving(true);
-    const ok = await onSubmit({ title: title.trim(), type, course, time });
+    const ok = await onSubmit({ title: clean, type, course, time });
     // On success the sheet closes and this form goes away with it.
     if (!ok) setSaving(false);
   }

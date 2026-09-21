@@ -28,7 +28,7 @@ export default function LegacyVerify({ email }: { email: string }) {
           ? t("verify.emailTaken")
           : message.includes("rate limit")
             ? t("verify.tooMany")
-            : updateError.message
+            : t("verify.sendFailed")
       );
       return false;
     }

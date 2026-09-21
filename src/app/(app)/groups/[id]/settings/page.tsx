@@ -82,7 +82,7 @@ export default function GroupSettingsPage() {
       p_max_members: v.maxMembers ? Number(v.maxMembers) : null,
     });
 
-    if (error) return error.message;
+    if (error) return t("common.somethingWrong");
     router.refresh();
     return null;
   }

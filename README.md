@@ -96,6 +96,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0030` | Profilikoner 01–60 (var 01–45) |
 | `0031` | Sikkerhet: tekstgrenser og lenke-sjekk, strammere bildelagring, mindre rettigheter for uinnloggede |
 | `0032` | Profilikoner 01–65 (var 01–60) |
+| `0033` | Sikkerhet 2: skjulte tegn avvises, kvoter per bruker, smalere skrivetilgang, egendefinerte emner merkes med hvem som la dem til |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
@@ -205,7 +206,8 @@ Tilgjengelighetserklæringen (`/tilgjengelighet`) er en egenvurdering, ikke en r
 | Tema | Status |
 | --- | --- |
 | **HSTS** | På (`next.config.ts`, to år). Vercel tvinger i tillegg HTTPS. |
-| **Sikkerhetshoder** | `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`. Ingen `X-Powered-By`. |
+| **Sikkerhetshoder** | `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `Cross-Origin-Resource-Policy`. Ingen `X-Powered-By`. |
+| **Content-Security-Policy** | Ja, med nonce per forespørsel (`src/proxy.ts`, `src/lib/csp.ts`). Skript kjører bare hvis de har riktig nonce, så injisert `<script>`, inline `onclick=` og `eval` blokkeres. Tilkoblinger og bilder er begrenset til egen origin og Supabase-prosjektet. `frame-ancestors 'none'`, `object-src 'none'`, `base-uri` og `form-action` er låst. Testet mot et produksjonsbygg. |
 | **CSRF** | Ikke et problem her: appen kaller Supabase med et token i `Authorization`-headeren, ikke med cookies alene, og innloggingscookien er `SameSite=Lax`. De få server-handlingene (språk og tema) sjekkes av Next.js mot `Origin`. Appen har ingen egne POST-ruter. |
 | **Passord** | Minst 8 tegn ved nytt passord (`src/lib/passwords.ts`). Lagres som hash av Supabase Auth. |
 | **Nullstill økter ved passordbytte** | Ja. Både «Glemt passord» og «Bytt passord» (Innstillinger) logger ut alle andre enheter (`signOut({ scope: "others" })`). |
@@ -217,9 +219,26 @@ Tilgjengelighetserklæringen (`/tilgjengelighet`) er en egenvurdering, ikke en r
 | **CORS** | Appen sender ingen CORS-hoder, så andre nettsteder kan ikke lese svarene den gir. Supabase-API-et er åpent for alle opprinnelser med vilje; det beskyttes av innlogging (JWT) og Row Level Security. |
 | **Rens før lagring** | Alle spørringer er parametriserte (ingen SQL bygges av tekst), og React escaper all tekst. Lenker må være `http(s)` både i skjemaet, i databasen (`profiles_text_limits`) og når de vises. Lengdegrenser finnes i databasen for navn, bio, kollokviegrupper, hendelser og emner. |
 | **Databasetilgang** | Row Level Security på alle tabeller. Migrering 0031: uinnloggede har null tilgang til tabeller, og kan bare kalle én funksjon (opprydding av uferdig registrering). `is_following` svarer bare om deg selv. |
+| **Hemmeligheter og miljøvariabler** | Bare `NEXT_PUBLIC_SUPABASE_URL` og `NEXT_PUBLIC_SUPABASE_ANON_KEY` (offentlige med vilje, beskyttet av Row Level Security) brukes i koden. Ingen `service_role`-nøkkel, Resend-nøkkel eller annen hemmelighet finnes i kildekoden eller git-historikken. `.env*` er i `.gitignore` og har aldri vært committet. Resend-nøkkelen ligger bare i Supabase. `npm audit`: 0 sårbarheter. Dependabot foreslår oppdateringer ukentlig (`.github/dependabot.yml`). |
+| **Admin og API-ruter** | Appen har ingen admin-sider og ingen egne API-ruter (ingen `route.ts` utenom `/.well-known/security.txt`). Alle sider bak innlogging sjekkes i `src/proxy.ts` (JWT verifiseres mot Supabase sin offentlige nøkkel) og på nytt i selve siden. Åpne sider matches nøyaktig, så `/vilkarfoo` ikke blir åpen ved en feil. Alle data går via Supabase-API-et, som styres av Row Level Security. |
+| **Skjemaer og XSS** | React escaper all tekst; ingen `dangerouslySetInnerHTML`, `innerHTML` eller `eval` i koden. Tekst renses før lagring (`src/lib/sanitize.ts`: kontrolltegn, usynlige tegn og høyre-mot-venstre-triks som lurer navn og titler) og databasen avviser de samme tegnene (`clean_text`, migrering 0033). Lenker må være `http(s)`. Feilmeldinger fra databasen vises aldri rått. |
+| **Misbruk og kvoter** | Per bruker: maks 30 kollokviegrupper, 1000 hendelser, 40 emner, 200 kalendervalg, 1000 følger-forespørsler, 200 medlemskap, 500 invitasjoner og 25 egne emner (migrering 0033). Lengdegrenser på all tekst. |
 | **Prompt injection** | Ikke relevant: appen bruker ingen AI-modell og sender ingen tekst til en. Legger du til AI senere, behandle brukertekst som data, aldri som instruksjoner. |
 
-Ingen Content-Security-Policy ennå (Next.js trenger nonces for sine inline-skript, som gjør alle sider dynamiske). Ta det når appen har fått mer trafikk.
+#### Kjente og aksepterte begrensninger
+
+Dette vet vi om, så du ikke bruker tid på dem (eller så du kan foreslå en bedre løsning):
+
+- **Innloggingscookien er ikke `HttpOnly`.** Appen bruker Supabase-klienten i nettleseren, som må kunne lese økten. Risikoen dekkes av CSP-en og at all tekst escapes. Den er `Secure` og `SameSite=Lax`.
+- **Økten sjekkes lokalt (JWT).** Tokenet er gyldig til det utløper (som regel 1 time) selv om en annen enhet er logget ut. «Bytt passord» logger ut andre enheter, men de gamle tokenene virker til de utløper.
+- **Supabase-API-et har åpen CORS** og kan kalles fra hvor som helst med anon-nøkkelen. Det er slik Supabase virker; tilgang styres av innlogging og Row Level Security.
+- **Registrering røper om en adresse er i bruk** («allerede registrert»), ellers ville ikke brukeren forstått hvorfor koden ikke kommer. Profilene er uansett synlige for alle innloggede.
+- **`release_unconfirmed_signup` kan kalles uinnlogget** og sletter uferdige (aldri bekreftede) registreringer for en adresse. Det kan brukes til å avbryte andres pågående registrering, men ikke til å røre bekreftede kontoer.
+- **Alle kan bruke en `@uio.no`-adresse** de har tilgang til, ikke bare IFI-studenter.
+- **Ingen egen rate limiting på REST-kall** utover kvotene over og Supabase sine grenser for innlogging og e-post. Vercel Firewall kan legge på regler for IP-baserte grenser.
+- **`created_by` på egendefinerte emner** er synlig for innloggede brukere (uten navn, bare en id).
+
+Meld sårbarheter etter [SECURITY.md](SECURITY.md). Kontaktadressen ligger også i `/.well-known/security.txt` (krever `NEXT_PUBLIC_CONTACT_EMAIL`).
 
 #### Innstillinger du må gjøre i Supabase
 

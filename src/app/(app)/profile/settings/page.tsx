@@ -21,6 +21,7 @@ import Collapsible from "@/components/collapsible";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { downloadMyData } from "@/lib/export-data";
 import { useI18n } from "@/lib/i18n/client";
+import { cleanLine, cleanText } from "@/lib/sanitize";
 
 const BIO_MAX = 160;
 
@@ -154,7 +155,7 @@ export default function SettingsPage() {
     setJustSaved(false);
     setErrorMessage("");
 
-    const trimmedName = fullName.trim();
+    const trimmedName = cleanLine(fullName);
 
     if (!trimmedName) {
       setErrorMessage(t("settings.nameRequired"));
@@ -197,7 +198,7 @@ export default function SettingsPage() {
       data: { full_name: trimmedName },
     });
 
-    const trimmedBio = bio.trim();
+    const trimmedBio = cleanText(bio);
     if (trimmedBio !== saved.bio.trim()) {
       const { error: bioError } = trimmedBio
         ? await supabase
@@ -209,7 +210,7 @@ export default function SettingsPage() {
         : await supabase.from("profile_bios").delete().eq("user_id", userId);
       if (bioError) {
         setSaving(false);
-        setErrorMessage(bioError.message);
+        setErrorMessage(t("common.somethingWrong"));
         return;
       }
     }
@@ -226,7 +227,7 @@ export default function SettingsPage() {
         .in("course_code", removed);
       if (removeError) {
         setSaving(false);
-        setErrorMessage(removeError.message);
+        setErrorMessage(t("common.somethingWrong"));
         return;
       }
     }
@@ -236,7 +237,7 @@ export default function SettingsPage() {
         .insert(added.map((code) => ({ user_id: userId, course_code: code })));
       if (addError) {
         setSaving(false);
-        setErrorMessage(addError.message);
+        setErrorMessage(t("common.somethingWrong"));
         return;
       }
     }
@@ -295,7 +296,7 @@ export default function SettingsPage() {
 
     if (error) {
       setDeleting(false);
-      setDeleteError(error.message);
+      setDeleteError(t("common.somethingWrong"));
       return;
     }
 

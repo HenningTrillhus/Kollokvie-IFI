@@ -11,6 +11,7 @@ import { EMAIL_VERIFICATION_ENABLED, emailForIfiUsername, ifiEmail } from "@/lib
 import VerifyCodeForm from "@/components/verify-code-form";
 import { IFI_USERNAME_PATTERN } from "@/lib/profiles";
 import { MIN_PASSWORD_LENGTH, checkPassword } from "@/lib/passwords";
+import { cleanLine } from "@/lib/sanitize";
 import { StrengthBar, StrengthLabel } from "@/components/password-strength";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -55,6 +56,10 @@ export default function SignupPage() {
       setErrorMessage(t("auth.consentRequired"));
       return;
     }
+    if (!cleanLine(fullName)) {
+      setErrorMessage(t("settings.nameRequired"));
+      return;
+    }
     if (!IFI_USERNAME_PATTERN.test(ifiUsername.trim())) {
       setErrorMessage(t("auth.ifiInvalid"));
       return;
@@ -87,7 +92,7 @@ export default function SignupPage() {
       password,
       options: {
         data: {
-          full_name: fullName.trim(),
+          full_name: cleanLine(fullName),
           // The IFI username is the username too.
           username: ifiUsername.trim().toLowerCase(),
           ifi_username: ifiUsername.trim().toLowerCase(),
@@ -107,7 +112,7 @@ export default function SignupPage() {
             ? t("verify.tooMany")
             : message.includes("database error")
               ? t("auth.signupFailed")
-              : error.message
+              : t("auth.signupFailed")
       );
       return;
     }

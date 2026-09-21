@@ -11,7 +11,8 @@ export default function SignOutButton() {
 
   async function handleSignOut() {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    // This device only. (Changing the password signs out all the others.)
+    await supabase.auth.signOut({ scope: "local" });
     try {
       sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
     } catch {

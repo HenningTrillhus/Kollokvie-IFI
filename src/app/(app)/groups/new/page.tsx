@@ -41,7 +41,10 @@ export default function NewGroupPage() {
       })
       .single();
 
-    if (error || !group) return error?.message ?? t("common.somethingWrong");
+    if (error || !group) {
+      // Don't show database wording; the group limit is the one case worth explaining.
+      return error?.message.includes("Quota") ? t("group.quotaError") : t("common.somethingWrong");
+    }
 
     router.push(`/groups/${(group as Group).id}`);
     router.refresh();

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CourseSingleSelect from "@/components/course-single-select";
 import { useI18n } from "@/lib/i18n/client";
+import { cleanLine, cleanText } from "@/lib/sanitize";
 import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import QuarterTimePicker from "@/components/quarter-time-picker";
 import type { Course } from "@/lib/courses";
@@ -67,11 +68,16 @@ export default function GroupForm({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!values.name.trim()) return;
+    if (!cleanLine(values.name)) return;
     setSaving(true);
     setErrorMessage("");
     setSaved(false);
-    const error = await onSubmit(values);
+    const error = await onSubmit({
+      ...values,
+      name: cleanLine(values.name),
+      description: cleanText(values.description),
+      location: cleanLine(values.location),
+    });
     setSaving(false);
     if (error) setErrorMessage(error);
     else setSaved(true);
