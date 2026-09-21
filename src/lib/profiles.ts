@@ -12,6 +12,8 @@ export type Profile = {
   accent_color: string;
   // null = initial on the accent color; "preset:NN" or "upload:<v>", see lib/avatars
   avatar: string | null;
+  // Which privacy policy version the user consented to (see lib/privacy.ts).
+  privacy_version?: string | null;
   created_at: string;
 };
 

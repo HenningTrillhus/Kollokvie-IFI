@@ -46,6 +46,10 @@ export default async function Home() {
 
         <p className="mt-8 text-xs text-muted">
           {t("app.forStudents")}
+          {" · "}
+          <Link href="/personvern" className="underline-offset-2 transition hover:text-foreground hover:underline">
+            {t("privacy.link")}
+          </Link>
         </p>
       </div>
     </main>

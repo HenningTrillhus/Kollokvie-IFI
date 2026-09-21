@@ -17,6 +17,7 @@ import AppearanceSettings from "@/components/appearance-settings";
 import AvatarPicker from "@/components/avatar-picker";
 import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
+import { downloadMyData } from "@/lib/export-data";
 import { useI18n } from "@/lib/i18n/client";
 
 const BIO_MAX = 160;
@@ -62,6 +63,8 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -248,6 +251,18 @@ export default function SettingsPage() {
     setSaving(false);
     setJustSaved(true);
     router.refresh();
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    setExportError(false);
+    try {
+      await downloadMyData();
+    } catch {
+      setExportError(true);
+    } finally {
+      setExporting(false);
+    }
   }
 
   async function handleDeleteAccount() {
@@ -453,6 +468,26 @@ export default function SettingsPage() {
       </form>
 
       <AppearanceSettings />
+
+      <section className="mt-4 space-y-2.5 border-t border-card-border pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <Link
+            href="/personvern"
+            className="text-xs text-muted transition hover:text-foreground"
+          >
+            {t("settings.privacy")}
+          </Link>
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting}
+            className="rounded-lg border border-card-border px-2.5 py-1 text-xs font-medium transition hover:bg-accent-soft active:scale-95 disabled:opacity-60"
+          >
+            {exporting ? t("settings.exporting") : t("settings.export")}
+          </button>
+        </div>
+        {exportError && <p className="text-xs text-red-500">{t("settings.exportError")}</p>}
+      </section>
 
       <div className="mb-6 mt-6 rounded-xl border border-red-500/30 p-4">
         <h2 className="text-sm font-semibold text-red-500">{t("settings.deleteTitle")}</h2>

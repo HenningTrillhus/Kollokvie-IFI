@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
+import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
 import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -34,6 +35,11 @@ export default function LoginPage() {
       return;
     }
 
+    try {
+      sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
+    } catch {
+      // ignore
+    }
     router.push("/dashboard");
     router.refresh();
   }
@@ -117,6 +123,12 @@ export default function LoginPage() {
             </p>
           </form>
         </div>
+
+        <p className="mt-6 text-center text-xs text-muted">
+          <Link href="/personvern" className="transition hover:text-foreground">
+            {t("privacy.link")}
+          </Link>
+        </p>
       </div>
     </main>
   );

@@ -24,6 +24,10 @@ Row Level Security) og **Tailwind CSS 4**. Hostes på Vercel.
   Profilbilde: last opp eget bilde (fra maskinen, bildegalleriet eller kamera) eller velg
   blant 30 ferdige ikoner. Uten bilde vises forbokstaven på en aksentfarge du velger.
   En kort bio (160 tegn) er bare synlig for de som følger deg.
+- **Personvern og samtykke.** Fullstendig personvernerklæring (`/personvern`, norsk og engelsk), obligatorisk
+  samtykke ved registrering, en samtykkeside (`/samtykke`) for eksisterende brukere, og «Last ned dataene mine»
+  og «Slett bruker» i Innstillinger. Innlogging lagres i langvarige informasjonskapsler, og en liten
+  melding sier «Logget inn som …» når appen åpnes.
 - **Innboks** for følgeforespørsler og invitasjoner til kollokviegrupper, med en rød
   prikk på avataren når noe venter.
 - **Kalender** med månedsvisning, egne hendelser (eksamen, innlevering, annet) og
@@ -73,6 +77,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0017` | Herding: godkjenning av følgere, kapasitet i databasen, kolonnerettigheter |
 | `0018`–`0019` | Profilbilder: `profiles.avatar`, lagringsbøtten `avatars` og de 30 ikonene |
 | `0020` | Bio (`profile_bios`, bare synlig for følgere) og medlemsforhåndsvisning på kollokviegrupper |
+| `0021` | Samtykke: `profiles.privacy_version` / `privacy_accepted_at` |
 
 ### 4. Skru av e-postbekreftelse
 
@@ -90,6 +95,10 @@ npm run dev
 Åpne [http://localhost:3000](http://localhost:3000).
 
 Andre kommandoer: `npm run lint` og `npm run build`.
+
+Valgfritt: sett `NEXT_PUBLIC_CONTACT_EMAIL` (lokalt og i Vercel) for å vise en kontakt-e-post nederst i
+personvernerklæringen. Når personvernerklæringen endres på en måte som krever nytt samtykke, øk
+`PRIVACY_VERSION` i `src/lib/privacy.ts`, så blir alle spurt på nytt.
 
 ## Deploy (Vercel)
 

@@ -7,6 +7,8 @@ import TopNav from "@/components/top-nav";
 import BottomNav from "@/components/bottom-nav";
 import AppShell from "@/components/app-shell";
 import AutoRefresh from "@/components/auto-refresh";
+import SignedInToast from "@/components/signed-in-toast";
+import { PRIVACY_VERSION } from "@/lib/privacy";
 
 export default async function AppLayout({
   children,
@@ -32,13 +34,22 @@ export default async function AppLayout({
   ]);
   const pendingRequestCount = (pendingFollowCount ?? 0) + pendingInviteCount;
 
+  // Ask for consent to the current privacy policy first. Only enforced once
+  // the database has the column, so an older database can't lock people out.
+  if (profile && "privacy_version" in profile && profile.privacy_version !== PRIVACY_VERSION) {
+    redirect("/samtykke");
+  }
+
   return (
-    <AppShell
-      header={<TopNav profile={profile} pendingRequestCount={pendingRequestCount} />}
-      bottom={<BottomNav />}
-    >
-      <AutoRefresh />
-      {children}
-    </AppShell>
+    <>
+      <AppShell
+        header={<TopNav profile={profile} pendingRequestCount={pendingRequestCount} />}
+        bottom={<BottomNav />}
+      >
+        <AutoRefresh />
+        {children}
+      </AppShell>
+      <SignedInToast profile={profile} />
+    </>
   );
 }

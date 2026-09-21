@@ -64,6 +64,16 @@ export const messages = {
     no: "IFI-brukernavnet kan bare ha bokstaver, tall, punktum, understrek og bindestrek.",
     en: "The IFI username can only contain letters, numbers, dots, underscores and hyphens.",
   },
+  "auth.consentBefore": { no: "Jeg har lest ", en: "I have read the " },
+  "auth.privacyLink": { no: "personvernerklæringen", en: "privacy policy" },
+  "auth.consentAfter": {
+    no: " og samtykker til at opplysningene mine behandles slik den beskriver.",
+    en: " and consent to my information being processed as it describes.",
+  },
+  "auth.consentRequired": {
+    no: "Du må godta personvernerklæringen for å opprette bruker.",
+    en: "You need to accept the privacy policy to create an account.",
+  },
   "auth.passwordShort": {
     no: "Passordet må være minst {min} tegn.",
     en: "The password must be at least {min} characters.",
@@ -82,6 +92,34 @@ export const messages = {
   "nav.search": { no: "Søk", en: "Search" },
   "nav.main": { no: "Hovedmeny", en: "Main menu" },
   "nav.yourProfile": { no: "Din profil", en: "Your profile" },
+
+  // ---- privacy & consent
+  "privacy.link": { no: "Personvern", en: "Privacy" },
+  "privacy.back": { no: "← Tilbake", en: "← Back" },
+  "privacy.updated": { no: "Sist oppdatert: {date}", en: "Last updated: {date}" },
+  "privacy.contactHeading": { no: "Kontakt", en: "Contact" },
+  "privacy.contactEmailLead": { no: "Spørsmål om personvern kan sendes til ", en: "Privacy questions can be sent to " },
+  "privacy.contactNone": {
+    no: "Spørsmål om personvern rettes til utvikleren av appen (Henning Trillhus).",
+    en: "Privacy questions can be directed to the developer of the app (Henning Trillhus).",
+  },
+  "consent.title": { no: "Før du fortsetter", en: "Before you continue" },
+  "consent.intro": {
+    no: "Kollokvie@IFI trenger samtykket ditt for å behandle opplysningene dine. Dette er det viktigste:",
+    en: "Kollokvie@IFI needs your consent to process your information. This is what matters most:",
+  },
+  "consent.readMore": { no: "Les hele personvernerklæringen", en: "Read the full privacy policy" },
+  "consent.accept": { no: "Godta og fortsett", en: "Accept and continue" },
+  "consent.accepting": { no: "Lagrer…", en: "Saving…" },
+  "consent.decline": { no: "Avslå og logg ut", en: "Decline and sign out" },
+  "consent.declineHint": {
+    no: "Uten samtykke kan du ikke bruke appen. Du kan også slette kontoen din i stedet.",
+    en: "You can't use the app without consent. You can also delete your account instead.",
+  },
+  "consent.error": { no: "Kunne ikke lagre samtykket. Prøv igjen.", en: "Couldn't save your consent. Try again." },
+
+  // ---- signed-in toast
+  "toast.signedInAs": { no: "Logget inn som {name}", en: "Signed in as {name}" },
 
   // ---- 404
   "notFound.title": { no: "Fant ikke siden", en: "Page not found" },
@@ -252,6 +290,10 @@ export const messages = {
     no: "Kunne ikke bruke bildet. Prøv et annet.",
     en: "Couldn't use that picture. Try another one.",
   },
+  "settings.privacy": { no: "Personvernerklæring", en: "Privacy policy" },
+  "settings.export": { no: "Last ned dataene mine", en: "Download my data" },
+  "settings.exporting": { no: "Henter…", en: "Preparing…" },
+  "settings.exportError": { no: "Kunne ikke hente dataene. Prøv igjen.", en: "Couldn't fetch your data. Try again." },
   "settings.bio": { no: "Bio", en: "Bio" },
   "settings.bioPlaceholder": { no: "Fortell litt om deg selv…", en: "Tell people a bit about yourself…" },
   "settings.bioHint": { no: "Bare folk som følger deg kan se bioen din.", en: "Only people who follow you can see your bio." },

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import LanguageSwitch from "@/components/language-switch";
+import { PRIVACY_VERSION } from "@/lib/privacy";
+import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
 import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -20,6 +22,7 @@ export default function SignupPage() {
   const [ifiUsername, setIfiUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -27,6 +30,10 @@ export default function SignupPage() {
     event.preventDefault();
     setErrorMessage("");
 
+    if (!consent) {
+      setErrorMessage(t("auth.consentRequired"));
+      return;
+    }
     if (!USERNAME_PATTERN.test(username.trim())) {
       setErrorMessage(t("auth.usernameInvalid"));
       return;
@@ -54,6 +61,8 @@ export default function SignupPage() {
           full_name: fullName.trim(),
           username: username.trim(),
           ifi_username: ifiUsername.trim(),
+          // Recorded with a timestamp by the database when the account is made.
+          privacy_version: PRIVACY_VERSION,
         },
       },
     });
@@ -68,6 +77,11 @@ export default function SignupPage() {
       return;
     }
 
+    try {
+      sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
+    } catch {
+      // ignore
+    }
     router.push("/dashboard");
     router.refresh();
   }
@@ -187,6 +201,26 @@ export default function SignupPage() {
               />
             </div>
 
+            <label className="flex cursor-pointer items-start gap-3 text-sm leading-snug">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]"
+              />
+              <span className="text-muted">
+                {t("auth.consentBefore")}
+                <Link
+                  href="/personvern"
+                  target="_blank"
+                  className="font-medium text-accent hover:text-accent-hover"
+                >
+                  {t("auth.privacyLink")}
+                </Link>
+                {t("auth.consentAfter")}
+              </span>
+            </label>
+
             {errorMessage && (
               <p className="text-sm text-red-500">{errorMessage}</p>
             )}
@@ -210,6 +244,12 @@ export default function SignupPage() {
             </p>
           </form>
         </div>
+
+        <p className="mt-6 text-center text-xs text-muted">
+          <Link href="/personvern" className="transition hover:text-foreground">
+            {t("privacy.link")}
+          </Link>
+        </p>
       </div>
     </main>
   );

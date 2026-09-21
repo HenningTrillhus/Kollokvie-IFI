@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/client";
+import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
 
 export default function SignOutButton() {
   const router = useRouter();
@@ -11,6 +12,11 @@ export default function SignOutButton() {
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
+    try {
+      sessionStorage.removeItem(SIGNED_IN_TOAST_KEY);
+    } catch {
+      // ignore
+    }
     router.push("/login");
     router.refresh();
   }
