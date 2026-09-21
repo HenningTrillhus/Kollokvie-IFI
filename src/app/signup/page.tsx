@@ -10,9 +10,9 @@ import { createClient } from "@/lib/supabase/client";
 import { EMAIL_VERIFICATION_ENABLED, emailForIfiUsername, ifiEmail } from "@/lib/ifi-auth";
 import VerifyCodeForm from "@/components/verify-code-form";
 import { IFI_USERNAME_PATTERN } from "@/lib/profiles";
+import { MIN_PASSWORD_LENGTH } from "@/lib/passwords";
 import { useI18n } from "@/lib/i18n/client";
 
-const MIN_PASSWORD_LENGTH = 6;
 
 export default function SignupPage() {
   const router = useRouter();

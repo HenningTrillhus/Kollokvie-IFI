@@ -127,6 +127,43 @@ export const messages = {
     no: "Passordet må være minst {min} tegn.",
     en: "The password must be at least {min} characters.",
   },
+  "auth.forgot": { no: "Glemt passord?", en: "Forgot password?" },
+  "reset.title": { no: "Glemt passord", en: "Forgot password" },
+  "reset.newTitle": { no: "Velg nytt passord", en: "Choose a new password" },
+  "reset.intro": {
+    no: "Skriv inn IFI-brukernavnet ditt, så sender vi en kode til UiO-e-posten din.",
+    en: "Enter your IFI username and we'll send a code to your UiO email.",
+  },
+  "reset.sentNeutral": {
+    no: "Hvis det finnes en bruker med dette brukernavnet, har vi sendt en kode til {email}. Skriv den inn under.",
+    en: "If an account with this username exists, we've sent a code to {email}. Enter it below.",
+  },
+  "reset.sendFailed": {
+    no: "Kunne ikke sende koden akkurat nå. Prøv igjen om litt.",
+    en: "Couldn't send the code right now. Try again in a moment.",
+  },
+  "reset.newPassword": { no: "Nytt passord", en: "New password" },
+  "reset.save": { no: "Lagre passord", en: "Save password" },
+  "reset.saving": { no: "Lagrer…", en: "Saving…" },
+  "reset.saveFailed": {
+    no: "Kunne ikke lagre passordet. Prøv igjen, eller be om en ny kode.",
+    en: "Couldn't save the password. Try again, or ask for a new code.",
+  },
+  "reset.backToLogin": { no: "Tilbake til innlogging", en: "Back to log in" },
+  "reset.unavailable": {
+    no: "Tilbakestilling av passord er ikke slått på ennå.",
+    en: "Password reset isn't turned on yet.",
+  },
+  "password.title": { no: "Bytt passord", en: "Change password" },
+  "password.change": { no: "Bytt passord", en: "Change password" },
+  "password.done": {
+    no: "Passordet er endret. Alle andre enheter er logget ut.",
+    en: "Password changed. All other devices have been signed out.",
+  },
+  "password.reauth": {
+    no: "Logg ut og inn igjen, og prøv på nytt.",
+    en: "Sign out and back in, then try again.",
+  },
   "auth.passwordMismatch": { no: "Passordene er ikke like.", en: "The passwords don't match." },
   "auth.alreadyRegistered": {
     no: "Det finnes allerede en bruker med dette IFI-brukernavnet.",

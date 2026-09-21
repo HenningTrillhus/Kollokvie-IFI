@@ -18,12 +18,15 @@ const RESEND_SECONDS = 60;
 export default function VerifyCodeForm({
   email,
   type,
+  message,
   onVerified,
   onResend,
   onBack,
 }: {
   email: string;
-  type: "signup" | "email_change";
+  type: "signup" | "email_change" | "recovery";
+  // Overrides "We sent a code to …" (the password reset says it neutrally).
+  message?: string;
   onVerified: () => void;
   onResend: () => Promise<boolean>;
   onBack?: () => void;
@@ -89,7 +92,7 @@ export default function VerifyCodeForm({
       className="space-y-4"
     >
       <p className="text-center text-sm text-muted">
-        {t("verify.sent", { email })}
+        {message ?? t("verify.sent", { email })}
       </p>
 
       <input

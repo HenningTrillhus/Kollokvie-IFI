@@ -6,7 +6,7 @@ import { SIGNED_IN_TOAST_KEY } from "@/components/signed-in-toast";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { loginEmails } from "@/lib/ifi-auth";
+import { EMAIL_VERIFICATION_ENABLED, loginEmails } from "@/lib/ifi-auth";
 import VerifyCodeForm from "@/components/verify-code-form";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -137,6 +137,16 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-xl border border-card-border bg-transparent px-4 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
               />
+              {EMAIL_VERIFICATION_ENABLED && (
+                <p className="mt-1.5 text-right text-xs">
+                  <Link
+                    href="/glemt-passord"
+                    className="font-medium text-accent hover:text-accent-hover"
+                  >
+                    {t("auth.forgot")}
+                  </Link>
+                </p>
+              )}
             </div>
 
             {errorMessage && (

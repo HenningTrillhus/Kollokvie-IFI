@@ -14,6 +14,7 @@ import { getUserCourses, type Course } from "@/lib/courses";
 import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
+import ChangePasswordCard from "@/components/change-password-card";
 import AvatarPicker from "@/components/avatar-picker";
 import { Card, Field, StickyBar, inputClass } from "@/components/form-ui";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
@@ -442,6 +443,8 @@ export default function SettingsPage() {
       </form>
 
       <AppearanceSettings />
+
+      <ChangePasswordCard />
 
       <section className="mt-4 space-y-2.5 border-t border-card-border pt-4">
         <div className="flex items-center justify-between gap-3">

@@ -87,6 +87,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0028` | Brukernavn = IFI-brukernavn (ingen egen brukernavn-innstilling lenger) |
 | `0029` | `suggested_profiles`: søket viser alle brukere når feltet er tomt, med felles kontakter først |
 | `0030` | Profilikoner 01–60 (var 01–45) |
+| `0031` | Sikkerhet: tekstgrenser og lenke-sjekk, strammere bildelagring, mindre rettigheter for uinnloggede |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
 | `0024` | Bare UiO-e-poster (`brukernavn@uio.no`) kan registrere seg, og IFI-brukernavnet leses fra den bekreftede adressen (kjøres sammen med steget under) |
@@ -190,8 +191,34 @@ Legger du til en ny tjeneste: oppdater personvernerklæringen (§ 5), cookie-erk
 
 ### Sikkerhet
 
-Sikkerhetshoder settes i `next.config.ts` (nosniff, ingen innramming, strengt referrer-policy, HSTS, låst tillatelses-policy).
-Tilgang til data håndheves i databasen med Row Level Security. Ingen Content-Security-Policy ennå.
+| Tema | Status |
+| --- | --- |
+| **HSTS** | På (`next.config.ts`, to år). Vercel tvinger i tillegg HTTPS. |
+| **Sikkerhetshoder** | `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`. Ingen `X-Powered-By`. |
+| **CSRF** | Ikke et problem her: appen kaller Supabase med et token i `Authorization`-headeren, ikke med cookies alene, og innloggingscookien er `SameSite=Lax`. De få server-handlingene (språk og tema) sjekkes av Next.js mot `Origin`. Appen har ingen egne POST-ruter. |
+| **Passord** | Minst 8 tegn ved nytt passord (`src/lib/passwords.ts`). Lagres som hash av Supabase Auth. |
+| **Nullstill økter ved passordbytte** | Ja. Både «Glemt passord» og «Bytt passord» (Innstillinger) logger ut alle andre enheter (`signOut({ scope: "others" })`). |
+| **Glemt passord** | `/glemt-passord`: kode på e-post til `brukernavn@uio.no`, deretter nytt passord. Koden kan bare brukes én gang og utløper (se under). |
+| **Brukeroppslag (enumeration)** | Innlogging gir alltid samme feilmelding. «Glemt passord» svarer likt om brukeren finnes eller ikke. Registrering sier at adressen er i bruk, ellers ville ikke brukeren forstå hvorfor koden ikke kommer. Profilene er uansett synlige for alle innloggede. |
+| **Rate limiting** | Håndheves av Supabase Auth (se innstillingene under) og av 60 sekunders nedtelling på «Send ny kode». |
+| **Filopplasting** | Bildet gjøres om til en 256×256 JPEG i nettleseren. Bøtta godtar bare `image/jpeg` (maks 300 KB), og bare filen `<din-id>/avatar.jpg` (migrering 0031). |
+| **Ingen kataloglisting** | Bildebøtta kan ikke listes av andre (lese-policyen er bare for egen mappe). Next.js og Vercel viser aldri mappeinnhold. |
+| **CORS** | Appen sender ingen CORS-hoder, så andre nettsteder kan ikke lese svarene den gir. Supabase-API-et er åpent for alle opprinnelser med vilje; det beskyttes av innlogging (JWT) og Row Level Security. |
+| **Rens før lagring** | Alle spørringer er parametriserte (ingen SQL bygges av tekst), og React escaper all tekst. Lenker må være `http(s)` både i skjemaet, i databasen (`profiles_text_limits`) og når de vises. Lengdegrenser finnes i databasen for navn, bio, kollokviegrupper, hendelser og emner. |
+| **Databasetilgang** | Row Level Security på alle tabeller. Migrering 0031: uinnloggede har null tilgang til tabeller, og kan bare kalle én funksjon (opprydding av uferdig registrering). `is_following` svarer bare om deg selv. |
+| **Prompt injection** | Ikke relevant: appen bruker ingen AI-modell og sender ingen tekst til en. Legger du til AI senere, behandle brukertekst som data, aldri som instruksjoner. |
+
+Ingen Content-Security-Policy ennå (Next.js trenger nonces for sine inline-skript, som gjør alle sider dynamiske). Ta det når appen har fått mer trafikk.
+
+#### Innstillinger du må gjøre i Supabase
+
+Dette ligger i Supabase-dashbordet, ikke i koden:
+
+1. **Authentication → URL Configuration:** sett *Site URL* til `https://kollokvie-ifi.no`, og la *Redirect URLs* bare inneholde adresser du selv bruker (fjern `*`-mønstre og `localhost` i produksjon).
+2. **Authentication → Sign In / Providers → Email:** *Email OTP Expiration* = 600 sekunder (10 min), *Minimum password length* = 8. Koden er engangs, og utløper etter tiden du setter.
+3. **Authentication → Rate Limits:** behold lave grenser for e-post (sending av koder) og for innlogging/verifisering per IP. Standardverdiene er greie for en liten app; ikke øk dem.
+4. **Authentication → Attack Protection** (hvis tilgjengelig i planen din): skru på «Prevent use of leaked passwords». CAPTCHA er valgfritt, men legger til en tredjepart, og personvernerklæringen må oppdateres hvis du bruker det.
+5. **Project Settings → API:** ikke del `service_role`-nøkkelen med noen, og legg den aldri i en `NEXT_PUBLIC_`-variabel. Appen bruker bare `anon`-nøkkelen.
 
 ### Dette må du gjøre selv
 

@@ -68,7 +68,7 @@ const no: Policy = {
       bullets: [
         "Supabase (Supabase Inc.): database, innlogging og lagring av profilbilder. Vi har valgt datasenter i EU (Irland, AWS eu-west-1).",
         "Vercel (Vercel Inc.): hosting av nettstedet. Serverfunksjonene kjører i Dublin, Irland. Statiske filer leveres via et globalt innholdsnettverk.",
-        "Resend (Resend Inc.): sender e-posten med bekreftelseskoden. Vi har valgt EU-region (Irland). Resend ser UiO-e-postadressen din og innholdet i e-posten, og bare for å levere den.",
+        "Resend (Resend Inc.): sender e-postene med koder (bekreftelse og tilbakestilling av passord). Vi har valgt EU-region (Irland). Resend ser UiO-e-postadressen din og innholdet i e-posten, og bare for å levere den.",
       ],
       paragraphs: [
         "Alle er databehandlere for oss og behandler opplysningene bare på våre vegne. Leverandørene er amerikanske selskaper. Der opplysninger kan bli behandlet utenfor EØS, skjer det med et lovlig overføringsgrunnlag, som EUs standardkontrakter (SCC) eller EU–USAs personvernrammeverk (Data Privacy Framework).",
@@ -190,7 +190,7 @@ const en: Policy = {
       bullets: [
         "Supabase (Supabase Inc.): database, sign-in and storage of profile pictures. We have chosen a data center in the EU (Ireland, AWS eu-west-1).",
         "Vercel (Vercel Inc.): hosting of the site. Server functions run in Dublin, Ireland. Static files are delivered through a global content network.",
-        "Resend (Resend Inc.): sends the email with the confirmation code. We have chosen the EU region (Ireland). Resend sees your UiO email address and the contents of the email, only to deliver it.",
+        "Resend (Resend Inc.): sends the emails with codes (confirmation and password reset). We have chosen the EU region (Ireland). Resend sees your UiO email address and the contents of the email, only to deliver it.",
       ],
       paragraphs: [
         "All of them are processors for us and only process the data on our behalf. The providers are US companies. Where data may be processed outside the EEA, this happens on a lawful transfer basis, such as the EU Standard Contractual Clauses (SCCs) or the EU–US Data Privacy Framework.",

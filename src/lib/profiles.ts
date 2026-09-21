@@ -77,6 +77,17 @@ export function sanitizeExternalUrl(value: string): string | null {
   }
 }
 
+// For rendering a stored link: null unless it is a plain http(s) address.
+export function safeExternalHref(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 // Escape LIKE wildcards so user input like "%" or "_" matches literally.
 export function escapeLike(value: string) {
   return value.replace(/[\\%_]/g, (c) => `\\${c}`);
