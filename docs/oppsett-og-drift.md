@@ -108,6 +108,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0038` | Notater i kalenderen: hendelsestypen `note` og kolonnen `body` |
 | `0039` | Profillenker kan bare være GitHub eller LinkedIn, i fast form (gamle lenker skrives om eller fjernes) |
 | `0040` | Strengere bildegrense (100 KB, bare JPEG) og tekstregler for studielinje og profilfarge |
+| `0043` | Profilen opprettes først når e-postkoden er bekreftet, ikke idet «Opprett bruker» trykkes |
 | `0042` | Retter Supabase sin «SECURITY DEFINER view»-varsling: `visible_profiles` kjører nå med spørrerens egne rettigheter, ikke eierens (kjør etter 0036) |
 | `0041` | Profilikoner 01–85 (var 01–65) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
