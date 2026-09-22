@@ -13,8 +13,10 @@ import {
   parseLinkHandle,
 } from "@/lib/profiles";
 import { getUserCourses, type Course } from "@/lib/courses";
+import { getUserAssociations, type UserAssociation } from "@/lib/associations";
 import StudyProgramSelect from "@/components/study-program-select";
 import CourseMultiSelect from "@/components/course-multi-select";
+import AssociationMultiSelect from "@/components/association-multi-select";
 import AppearanceSettings from "@/components/appearance-settings";
 import ChangePasswordCard from "@/components/change-password-card";
 import ProfileVisibility from "@/components/profile-visibility";
@@ -40,7 +42,14 @@ type Fields = {
   studyProgram: string;
   studyYear: string;
   courseCodes: string[];
+  associations: UserAssociation[];
 };
+
+// Stable order, so the dirty-check doesn't fire just because items were
+// added in a different order than they were saved in.
+function sortAssociations(list: UserAssociation[]): UserAssociation[] {
+  return [...list].sort((a, b) => a.association.localeCompare(b.association));
+}
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -60,6 +69,8 @@ export default function SettingsPage() {
   const [studyYear, setStudyYear] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [savedCourses, setSavedCourses] = useState<Course[]>([]);
+  const [associations, setAssociations] = useState<UserAssociation[]>([]);
+  const [savedAssociations, setSavedAssociations] = useState<UserAssociation[]>([]);
 
   // What's saved in the database, so Save is only active when something changed.
   const [saved, setSaved] = useState<Fields | null>(null);
@@ -92,6 +103,7 @@ export default function SettingsPage() {
         .single();
 
       const userCourses = await getUserCourses(supabase, user.id);
+      const userAssociations = await getUserAssociations(supabase, user.id);
       const { data: bioRow } = await supabase
         .from("profile_bios")
         .select("bio")
@@ -113,6 +125,8 @@ export default function SettingsPage() {
       }
       setCourses(userCourses);
       setSavedCourses(userCourses);
+      setAssociations(userAssociations);
+      setSavedAssociations(userAssociations);
       setBio(savedBio);
       setSaved({
         bio: savedBio,
@@ -122,6 +136,7 @@ export default function SettingsPage() {
         studyProgram: profile?.study_program ?? "",
         studyYear: profile?.study_year ? String(profile.study_year) : "",
         courseCodes: userCourses.map((c) => c.code),
+        associations: sortAssociations(userAssociations),
       });
       setLoading(false);
     })();
@@ -135,6 +150,7 @@ export default function SettingsPage() {
     studyProgram,
     studyYear,
     courseCodes: courses.map((c) => c.code),
+    associations: sortAssociations(associations),
   };
   const dirty = saved !== null && JSON.stringify(current) !== JSON.stringify(saved);
 
@@ -181,6 +197,11 @@ export default function SettingsPage() {
       setErrorMessage(
         looksLikeLink(linkedinHandle) ? t("settings.noLinks") : t("settings.invalidLinkedin")
       );
+      return;
+    }
+    const cleanedAssociations = associations.map((a) => ({ ...a, title: cleanLine(a.title) }));
+    if (cleanedAssociations.some((a) => !a.title)) {
+      setErrorMessage(t("settings.associationTitleRequired"));
       return;
     }
 
@@ -252,14 +273,62 @@ export default function SettingsPage() {
       }
     }
 
+    // Same idea for associations: only touch what actually changed.
+    const savedBySlug = new Map(savedAssociations.map((a) => [a.association, a.title]));
+    const currentSlugs = new Set(cleanedAssociations.map((a) => a.association));
+    const removedAssoc = savedAssociations
+      .filter((a) => !currentSlugs.has(a.association))
+      .map((a) => a.association);
+    const addedAssoc = cleanedAssociations.filter((a) => !savedBySlug.has(a.association));
+    const changedAssoc = cleanedAssociations.filter(
+      (a) => savedBySlug.has(a.association) && savedBySlug.get(a.association) !== a.title
+    );
+    if (removedAssoc.length > 0) {
+      const { error: removeAssocError } = await supabase
+        .from("user_associations")
+        .delete()
+        .eq("user_id", userId)
+        .in("association", removedAssoc);
+      if (removeAssocError) {
+        setSaving(false);
+        setErrorMessage(t("common.somethingWrong"));
+        return;
+      }
+    }
+    if (addedAssoc.length > 0) {
+      const { error: addAssocError } = await supabase
+        .from("user_associations")
+        .insert(addedAssoc.map((a) => ({ user_id: userId, association: a.association, title: a.title })));
+      if (addAssocError) {
+        setSaving(false);
+        setErrorMessage(t("common.somethingWrong"));
+        return;
+      }
+    }
+    for (const a of changedAssoc) {
+      const { error: updateAssocError } = await supabase
+        .from("user_associations")
+        .update({ title: a.title })
+        .eq("user_id", userId)
+        .eq("association", a.association);
+      if (updateAssocError) {
+        setSaving(false);
+        setErrorMessage(t("common.somethingWrong"));
+        return;
+      }
+    }
+
     setSaved({
       ...current,
       bio: trimmedBio,
       fullName: trimmedName,
       githubHandle: github,
       linkedinHandle: linkedin,
+      associations: sortAssociations(cleanedAssociations),
     });
     setSavedCourses(courses);
+    setSavedAssociations(cleanedAssociations);
+    setAssociations(cleanedAssociations);
     setBio(trimmedBio);
     setFullName(trimmedName);
     setGithubHandle(github);
@@ -279,6 +348,7 @@ export default function SettingsPage() {
     setStudyProgram(saved.studyProgram);
     setStudyYear(saved.studyYear);
     setCourses(savedCourses);
+    setAssociations(savedAssociations);
     setErrorMessage("");
   }
 
@@ -469,6 +539,17 @@ export default function SettingsPage() {
                   value={linkedinHandle}
                   onChange={edit(setLinkedinHandle)}
                 />
+              </Field>
+            </Card>
+          </section>
+
+          {/* z-30: same reason as the study section above — the picker opens
+              downward and must sit above the sticky save bar. */}
+          <section style={rise(3)} className="animate-rise relative z-30">
+            <SectionTitle>{t("settings.secAssociations")}</SectionTitle>
+            <Card>
+              <Field label={t("settings.associations")} hint={t("settings.associationsHint")}>
+                <AssociationMultiSelect selected={associations} onChange={edit(setAssociations)} />
               </Field>
             </Card>
           </section>

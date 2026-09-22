@@ -8,6 +8,7 @@ import {
   getProfileById,
   getProfileByUsername,
 } from "@/lib/profiles";
+import { getUserAssociations } from "@/lib/associations";
 import FollowButton from "@/components/follow-button";
 import ProfileHeader from "@/components/profile-header";
 import BackButton from "@/components/back-button";
@@ -51,15 +52,16 @@ export default async function PublicProfilePage({
     getFollowStatus(supabase, user.id, profile.id),
   ]);
 
-  // The bio follows the profile's visibility (also enforced by RLS).
+  // The bio and associations follow the profile's visibility (also enforced by RLS).
   let bio: string | null = null;
+  let associations: Awaited<ReturnType<typeof getUserAssociations>> = [];
   if (!hidden) {
-    const { data: bioRow } = await supabase
-      .from("profile_bios")
-      .select("bio")
-      .eq("user_id", profile.id)
-      .maybeSingle();
+    const [{ data: bioRow }, assoc] = await Promise.all([
+      supabase.from("profile_bios").select("bio").eq("user_id", profile.id).maybeSingle(),
+      getUserAssociations(supabase, profile.id),
+    ]);
     bio = bioRow?.bio ?? null;
+    associations = assoc;
   }
 
   return (
@@ -70,6 +72,7 @@ export default async function PublicProfilePage({
         profile={profile}
         bio={bio}
         courses={courses}
+        associations={associations}
         counts={counts}
         actions={
           <FollowButton

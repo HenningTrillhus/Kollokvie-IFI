@@ -3,8 +3,10 @@ import Link from "next/link";
 import Avatar from "@/components/avatar";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
+import AssociationBadges from "@/components/association-badges";
 import { Card } from "@/components/form-ui";
 import { LockIcon } from "@/components/meta-icons";
+import type { UserAssociation } from "@/lib/associations";
 import type { Course } from "@/lib/courses";
 import { programLabel } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
@@ -25,6 +27,7 @@ export default async function ProfileHeader({
   profile,
   bio,
   courses,
+  associations = [],
   counts,
   actions,
   isOwn = false,
@@ -32,6 +35,7 @@ export default async function ProfileHeader({
   profile: Profile;
   bio: string | null;
   courses: Course[];
+  associations?: UserAssociation[];
   // Left out when the profile's details are hidden from the viewer.
   counts?: { followers: number; following: number };
   actions?: ReactNode;
@@ -134,6 +138,15 @@ export default async function ProfileHeader({
           <Card className="space-y-2.5">
             <Label>{t("profile.linksHeading")}</Label>
             <ProfileLinks githubUrl={profile.github_url} linkedinUrl={profile.linkedin_url} />
+          </Card>
+        </div>
+      )}
+
+      {associations.length > 0 && (
+        <div style={rise(6)} className="animate-rise">
+          <Card className="space-y-2.5">
+            <Label>{t("profile.associationsHeading")}</Label>
+            <AssociationBadges items={associations} />
           </Card>
         </div>
       )}

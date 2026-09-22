@@ -45,7 +45,8 @@ where schemaname = 'public'
 
 -- 7. Hvilke kolonner innloggede kan endre direkte. Forventet: bare de som skal kunne endres
 --    (profiles: full_name, github_url, linkedin_url, study_program, study_year, accent_color,
---     avatar, privacy_version, privacy_accepted_at; groups og events: se migrering 0033).
+--     avatar, privacy_version, privacy_accepted_at; user_associations: title (0045);
+--     groups og events: se migrering 0033).
 select table_name, string_agg(column_name, ', ' order by column_name) as updatable_columns
 from information_schema.column_privileges
 where table_schema = 'public' and grantee = 'authenticated' and privilege_type = 'UPDATE'

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getFollowCounts, getProfileById } from "@/lib/profiles";
+import { getUserAssociations } from "@/lib/associations";
 import { getPendingInviteCount } from "@/lib/group-invites";
 import ProfileHeader from "@/components/profile-header";
 import SignOutButton from "@/components/sign-out-button";
@@ -19,18 +20,25 @@ export default async function OwnProfilePage() {
   const profile = await getProfileById(supabase, user.id);
   if (!profile) return null;
 
-  const [counts, courses, { count: pendingFollowCount }, pendingInviteCount, { data: bioRow }] =
-    await Promise.all([
-      getFollowCounts(supabase, user.id),
-      getUserCourses(supabase, user.id),
-      supabase
-        .from("follows")
-        .select("*", { count: "exact", head: true })
-        .eq("followee_id", user.id)
-        .eq("status", "pending"),
-      getPendingInviteCount(supabase, user.id),
-      supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
-    ]);
+  const [
+    counts,
+    courses,
+    associations,
+    { count: pendingFollowCount },
+    pendingInviteCount,
+    { data: bioRow },
+  ] = await Promise.all([
+    getFollowCounts(supabase, user.id),
+    getUserCourses(supabase, user.id),
+    getUserAssociations(supabase, user.id),
+    supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("followee_id", user.id)
+      .eq("status", "pending"),
+    getPendingInviteCount(supabase, user.id),
+    supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
+  ]);
 
   const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
 
@@ -40,6 +48,7 @@ export default async function OwnProfilePage() {
         profile={profile}
         bio={bioRow?.bio ?? null}
         courses={courses}
+        associations={associations}
         counts={counts}
         isOwn
         actions={

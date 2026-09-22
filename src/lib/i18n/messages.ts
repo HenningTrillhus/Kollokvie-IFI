@@ -481,6 +481,7 @@ export const messages = {
   "profile.studiesHeading": { no: "Studier", en: "Studies" },
   "profile.coursesHeading": { no: "Emner", en: "Courses" },
   "profile.linksHeading": { no: "Lenker", en: "Links" },
+  "profile.associationsHeading": { no: "Foreninger", en: "Associations" },
   "profile.followers": { no: "følgere", en: "followers" },
   "profile.following": { no: "følger", en: "following" },
   "profile.tabFollowers": { no: "Følgere", en: "Followers" },
@@ -565,6 +566,16 @@ export const messages = {
   "settings.linkedin": { no: "LinkedIn", en: "LinkedIn" },
   "settings.githubPlaceholder": { no: "ditt-brukernavn", en: "your-username" },
   "settings.linkedinPlaceholder": { no: "ditt-navn-123abc", en: "your-name-123abc" },
+  "settings.secAssociations": { no: "Foreninger", en: "Associations" },
+  "settings.associations": { no: "Foreninger", en: "Associations" },
+  "settings.associationsHint": {
+    no: "Er du med i en forening på IFI? Velg den og skriv en kort tittel, som «Intern», «Funk» eller «Styreleder».",
+    en: "Part of an IFI student association? Pick it and add a short title, like “Member”, “Volunteer” or “Chair”.",
+  },
+  "settings.associationTitleRequired": {
+    no: "Skriv en tittel for hver forening du har lagt til.",
+    en: "Write a title for each association you've added.",
+  },
   "settings.linkHint": {
     no: "Skriv bare brukernavnet ditt, så lager vi veien til profilen din. Lenker kan ikke legges inn.",
     en: "Just type your username and we build the way to your profile. Links can't be added.",
@@ -629,6 +640,12 @@ export const messages = {
   },
   "course.remove": { no: "Fjern {code}", en: "Remove {code}" },
   "select.search": { no: "Søk…", en: "Search…" },
+
+  // ---- association picker
+  "association.searchPlaceholder": { no: "Søk forening…", en: "Search association…" },
+  "association.titlePlaceholder": { no: "Tittel, f.eks. Intern", en: "Title, e.g. Member" },
+  "association.remove": { no: "Fjern {name}", en: "Remove {name}" },
+  "association.noMatches": { no: "Fant ingen forening.", en: "No matching association." },
 
   // ---- calendar
   "cal.prevMonth": { no: "Forrige måned", en: "Previous month" },
