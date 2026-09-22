@@ -11,7 +11,7 @@ import { useI18n } from "@/lib/i18n/client";
 const CODE_LENGTH = Number(process.env.NEXT_PUBLIC_OTP_LENGTH) || 8;
 const MIN_LENGTH = 6;
 const MAX_LENGTH = 10;
-const RESEND_SECONDS = 60;
+const RESEND_SECONDS = 120;
 
 // "Enter the code we emailed you." Used when signing up, when logging
 // in with an unconfirmed address, and when an older account verifies its email.
@@ -39,7 +39,8 @@ export default function VerifyCodeForm({
   const [cooldown, setCooldown] = useState(RESEND_SECONDS);
   const input = useRef<HTMLInputElement>(null);
 
-  // The resend button unlocks after a minute.
+  // The resend button unlocks after two minutes (the email is often slow, and
+  // people should check spam before asking for a new one).
   useEffect(() => {
     if (cooldown <= 0) return;
     const id = setTimeout(() => setCooldown((n) => n - 1), 1000);

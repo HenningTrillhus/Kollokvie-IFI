@@ -104,8 +104,8 @@ export const messages = {
   "verify.resendFailed": { no: "Kunne ikke sende ny kode. Prøv igjen om litt.", en: "Couldn't send a new code. Try again in a moment." },
   "verify.back": { no: "← Tilbake", en: "← Back" },
   "verify.spamHint": {
-    no: "E-posten kan bruke opptil ett minutt på å komme fram. Ser du den ikke, sjekk søppelpost.",
-    en: "The email can take up to a minute to arrive. Can't find it? Check your spam folder.",
+    no: "E-posten havner ofte i søppelpost eller uønsket e-post, så sjekk der. Det kan i tillegg ta opptil et minutt før den kommer fram.",
+    en: "The email often ends up in spam or junk, so check there. It can also take up to a minute to arrive.",
   },
   "verify.sendFailed": {
     no: "Kunne ikke sende koden akkurat nå. Prøv igjen om litt.",
