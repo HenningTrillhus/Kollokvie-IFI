@@ -123,10 +123,17 @@ export default function DayPanel({
                     <DoneCheck done={item.done} onToggle={(el) => onToggleDone(item, el)} />
                   )}
                   {item.href ? (
-                    <Link href={item.href} className="flex min-w-0 flex-1 transition hover:opacity-80">
+                    // A study group opens its page; an exam's link is UiO's own
+                    // exam info, external, so it opens in a new tab.
+                    <Link
+                      href={item.href}
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="flex min-w-0 flex-1 transition hover:opacity-80"
+                    >
                       {body}
                     </Link>
-                  ) : (
+                  ) : item.kind === "event" ? (
                     // Your own events open for editing.
                     <button
                       type="button"
@@ -136,6 +143,8 @@ export default function DayPanel({
                     >
                       {body}
                     </button>
+                  ) : (
+                    <div className="flex min-w-0 flex-1">{body}</div>
                   )}
                   {item.done && (
                     <span className="shrink-0 rounded-md bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-600">

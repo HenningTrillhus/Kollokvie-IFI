@@ -78,3 +78,10 @@ from public.profiles;
 select relname, reloptions
 from pg_class
 where relname = 'visible_profiles' and relkind = 'v';
+
+-- 12. course_exams (offisielle eksamensdatoer, etter 0044) er skrivebeskyttet:
+--     ingen kan endre den fra appen. Forventet: ingen rader.
+select table_name, privilege_type
+from information_schema.column_privileges
+where table_schema = 'public' and table_name = 'course_exams'
+  and privilege_type in ('INSERT', 'UPDATE', 'DELETE');

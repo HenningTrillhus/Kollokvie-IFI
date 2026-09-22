@@ -18,6 +18,7 @@ import UpcomingStrip from "@/components/calendar/upcoming-strip";
 import { daysInMonth, daysUntil, toDateKey, type CalendarEvent } from "@/lib/events";
 import { buildItems, groupByDate, type CalItem } from "@/lib/calendar-items";
 import type { Pref, Prefs } from "@/lib/calendar-prefs";
+import { getCourseExams, type CourseExam } from "@/lib/course-exams";
 import { getUserCourses, type Course } from "@/lib/courses";
 import type { Group } from "@/lib/groups";
 import {
@@ -58,6 +59,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [upcoming, setUpcoming] = useState<CalendarEvent[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [courseExams, setCourseExams] = useState<CourseExam[]>([]);
   const [prefs, setPrefs] = useState<Prefs>({});
   const [myCourses, setMyCourses] = useState<Course[]>([]);
   const [extraCourses, setExtraCourses] = useState<Course[]>([]);
@@ -119,6 +121,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       });
       setPrefs(loaded);
       setMyCourses(courses);
+      getCourseExams(supabase, courses.map((c) => c.code)).then(setCourseExams);
       const upcomingList = (upcomingRows ?? []) as CalendarEvent[];
       setUpcoming(upcomingList);
 
@@ -162,15 +165,19 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     };
   }, [rangeStart, rangeEnd, currentUserId]);
 
-  const items = useMemo(() => buildItems(events, groups, prefs), [events, groups, prefs]);
+  const examTitle = t("cal.exam");
+  const items = useMemo(
+    () => buildItems(events, groups, courseExams, prefs, examTitle),
+    [events, groups, courseExams, prefs, examTitle]
+  );
   const itemsByDate = useMemo(() => groupByDate(items), [items]);
   // Coming exams and obligs; finished ones go to the back of the row.
   const upcomingItems = useMemo(() => {
-    const list = buildItems(upcoming, [], prefs).filter(
+    const list = buildItems(upcoming, [], courseExams, prefs, examTitle).filter(
       (i) => i.date >= todayKey && (i.type === "exam" || i.type === "deadline")
     );
     return [...list.filter((i) => !i.done), ...list.filter((i) => i.done)].slice(0, 10);
-  }, [upcoming, prefs, todayKey]);
+  }, [upcoming, courseExams, prefs, examTitle, todayKey]);
 
   const filterCourses: FilterCourse[] = useMemo(() => {
     const byCode = new Map<string, FilterCourse>();

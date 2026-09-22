@@ -84,6 +84,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 
 | Fil | Innhold |
 | --- | --- |
+| `0044` | `course_exams`: offisielle eksamensdatoer (skrivebeskyttet), automatisk i kalenderen for alle som har emnet |
 | `0001`–`0003` | Profiler, følgere og tilgangsrettigheter |
 | `0004`–`0006` | Profilfelter (linje, år, lenker) og aksentfarge, sletting av egen bruker |
 | `0007`–`0009` | Kalenderhendelser, emner og «mine emner» |

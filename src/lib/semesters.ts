@@ -99,3 +99,9 @@ export function shiftSemester(sem: Semester, delta: number): Semester {
 export function semesterOfMonth(year: number, month: number): Semester {
   return { year, term: month <= 5 ? "spring" : "autumn" };
 }
+
+// UiO's own short form, e.g. "2026h" (matches the "h26"/"v26" in their own
+// course URLs, just with the year first so it sorts correctly as text).
+export function semesterCode(sem: Semester): string {
+  return `${sem.year}${sem.term === "autumn" ? "h" : "v"}`;
+}

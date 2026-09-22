@@ -1,12 +1,14 @@
 import { GROUPS_KEY, NO_COURSE_KEY, colorFor, isVisible, type Prefs } from "@/lib/calendar-prefs";
+import type { CourseExam } from "@/lib/course-exams";
 import { shortTime, type CalendarEvent, type EventType } from "@/lib/events";
 import type { Group } from "@/lib/groups";
 
-// One thing on the calendar: either the user's own event or a study group
-// session, already resolved to a color and filtered by the course settings.
+// One thing on the calendar: the user's own event, a study group session, or
+// an official exam date, already resolved to a color and filtered by the
+// course settings.
 export type CalItem = {
   key: string;
-  kind: "event" | "group";
+  kind: "event" | "group" | "exam";
   id: string;
   date: string;
   time: string | null;
@@ -25,7 +27,11 @@ export type CalItem = {
 export function buildItems(
   events: CalendarEvent[],
   groups: Group[],
-  prefs: Prefs
+  exams: CourseExam[],
+  prefs: Prefs,
+  // The generic "Exam" title, translated (see cal.exam) — official exams
+  // never have their own title, same as a title-less exam you'd add yourself.
+  examTitle: string
 ): CalItem[] {
   const items: CalItem[] = [];
 
@@ -68,6 +74,25 @@ export function buildItems(
       done: false,
       completable: false,
       body: null,
+    });
+  }
+
+  for (const x of exams) {
+    if (!isVisible(prefs, x.course_code)) continue;
+    items.push({
+      key: `x-${x.id}`,
+      kind: "exam",
+      id: x.id,
+      date: x.exam_date,
+      time: shortTime(x.exam_time),
+      title: examTitle,
+      courseCode: x.course_code,
+      type: "exam",
+      color: colorFor(prefs, x.course_code),
+      href: x.source_url,
+      done: false,
+      completable: false,
+      body: x.note,
     });
   }
 
