@@ -72,3 +72,9 @@ where table_schema = 'public' and table_name = 'profiles'
 select count(*) filter (where is_private) as private_profiles,
        count(*) filter (where not is_private) as open_profiles
 from public.profiles;
+
+-- 11. visible_profiles kjører nå med spørrerens egne rettigheter, ikke eierens
+--     (etter 0042). Forventet: security_invoker finnes og er «true» i reloptions.
+select relname, reloptions
+from pg_class
+where relname = 'visible_profiles' and relkind = 'v';

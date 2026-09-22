@@ -108,6 +108,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 | `0038` | Notater i kalenderen: hendelsestypen `note` og kolonnen `body` |
 | `0039` | Profillenker kan bare være GitHub eller LinkedIn, i fast form (gamle lenker skrives om eller fjernes) |
 | `0040` | Strengere bildegrense (100 KB, bare JPEG) og tekstregler for studielinje og profilfarge |
+| `0042` | Retter Supabase sin «SECURITY DEFINER view»-varsling: `visible_profiles` kjører nå med spørrerens egne rettigheter, ikke eierens (kjør etter 0036) |
 | `0041` | Profilikoner 01–85 (var 01–65) |
 | `0026` | Innhenting: kjører 0017, 0021 og 0024 i riktig rekkefølge hvis de ble hoppet over |
 | `0025` | Sjekk om brukernavn er ledig ved registrering (`username_available`) |
@@ -248,7 +249,7 @@ Tilgjengelighetserklæringen (`/tilgjengelighet`) er en egenvurdering, ikke en r
 | Debug og feilsøking | Ingen `console.log`, `debugger` eller feilsøkingsflagg i koden. `productionBrowserSourceMaps` er av, og produksjonsbygget har ingen source maps. Dev-verktøy (feiloverlegg, `unsafe-eval` i CSP) finnes bare når du kjører `npm run dev`. |
 | Sikkerhetshoder | Målt mot et produksjonsbygg: CSP med nonce, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy (utvidet), COOP, CORP. Ingen `X-Powered-By`. Uinnloggede får omdirigering til `/login` for alle ukjente og beskyttede stier. |
 | Passord | Appen lagrer, logger og sender aldri passord selv. Passordet går direkte til Supabase Auth, som lagrer det som en saltet **bcrypt**-hash. Appen krever i tillegg minst 8 tegn, avviser vanlige og personlige passord, og logger ut andre enheter ved passordbytte. |
-| Database | Row Level Security på alle 10 tabeller, alle definer-funksjoner har fast `search_path`, uinnloggede har ingen tabelltilgang, kolonnetilgang er begrenset, kvoter og tekstregler håndheves (migrering 0031 og 0033). `supabase/audit.sql` kan du kjøre selv for å bekrefte dette mot den levende databasen. |
+| Database | Row Level Security på alle 10 tabeller, alle definer-funksjoner har fast `search_path`, uinnloggede har ingen tabelltilgang, kolonnetilgang er begrenset, kvoter og tekstregler håndheves (migrering 0031 og 0033). Visningen `visible_profiles` kjører med spørrerens egne rettigheter, ikke eierens (migrering 0042) — det som trenger utvidede rettigheter for å skjule felt på private profiler, ligger i en egen, tydelig merket funksjon i stedet. `supabase/audit.sql` kan du kjøre selv for å bekrefte dette mot den levende databasen. |
 
 #### Hastighetsgrenser: innstillinger utenfor koden
 
