@@ -3,7 +3,7 @@ import { MAX_INPUT_BYTES, MAX_PIXELS, MAX_STORED_BYTES, sniffImage } from "@/lib
 // A profile's `avatar` column is null (show the initial on the accent color),
 // "preset:NN" (one of the built-in icons) or "upload:<version>" (own picture).
 
-export const PRESET_COUNT = 65;
+export const PRESET_COUNT = 85;
 
 export const PRESET_AVATARS = Array.from(
   { length: PRESET_COUNT },

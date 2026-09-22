@@ -41,7 +41,7 @@ Det er laget av en student, for studenter, og er ikke en offisiell tjeneste fra 
 
 **Profil og personvern**
 - Åpen eller privat profil. Privat: andre ser bare navn og ikon. Åpen: også studielinje, årstrinn, emner, bio og lenker. De som følger deg ser alltid alt.
-- 65 ferdige profilikoner eller eget bilde. Følgeforespørsler må godkjennes.
+- 85 ferdige profilikoner eller eget bilde. Følgeforespørsler må godkjennes.
 - GitHub og LinkedIn legges inn som brukernavn (aldri som lenke), og siden lager veien til profilen din, så bare de to nettstedene er mulige.
 - Last ned alle dataene dine eller slett kontoen når som helst.
 
