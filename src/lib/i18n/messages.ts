@@ -277,6 +277,17 @@ export const messages = {
     en: "Accessibility feedback can be directed to the developer of the app (Henning Trillhus).",
   },
   "legal.nav": { no: "Juridisk informasjon", en: "Legal information" },
+  "bug.link": { no: "Rapporter feil", en: "Report a bug" },
+  "bug.title": { no: "Rapporter en feil", en: "Report a bug" },
+  "bug.intro": {
+    no: "Har du funnet en feil, eller noe som ikke virker som det skal? Fortell oss gjerne hva som skjedde, så ser vi på det.",
+    en: "Found a bug, or something that isn't working as it should? Let us know what happened and we'll take a look.",
+  },
+  "bug.hint": {
+    no: "Det er fint om du nevner hva du gjorde da det skjedde, og gjerne et skjermbilde hvis det er noe visuelt.",
+    en: "It helps to mention what you were doing when it happened, and a screenshot if it's something visual.",
+  },
+  "bug.button": { no: "Send e-post om feilen", en: "Email us about the bug" },
   "cookies.noticeTitle": { no: "Informasjon om informasjonskapsler", en: "Cookie information" },
   "cookies.notice": {
     no: "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema). Ingen sporing eller reklame.",

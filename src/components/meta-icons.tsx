@@ -61,3 +61,13 @@ export function SettingsIcon({ className = "h-4 w-4" }: IconProps) {
     </svg>
   );
 }
+
+export function BugIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M9 8.5V7a3 3 0 016 0v1.5" />
+      <rect x="7.5" y="8.5" width="9" height="10" rx="4.5" />
+      <path d="M12 8.5v10M4.5 11h3M16.5 11h3M4.5 15h3M16.5 15h3M6 6.5l1.5 1.5M18 6.5l-1.5 1.5M6 19.5l1.5-2M18 19.5l-1.5-2" />
+    </svg>
+  );
+}

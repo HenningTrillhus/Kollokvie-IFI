@@ -22,7 +22,7 @@ import YearPicker from "@/components/year-picker";
 import LinkHandleInput from "@/components/link-handle-input";
 import AvatarPicker from "@/components/avatar-picker";
 import { Card, Field, SectionTitle, StickyBar, inputClass } from "@/components/form-ui";
-import { ChevronRightIcon } from "@/components/meta-icons";
+import { BugIcon, ChevronRightIcon } from "@/components/meta-icons";
 import Collapsible from "@/components/collapsible";
 import { AVATAR_BUCKET, uploadedAvatarPath } from "@/lib/avatars";
 import { downloadMyData } from "@/lib/export-data";
@@ -558,6 +558,16 @@ export default function SettingsPage() {
                   <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted" />
                 </Link>
               ))}
+              <Link
+                href="/rapporter-feil"
+                className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium transition hover:bg-accent-soft/60 active:bg-accent-soft"
+              >
+                <span className="flex items-center gap-2">
+                  <BugIcon className="h-4 w-4 shrink-0 text-muted" />
+                  {t("bug.link")}
+                </span>
+                <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted" />
+              </Link>
             </div>
             {exportError && (
               <p role="alert" className="mt-2 text-xs text-red-500">

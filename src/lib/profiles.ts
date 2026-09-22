@@ -167,3 +167,37 @@ export async function getFollowCounts(
     following: number;
   };
 }
+
+// People who follow (or are followed by) userId, accepted follows only.
+export async function getFollowerProfiles(supabase: SupabaseClient, userId: string) {
+  const { data } = await supabase
+    .from("follows")
+    .select("follower_id")
+    .eq("followee_id", userId)
+    .eq("status", "accepted");
+  return getProfilesByIds(supabase, (data ?? []).map((r) => r.follower_id));
+}
+
+export async function getFollowingProfiles(supabase: SupabaseClient, userId: string) {
+  const { data } = await supabase
+    .from("follows")
+    .select("followee_id")
+    .eq("follower_id", userId)
+    .eq("status", "accepted");
+  return getProfilesByIds(supabase, (data ?? []).map((r) => r.followee_id));
+}
+
+// Whether viewerId follows targetId, and whether that follow was accepted.
+export async function getFollowStatus(
+  supabase: SupabaseClient,
+  viewerId: string,
+  targetId: string
+) {
+  const { data } = await supabase
+    .from("follows")
+    .select("status")
+    .eq("follower_id", viewerId)
+    .eq("followee_id", targetId)
+    .maybeSingle();
+  return (data?.status as "pending" | "accepted" | undefined) ?? "none";
+}

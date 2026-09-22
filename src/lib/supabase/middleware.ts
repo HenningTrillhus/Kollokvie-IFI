@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   "/vilkar",
   "/informasjonskapsler",
   "/tilgjengelighet",
+  "/rapporter-feil",
   "/glemt-passord",
   "/.well-known",
 ];

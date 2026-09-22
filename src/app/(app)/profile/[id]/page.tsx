@@ -4,9 +4,11 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   UUID_PATTERN,
   getFollowCounts,
+  getFollowStatus,
+  getFollowerProfiles,
+  getFollowingProfiles,
   getProfileById,
   getProfileByUsername,
-  getProfilesByIds,
 } from "@/lib/profiles";
 import FollowButton from "@/components/follow-button";
 import ProfileList from "@/components/profile-list";
@@ -50,24 +52,18 @@ export default async function PublicProfilePage({
   const hidden = profile.details_hidden === true;
   const shownName = profile.username ? `@${profile.username}` : profile.full_name;
 
-  const [counts, courses, { data: myFollowRow }] = await Promise.all([
+  const [counts, courses, myStatus] = await Promise.all([
     hidden ? Promise.resolve(undefined) : getFollowCounts(supabase, profile.id),
     hidden ? Promise.resolve([]) : getUserCourses(supabase, profile.id),
-    supabase
-      .from("follows")
-      .select("status")
-      .eq("follower_id", user.id)
-      .eq("followee_id", profile.id)
-      .maybeSingle(),
+    getFollowStatus(supabase, user.id, profile.id),
   ]);
-  const myStatus = (myFollowRow?.status as "pending" | "accepted" | undefined) ?? "none";
   const iFollowThem = myStatus === "accepted";
 
   // The bio follows the profile's visibility (also enforced by RLS). The
   // follow lists are only for people who follow this user.
   let bio: string | null = null;
-  let followingProfiles: Awaited<ReturnType<typeof getProfilesByIds>> = [];
-  let followerProfiles: Awaited<ReturnType<typeof getProfilesByIds>> = [];
+  let followingProfiles: Awaited<ReturnType<typeof getFollowingProfiles>> = [];
+  let followerProfiles: Awaited<ReturnType<typeof getFollowerProfiles>> = [];
 
   if (!hidden) {
     const { data: bioRow } = await supabase
@@ -79,21 +75,9 @@ export default async function PublicProfilePage({
   }
 
   if (iFollowThem) {
-    const [{ data: followingRows }, { data: followerRows }] = await Promise.all([
-      supabase
-        .from("follows")
-        .select("followee_id")
-        .eq("follower_id", profile.id)
-        .eq("status", "accepted"),
-      supabase
-        .from("follows")
-        .select("follower_id")
-        .eq("followee_id", profile.id)
-        .eq("status", "accepted"),
-    ]);
     [followingProfiles, followerProfiles] = await Promise.all([
-      getProfilesByIds(supabase, (followingRows ?? []).map((r) => r.followee_id)),
-      getProfilesByIds(supabase, (followerRows ?? []).map((r) => r.follower_id)),
+      getFollowingProfiles(supabase, profile.id),
+      getFollowerProfiles(supabase, profile.id),
     ]);
   }
 

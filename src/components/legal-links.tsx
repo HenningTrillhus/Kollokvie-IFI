@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { BugIcon } from "@/components/meta-icons";
 import { useI18n } from "@/lib/i18n/client";
 
-// Privacy / terms / cookies, as a row of small links.
+// Privacy / terms / cookies / bug reports, as a row of small links.
 export default function LegalLinks({ className = "" }: { className?: string }) {
   const { t } = useI18n();
   const link = "transition hover:text-foreground hover:underline underline-offset-2";
@@ -24,6 +25,10 @@ export default function LegalLinks({ className = "" }: { className?: string }) {
       </Link>
       <Link href="/tilgjengelighet" className={link}>
         {t("a11y.link")}
+      </Link>
+      <Link href="/rapporter-feil" className={`inline-flex items-center gap-1 ${link}`}>
+        <BugIcon className="h-3 w-3" />
+        {t("bug.link")}
       </Link>
     </nav>
   );

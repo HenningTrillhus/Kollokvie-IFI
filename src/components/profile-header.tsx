@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import Avatar from "@/components/avatar";
 import ProfileLinks from "@/components/profile-links";
 import CourseChips from "@/components/course-chips";
@@ -26,6 +27,7 @@ export default async function ProfileHeader({
   courses,
   counts,
   actions,
+  isOwn = false,
 }: {
   profile: Profile;
   bio: string | null;
@@ -33,6 +35,9 @@ export default async function ProfileHeader({
   // Left out when the profile's details are hidden from the viewer.
   counts?: { followers: number; following: number };
   actions?: ReactNode;
+  // Whether this is the signed-in user's own profile (picks the right links
+  // for the follower/following counts below).
+  isOwn?: boolean;
 }) {
   const { t, lang } = await getT();
   // The links card only exists if there is at least one valid link to show.
@@ -40,6 +45,8 @@ export default async function ProfileHeader({
     safeLinkUrl("github", profile.github_url) || safeLinkUrl("linkedin", profile.linkedin_url)
   );
   const rise = (i: number) => ({ ["--i" as string]: i });
+  const followersHref = isOwn ? "/profile/followers" : `/profile/${profile.id}/followers`;
+  const followingHref = isOwn ? "/profile/following" : `/profile/${profile.id}/following`;
 
   return (
     <div className="space-y-3">
@@ -68,15 +75,24 @@ export default async function ProfileHeader({
 
       {counts && (
         <div style={rise(1)} className="animate-rise">
-          <div className="grid grid-cols-2 divide-x divide-card-border overflow-hidden rounded-2xl border border-card-border bg-card py-3 text-center">
-            <div>
+          <div className="grid grid-cols-2 divide-x divide-card-border overflow-hidden rounded-2xl border border-card-border bg-card text-center">
+            {/* Tapping jumps to the full list on mobile, where the tabs below
+                aren't already in view; on a wide screen they're right there,
+                so the box is just a display. */}
+            <Link
+              href={followersHref}
+              className="py-3 transition active:bg-accent-soft lg:pointer-events-none lg:cursor-default"
+            >
               <p className="text-xl font-semibold leading-tight">{counts.followers}</p>
               <p className="text-xs text-muted">{t("profile.followers")}</p>
-            </div>
-            <div>
+            </Link>
+            <Link
+              href={followingHref}
+              className="py-3 transition active:bg-accent-soft lg:pointer-events-none lg:cursor-default"
+            >
               <p className="text-xl font-semibold leading-tight">{counts.following}</p>
               <p className="text-xs text-muted">{t("profile.following")}</p>
-            </div>
+            </Link>
           </div>
         </div>
       )}

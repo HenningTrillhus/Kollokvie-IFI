@@ -9,3 +9,7 @@ export const CONTROLLER_NAME = "Henning Trillhus";
 
 // Set NEXT_PUBLIC_CONTACT_EMAIL in the environment to show a contact address.
 export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || null;
+
+// Where the "report a bug" page sends people. Fixed, not an env var: it's the
+// developer's own inbox, not a general support address.
+export const BUG_REPORT_EMAIL = "henninlt@uio.no";

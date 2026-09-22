@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getFollowCounts, getProfileById, getProfilesByIds } from "@/lib/profiles";
+import {
+  getFollowCounts,
+  getFollowerProfiles,
+  getFollowingProfiles,
+  getProfileById,
+} from "@/lib/profiles";
 import { getPendingInviteCount } from "@/lib/group-invites";
 import ProfileList from "@/components/profile-list";
 import ProfileHeader from "@/components/profile-header";
@@ -26,8 +31,8 @@ export default async function OwnProfilePage() {
     courses,
     { count: pendingFollowCount },
     pendingInviteCount,
-    { data: followingRows },
-    { data: followerRows },
+    followingProfiles,
+    followerProfiles,
     { data: bioRow },
   ] = await Promise.all([
     getFollowCounts(supabase, user.id),
@@ -38,22 +43,9 @@ export default async function OwnProfilePage() {
       .eq("followee_id", user.id)
       .eq("status", "pending"),
     getPendingInviteCount(supabase, user.id),
-    supabase
-      .from("follows")
-      .select("followee_id")
-      .eq("follower_id", user.id)
-      .eq("status", "accepted"),
-    supabase
-      .from("follows")
-      .select("follower_id")
-      .eq("followee_id", user.id)
-      .eq("status", "accepted"),
+    getFollowingProfiles(supabase, user.id),
+    getFollowerProfiles(supabase, user.id),
     supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
-  ]);
-
-  const [followingProfiles, followerProfiles] = await Promise.all([
-    getProfilesByIds(supabase, (followingRows ?? []).map((r) => r.followee_id)),
-    getProfilesByIds(supabase, (followerRows ?? []).map((r) => r.follower_id)),
   ]);
 
   const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
@@ -67,6 +59,7 @@ export default async function OwnProfilePage() {
         bio={bioRow?.bio ?? null}
         courses={courses}
         counts={counts}
+        isOwn
         actions={
           <>
             <Link
