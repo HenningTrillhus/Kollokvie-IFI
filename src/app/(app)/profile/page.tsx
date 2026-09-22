@@ -1,16 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import {
-  getFollowCounts,
-  getFollowerProfiles,
-  getFollowingProfiles,
-  getProfileById,
-} from "@/lib/profiles";
+import { getFollowCounts, getProfileById } from "@/lib/profiles";
 import { getPendingInviteCount } from "@/lib/group-invites";
-import ProfileList from "@/components/profile-list";
 import ProfileHeader from "@/components/profile-header";
-import SwipeTabs from "@/components/swipe-tabs";
 import SignOutButton from "@/components/sign-out-button";
 import { ListCard, Page } from "@/components/form-ui";
 import { ChevronRightIcon } from "@/components/meta-icons";
@@ -26,34 +19,23 @@ export default async function OwnProfilePage() {
   const profile = await getProfileById(supabase, user.id);
   if (!profile) return null;
 
-  const [
-    counts,
-    courses,
-    { count: pendingFollowCount },
-    pendingInviteCount,
-    followingProfiles,
-    followerProfiles,
-    { data: bioRow },
-  ] = await Promise.all([
-    getFollowCounts(supabase, user.id),
-    getUserCourses(supabase, user.id),
-    supabase
-      .from("follows")
-      .select("*", { count: "exact", head: true })
-      .eq("followee_id", user.id)
-      .eq("status", "pending"),
-    getPendingInviteCount(supabase, user.id),
-    getFollowingProfiles(supabase, user.id),
-    getFollowerProfiles(supabase, user.id),
-    supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
-  ]);
+  const [counts, courses, { count: pendingFollowCount }, pendingInviteCount, { data: bioRow }] =
+    await Promise.all([
+      getFollowCounts(supabase, user.id),
+      getUserCourses(supabase, user.id),
+      supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("followee_id", user.id)
+        .eq("status", "pending"),
+      getPendingInviteCount(supabase, user.id),
+      supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
+    ]);
 
   const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
 
   return (
-    <Page width="wide">
-      <div className="space-y-4 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start lg:gap-5 lg:space-y-0">
-      <div className="space-y-4">
+    <Page>
       <ProfileHeader
         profile={profile}
         bio={bioRow?.bio ?? null}
@@ -91,33 +73,6 @@ export default async function OwnProfilePage() {
           </span>
         </Link>
       </ListCard>
-      </div>
-
-      <SwipeTabs
-        tabs={[
-          {
-            label: t("profile.tabFollowers"),
-            count: followerProfiles.length,
-            content: (
-              <ProfileList
-                profiles={followerProfiles}
-                emptyLabel={t("profile.noFollowers")}
-              />
-            ),
-          },
-          {
-            label: t("profile.tabFollowing"),
-            count: followingProfiles.length,
-            content: (
-              <ProfileList
-                profiles={followingProfiles}
-                emptyLabel={t("profile.followNobody")}
-              />
-            ),
-          },
-        ]}
-      />
-      </div>
     </Page>
   );
 }

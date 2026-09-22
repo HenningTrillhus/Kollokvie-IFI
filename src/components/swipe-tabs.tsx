@@ -1,15 +1,30 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { cardClass } from "@/components/form-ui";
 
 type Tab = { label: string; count?: number; content: ReactNode };
 
 // A card with tabs whose panes you can swipe between (scroll-snap) or tap.
 // Each pane is its own scroll box, so long lists don't stretch the whole page.
-export default function SwipeTabs({ tabs }: { tabs: Tab[] }) {
+export default function SwipeTabs({
+  tabs,
+  initialIndex = 0,
+}: {
+  tabs: Tab[];
+  // Which pane to start on (e.g. arriving on a "following" page/link).
+  initialIndex?: number;
+}) {
   const scroller = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(initialIndex);
+
+  // Jump to the starting pane before paint, so there's no flash of tab 0.
+  useLayoutEffect(() => {
+    const el = scroller.current;
+    if (!el || initialIndex === 0) return;
+    el.scrollLeft = initialIndex * el.clientWidth;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleScroll() {
     const el = scroller.current;

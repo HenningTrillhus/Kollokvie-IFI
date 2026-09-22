@@ -4,15 +4,17 @@ import { getAuthUser } from "@/lib/supabase/get-user";
 import {
   UUID_PATTERN,
   getFollowStatus,
+  getFollowerProfiles,
   getFollowingProfiles,
   getProfileById,
 } from "@/lib/profiles";
-import ProfileList from "@/components/profile-list";
+import ConnectionsView from "@/components/connections-view";
 import BackButton from "@/components/back-button";
-import { EmptyCard, Page, cardClass } from "@/components/form-ui";
+import { EmptyCard, Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
 
-// Someone else's following list, for mobile: see ../followers/page.tsx.
+// Someone else's following list, swipeable across to followers: see
+// ../followers/page.tsx.
 export default async function OtherFollowingPage({
   params,
 }: {
@@ -33,24 +35,34 @@ export default async function OtherFollowingPage({
   const myStatus = await getFollowStatus(supabase, user.id, profile.id);
   const iFollowThem = myStatus === "accepted";
 
-  return (
-    <Page>
-      <BackButton />
-      <h1 className="text-xl font-semibold">{t("profile.tabFollowing")}</h1>
-      {iFollowThem ? (
-        <div className={`overflow-hidden p-2 ${cardClass}`}>
-          <ProfileList
-            profiles={await getFollowingProfiles(supabase, profile.id)}
-            emptyLabel={t("profile.userFollowsNobody", { username: shownName })}
-          />
-        </div>
-      ) : (
+  if (!iFollowThem) {
+    return (
+      <Page>
+        <BackButton />
         <EmptyCard>
           {hidden
             ? t("profile.privateNotice", { name: profile.full_name })
             : t("profile.followToSee", { username: shownName })}
         </EmptyCard>
-      )}
+      </Page>
+    );
+  }
+
+  const [followers, following] = await Promise.all([
+    getFollowerProfiles(supabase, profile.id),
+    getFollowingProfiles(supabase, profile.id),
+  ]);
+
+  return (
+    <Page>
+      <BackButton />
+      <ConnectionsView
+        followers={followers}
+        following={following}
+        emptyFollowers={t("profile.noFollowers")}
+        emptyFollowing={t("profile.userFollowsNobody", { username: shownName })}
+        initialTab="following"
+      />
     </Page>
   );
 }
