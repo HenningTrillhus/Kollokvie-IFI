@@ -55,7 +55,7 @@ export default function PersonRow({
       <div className="flex items-center gap-3">
         <Link
           href={href ?? `/profile/${profile.id}`}
-          className="flex min-w-0 flex-1 items-center gap-3.5 rounded-lg"
+          className="flex min-w-0 flex-1 items-center gap-3.5 rounded-lg transition active:opacity-70"
         >
           <Avatar
             profile={profile}

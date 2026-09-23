@@ -47,7 +47,7 @@ export default function Segmented<T extends string>({
           aria-checked={value === option.value}
           disabled={disabled}
           onClick={() => onChange(option.value)}
-          className={`relative rounded-lg px-3.5 py-1.5 transition-colors disabled:opacity-70 ${
+          className={`relative rounded-lg px-3.5 py-1.5 transition-colors active:scale-95 disabled:opacity-70 disabled:active:scale-100 ${
             value === option.value ? "text-accent" : "text-muted hover:text-foreground"
           }`}
         >

@@ -86,7 +86,7 @@ export function SemesterGrid({
                   <button
                     key={key}
                     onClick={() => onPickDay(key)}
-                    className={`flex h-12 flex-col items-center justify-center gap-0.5 text-xs transition active:bg-accent-soft ${
+                    className={`flex h-12 flex-col items-center justify-center gap-0.5 text-xs transition hover:bg-accent-soft/60 active:scale-95 active:bg-accent-soft ${
                       banded ? "bg-accent-soft/60" : ""
                     } ${outside ? "opacity-35" : ""}`}
                   >
@@ -315,7 +315,7 @@ export function SemesterDeadlines({
                   <li key={item.key} className="flex items-center gap-2 pr-4 transition hover:bg-accent-soft/60">
                     <button
                       onClick={() => onPickDay(item.date)}
-                      className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-5 text-left"
+                      className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-5 text-left transition active:bg-accent-soft"
                     >
                       <div className="w-9 shrink-0 text-center leading-tight">
                         <p className={`text-base font-semibold ${overdue ? "text-red-500" : ""}`}>

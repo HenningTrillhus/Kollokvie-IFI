@@ -237,8 +237,8 @@ export default function SearchClient({
                   setMode(value);
                   setPage(1);
                 }}
-                className={`rounded-lg px-3 py-1.5 transition ${
-                  mode === value ? "bg-accent text-white" : "text-muted"
+                className={`rounded-lg px-3 py-1.5 transition active:scale-95 ${
+                  mode === value ? "bg-accent text-white" : "text-muted hover:text-foreground"
                 }`}
               >
                 {label}
@@ -281,7 +281,40 @@ export default function SearchClient({
             loading ? "opacity-60" : ""
           }`}
         >
-          {!loading && shown === 0 ? (
+          {loading && shown === 0 ? (
+            mode === "groups" ? (
+              <div className="grid gap-3 pb-1 md:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    style={{ animationDelay: `${i * 60}ms` }}
+                    className="h-36 animate-pulse rounded-2xl border border-card-border bg-accent-soft/40"
+                  />
+                ))}
+              </div>
+            ) : (
+              <ListCard>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3.5 px-4 py-3">
+                    <div
+                      style={{ animationDelay: `${i * 60}ms` }}
+                      className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-accent-soft/40"
+                    />
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <div
+                        style={{ animationDelay: `${i * 60}ms` }}
+                        className="h-3.5 w-2/5 animate-pulse rounded bg-accent-soft/40"
+                      />
+                      <div
+                        style={{ animationDelay: `${i * 60}ms` }}
+                        className="h-3 w-1/4 animate-pulse rounded bg-accent-soft/40"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </ListCard>
+            )
+          ) : !loading && shown === 0 ? (
             <EmptyCard>
               {mode === "people" ? t("search.noUsers") : t("search.noGroups")}
             </EmptyCard>

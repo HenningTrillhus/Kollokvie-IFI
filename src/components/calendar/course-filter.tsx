@@ -167,7 +167,7 @@ function PrefRow({
           aria-checked={visible}
           aria-label={t("cal.toggle", { name: label })}
           onClick={() => onToggle(!visible)}
-          className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${
+          className={`relative h-6 w-10 shrink-0 rounded-full transition-colors active:scale-95 ${
             visible ? "bg-accent" : "bg-card-border"
           }`}
         >

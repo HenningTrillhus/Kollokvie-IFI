@@ -146,9 +146,17 @@ input[type="search"]::-webkit-search-decoration {
   from { transform: translateY(100%); }
   to { transform: none; }
 }
+@keyframes sheet-down {
+  from { transform: none; }
+  to { transform: translateY(100%); }
+}
 @keyframes fade-only {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+@keyframes fade-out-only {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 @keyframes check-pop {
   0% { transform: scale(0.2); opacity: 0; }
@@ -159,7 +167,9 @@ input[type="search"]::-webkit-search-decoration {
 .animate-slide-from-right { animation: slide-from-right 0.22s ease-out both; }
 .animate-slide-from-left { animation: slide-from-left 0.22s ease-out both; }
 .animate-sheet-up { animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.animate-sheet-down { animation: sheet-down 0.2s cubic-bezier(0.32, 0.72, 0, 1) both; }
 .animate-fade-only { animation: fade-only 0.2s ease-out both; }
+.animate-fade-out-only { animation: fade-out-only 0.2s ease-out both; }
 
 /* A control that just changed state (Follow -> Requested) settles in. */
 @keyframes swap-in {
@@ -204,10 +214,12 @@ input[type="search"]::-webkit-search-decoration {
   .animate-slide-from-right,
   .animate-slide-from-left,
   .animate-sheet-up,
+  .animate-sheet-down,
   .animate-check-pop,
   .animate-pop,
   .animate-swap,
-  .animate-fade-only {
+  .animate-fade-only,
+  .animate-fade-out-only {
     animation: none;
   }
 }

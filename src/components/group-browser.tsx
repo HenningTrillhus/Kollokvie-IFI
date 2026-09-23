@@ -56,8 +56,8 @@ export default function GroupBrowser({ items }: { items: GroupCardData[] }) {
               key={value}
               type="button"
               onClick={() => setVisibility(value)}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                visibility === value ? "bg-accent text-white" : "text-muted"
+              className={`rounded-lg px-3 py-1.5 transition active:scale-95 ${
+                visibility === value ? "bg-accent text-white" : "text-muted hover:text-foreground"
               }`}
             >
               {label}
