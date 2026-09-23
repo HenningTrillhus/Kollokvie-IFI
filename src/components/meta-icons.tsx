@@ -71,3 +71,12 @@ export function BugIcon({ className = "h-4 w-4" }: IconProps) {
     </svg>
   );
 }
+
+export function FlagIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M6 3v18" />
+      <path d="M6 4h11l-2.5 4L17 12H6" />
+    </svg>
+  );
+}

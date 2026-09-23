@@ -288,6 +288,22 @@ export const messages = {
     en: "It helps to mention what you were doing when it happened, and a screenshot if it's something visual.",
   },
   "bug.button": { no: "Send e-post om feilen", en: "Email us about the bug" },
+
+  "report.link": { no: "Rapporter bruker", en: "Report user" },
+  "report.title": { no: "Rapporter {name}", en: "Report {name}" },
+  "report.intro": {
+    no: "Opplever du trakassering, mobbing, upassende bilder eller annen oppførsel som bryter reglene? Send oss en e-post, så ser vi på det.",
+    en: "Experiencing harassment, bullying, inappropriate pictures, or other behavior that breaks the rules? Email us and we'll take a look.",
+  },
+  "report.hint": {
+    no: "Fortell gjerne hva som skjedde. Vi har fylt inn hvem det gjelder for deg.",
+    en: "It helps to describe what happened. We've filled in who it's about for you.",
+  },
+  "report.button": { no: "Send e-post om brukeren", en: "Email us about this user" },
+  "report.subject": { no: "Rapporter bruker - Kollokvie@IFI", en: "Report user - Kollokvie@IFI" },
+  "report.bodyUser": { no: "Bruker", en: "User" },
+  "report.bodyId": { no: "Bruker-ID", en: "User ID" },
+  "report.bodyReason": { no: "Beskriv hva som skjedde", en: "Describe what happened" },
   "cookies.noticeTitle": { no: "Informasjon om informasjonskapsler", en: "Cookie information" },
   "cookies.notice": {
     no: "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema). Ingen sporing eller reklame.",

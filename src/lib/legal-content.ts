@@ -35,7 +35,8 @@ const termsNo: Policy = {
       heading: "4. Slik skal tjenesten brukes",
       paragraphs: ["Du skal ikke bruke tjenesten til, eller dele innhold som:"],
       bullets: [
-        "er ulovlig, truende, trakasserende, diskriminerende, hatefullt eller krenkende,",
+        "er ulovlig, truende, mobbing, trakasserende, diskriminerende, hatefullt eller krenkende,",
+        "er upassende, anstøtelige eller krenkende bilder, for eksempel som profilbilde — uavhengig av hvem som er avbildet,",
         "gir deg ut for å være en annen person, eller bruker andres navn eller bilder uten lov,",
         "bryter andres opphavsrett eller personvern, for eksempel bilder av andre uten samtykke,",
         "er spam, reklame eller masseutsendelser,",
@@ -65,7 +66,7 @@ const termsNo: Policy = {
     {
       heading: "8. Fjerning av innhold og stenging",
       paragraphs: [
-        "Vi kan fjerne innhold og stenge eller slette kontoer som bryter disse vilkårene, eller som setter andre eller tjenesten i fare. Skal vi stenge en konto, sier vi fra og forklarer hvorfor, med mindre det er urimelig, for eksempel ved alvorlig misbruk. Ser du innhold som bryter vilkårene, kan du ta kontakt (se nederst).",
+        "Vi kan fjerne innhold og stenge eller slette kontoer som bryter disse vilkårene, eller som setter andre eller tjenesten i fare. Skal vi stenge en konto, sier vi fra og forklarer hvorfor, med mindre det er urimelig, for eksempel ved alvorlig misbruk. Opplever du mobbing, trakassering, upassende bilder eller annet som bryter vilkårene, kan du trykke «Rapporter bruker» på profilen til vedkommende, eller ta kontakt (se nederst).",
       ],
     },
     {
@@ -126,7 +127,8 @@ const termsEn: Policy = {
       heading: "4. How the service may be used",
       paragraphs: ["You must not use the service for, or share, content that:"],
       bullets: [
-        "is illegal, threatening, harassing, discriminatory, hateful or abusive,",
+        "is illegal, threatening, bullying, harassing, discriminatory, hateful or abusive,",
+        "is inappropriate, indecent or offensive imagery, for example as a profile picture — regardless of who is pictured,",
         "impersonates another person, or uses someone else's name or pictures without permission,",
         "infringes others' copyright or privacy, for example pictures of others without consent,",
         "is spam, advertising or bulk messaging,",
@@ -156,7 +158,7 @@ const termsEn: Policy = {
     {
       heading: "8. Removal of content and suspension",
       paragraphs: [
-        "We may remove content and suspend or delete accounts that break these terms or put others or the service at risk. When we suspend an account we tell you and explain why, unless that is unreasonable, for example in cases of serious abuse. If you see content that breaks the terms, contact us (see the bottom of this page).",
+        "We may remove content and suspend or delete accounts that break these terms or put others or the service at risk. When we suspend an account we tell you and explain why, unless that is unreasonable, for example in cases of serious abuse. If you experience bullying, harassment, inappropriate pictures or anything else that breaks these terms, you can tap “Report user” on that person's profile, or contact us (see the bottom of this page).",
       ],
     },
     {

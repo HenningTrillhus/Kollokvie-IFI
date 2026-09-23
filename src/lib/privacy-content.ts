@@ -41,7 +41,7 @@ const no: Policy = {
       heading: "2. Hvilke opplysninger vi behandler",
       bullets: [
         "Konto: fullt navn, brukernavn og UiO-e-postadressen din (brukernavn@uio.no). Adressen bekreftes med en engangskode som sendes til den når du registrerer deg. Passordet ditt lagres kryptert (som hash) av Supabase Auth. Vi kan aldri se det.",
-        "Profil (valgfritt): studielinje, årstrinn, emner, GitHub- og LinkedIn-lenke, bio, profilbilde (et ferdig ikon eller et bilde du laster opp) og en farge.",
+        "Profil (valgfritt): studielinje, årstrinn, emner, foreninger og tittel i dem, GitHub- og LinkedIn-lenke, bio, profilbilde (et ferdig ikon eller et bilde du laster opp) og en farge.",
         "Bruk: hvem du følger og hvem som følger deg (også forespørsler), kollokviegrupper du lager, er med i eller blir invitert til, og hendelser du legger i kalenderen (for eksempel eksamener og innleveringer).",
         "Tekniske opplysninger: en innloggingsøkt i en informasjonskapsel, og valg av språk og tema. Leverandørene våre kan i tillegg logge IP-adresse og tekniske data for drift og sikkerhet.",
         "Misbruksvern: for å stoppe skript og oversvømmelse teller vi hvor mange handlinger hver bruker gjør per minutt og time (for eksempel nye hendelser eller følgeforespørsler), og serveren teller forespørsler per IP-adresse og innloggingsøkt i minnet i under ett minutt. Innloggingsøkten brukes bare som en kortlivet, uleselig etikett i telleren og lagres ikke. Grensene er satt høyt, så vanlig bruk aldri merker dem.",
@@ -58,7 +58,7 @@ const no: Policy = {
       heading: "4. Hvem kan se hva",
       bullets: [
         "Alle innloggede brukere kan alltid se navnet og profilbildet ditt (ikonet).",
-        "Er profilen din åpen, kan alle innloggede også se IFI-brukernavn, studielinje, årstrinn, emner, bio, GitHub- og LinkedIn-lenke og antall følgere og følger. Er den privat, kan bare de som følger deg (godkjent) se dette. Du bytter mellom åpen og privat i Innstillinger, og nye og eksisterende profiler er private til du selv velger noe annet.",
+        "Er profilen din åpen, kan alle innloggede også se IFI-brukernavn, studielinje, årstrinn, emner, foreninger, bio, GitHub- og LinkedIn-lenke og antall følgere og følger. Er den privat, kan bare de som følger deg (godkjent) se dette. Du bytter mellom åpen og privat i Innstillinger, og nye og eksisterende profiler er private til du selv velger noe annet.",
         "Listene over hvem du følger og hvem som følger deg kan bare ses av de som følger deg.",
         "Offentlige kollokviegrupper kan ses av alle innloggede brukere. Private kollokviegrupper kan ses av folk som følger eieren eller blir fulgt av eieren. Kollokviegrupper med «kun invitasjon» kan bare ses av medlemmer og inviterte.",
         "Kalenderhendelsene dine er bare synlige for deg.",
@@ -115,6 +115,12 @@ const no: Policy = {
       ],
     },
     {
+      heading: "8c. Rapportering av feil og brukere",
+      paragraphs: [
+        "Knappene «Rapporter feil» og «Rapporter bruker» åpner din egen e-postklient med en ferdig utfylt melding til utvikleren (henninlt@uio.no). E-posten sendes direkte fra din egen e-postkonto og går ikke via våre servere eller databasen — vi ser og lagrer den bare som en vanlig e-post i innboksen vår, på samme måte som annen e-post du sender oss.",
+      ],
+    },
+    {
       heading: "9. Sikkerhet",
       paragraphs: [
         "All trafikk går over kryptert forbindelse (HTTPS). Tilgang til dataene styres i databasen, slik at hver bruker bare får de opplysningene de har lov til å se. Passord lagres aldri i klartekst.",
@@ -165,7 +171,7 @@ const en: Policy = {
       heading: "2. What information we process",
       bullets: [
         "Account: full name, username and your UiO email address (username@uio.no). The address is confirmed with a one-time code sent to it when you sign up. Your password is stored encrypted (as a hash) by Supabase Auth. We can never see it.",
-        "Profile (optional): study program, year, courses, GitHub and LinkedIn link, bio, profile picture (a ready-made icon or a picture you upload) and a color.",
+        "Profile (optional): study program, year, courses, associations and your title in them, GitHub and LinkedIn link, bio, profile picture (a ready-made icon or a picture you upload) and a color.",
         "Usage: who you follow and who follows you (including requests), study groups you create, join or are invited to, and events you add to the calendar (for example exams and deadlines).",
         "Technical: a sign-in session in a cookie, and your language and theme choice. Our providers may also log IP addresses and technical data for operation and security.",
         "Abuse protection: to stop scripts and flooding we count how many actions each user makes per minute and hour (for example new events or follow requests), and the server counts requests per IP address and sign-in session in memory for under a minute. The sign-in session is only used as a short-lived, unreadable label in the counter and is not stored. The limits are high, so normal use never notices them.",
@@ -182,7 +188,7 @@ const en: Policy = {
       heading: "4. Who can see what",
       bullets: [
         "All signed-in users can always see your name and profile picture (icon).",
-        "If your profile is open, all signed-in users can also see your IFI username, study program, year, courses, bio, GitHub and LinkedIn links and follower counts. If it is private, only people who follow you (approved) can see this. You switch between open and private in Settings, and new and existing profiles are private until you choose otherwise.",
+        "If your profile is open, all signed-in users can also see your IFI username, study program, year, courses, associations, bio, GitHub and LinkedIn links and follower counts. If it is private, only people who follow you (approved) can see this. You switch between open and private in Settings, and new and existing profiles are private until you choose otherwise.",
         "The lists of who you follow and who follows you can only be seen by people who follow you.",
         "Public study groups can be seen by all signed-in users. Private study groups can be seen by people who follow the owner or are followed by the owner. Invite-only study groups can only be seen by members and invited people.",
         "Your calendar events are only visible to you.",
@@ -236,6 +242,12 @@ const en: Policy = {
       heading: "8b. Local storage",
       paragraphs: [
         "We also use local storage in your browser (for example to remember where you were in the search results, and that you closed the cookie information box). Everything about this is in the cookies and local storage policy.",
+      ],
+    },
+    {
+      heading: "8c. Reporting bugs and users",
+      paragraphs: [
+        "The “Report a bug” and “Report user” buttons open your own email app with a pre-filled message to the developer (henninlt@uio.no). It is sent directly from your own email account, not through our servers or database — we only see and keep it like any other email you send us.",
       ],
     },
     {

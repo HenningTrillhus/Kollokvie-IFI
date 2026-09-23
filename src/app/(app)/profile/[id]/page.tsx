@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import {
@@ -12,8 +13,10 @@ import { getUserAssociations } from "@/lib/associations";
 import FollowButton from "@/components/follow-button";
 import ProfileHeader from "@/components/profile-header";
 import BackButton from "@/components/back-button";
+import { FlagIcon } from "@/components/meta-icons";
 import { Page } from "@/components/form-ui";
 import { getUserCourses } from "@/lib/courses";
+import { getT } from "@/lib/i18n/server";
 
 // Someone else's profile. The address is their id. (Old links used the IFI
 // username, which private profiles keep hidden, so those are forwarded.)
@@ -29,6 +32,7 @@ export default async function PublicProfilePage({
   } catch {
     // malformed: use as-is
   }
+  const { t } = await getT();
   const user = await getAuthUser();
   if (!user) redirect("/login");
 
@@ -84,6 +88,14 @@ export default async function PublicProfilePage({
           />
         }
       />
+
+      <Link
+        href={`/profile/${profile.id}/rapporter`}
+        className="flex items-center justify-center gap-1.5 text-xs text-muted transition hover:text-foreground"
+      >
+        <FlagIcon className="h-3.5 w-3.5" />
+        {t("report.link")}
+      </Link>
     </Page>
   );
 }

@@ -1,5 +1,5 @@
 import { BugIcon } from "@/components/meta-icons";
-import { BUG_REPORT_EMAIL } from "@/lib/privacy";
+import { REPORT_EMAIL } from "@/lib/privacy";
 import LegalPage from "@/components/legal-page";
 import { getT } from "@/lib/i18n/server";
 
@@ -24,12 +24,12 @@ export default async function ReportBugPage() {
         <section className="space-y-3 rounded-2xl border border-card-border bg-card p-4">
           <p className="text-sm leading-relaxed text-muted">{t("bug.hint")}</p>
           <a
-            href={`mailto:${BUG_REPORT_EMAIL}?subject=${subject}`}
+            href={`mailto:${REPORT_EMAIL}?subject=${subject}`}
             className="flex h-11 items-center justify-center rounded-xl bg-accent px-4 text-sm font-medium text-white transition hover:bg-accent-hover"
           >
             {t("bug.button")}
           </a>
-          <p className="text-center text-xs text-muted">{BUG_REPORT_EMAIL}</p>
+          <p className="text-center text-xs text-muted">{REPORT_EMAIL}</p>
         </section>
       </article>
     </LegalPage>
