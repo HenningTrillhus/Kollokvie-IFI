@@ -304,13 +304,17 @@ export const messages = {
   "report.bodyUser": { no: "Bruker", en: "User" },
   "report.bodyId": { no: "Bruker-ID", en: "User ID" },
   "report.bodyReason": { no: "Beskriv hva som skjedde", en: "Describe what happened" },
-  "cookies.noticeTitle": { no: "Informasjon om informasjonskapsler", en: "Cookie information" },
-  "cookies.notice": {
-    no: "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema). Ingen sporing eller reklame.",
-    en: "We only use necessary cookies (sign-in, language and theme). No tracking or advertising.",
+  "cookies.noticeTitle": {
+    no: "Informasjon om informasjonskapsler og bruksvilkår",
+    en: "Cookie and terms information",
   },
-  "cookies.readMore": { no: "Les mer", en: "Read more" },
-  "cookies.ok": { no: "OK", en: "OK" },
+  "cookies.notice": {
+    no: "Vi bruker bare nødvendige informasjonskapsler (innlogging, språk og tema). Ingen sporing eller reklame. Ved å bruke tjenesten godtar du bruksvilkårene — blant annet ingen mobbing, trakassering eller upassende bilder.",
+    en: "We only use necessary cookies (sign-in, language and theme). No tracking or advertising. By using the service you accept the terms of service — including no bullying, harassment or inappropriate pictures.",
+  },
+  "cookies.readMore": { no: "Cookies", en: "Cookies" },
+  "cookies.termsLink": { no: "Vilkår", en: "Terms" },
+  "cookies.ok": { no: "Jeg forstår", en: "I understand" },
   "a11y.skip": { no: "Hopp til innholdet", en: "Skip to content" },
   "privacy.back": { no: "← Tilbake", en: "← Back" },
   "privacy.updated": { no: "Sist oppdatert: {date}", en: "Last updated: {date}" },

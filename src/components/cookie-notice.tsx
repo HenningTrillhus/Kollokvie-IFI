@@ -23,9 +23,11 @@ function dismissed(): boolean {
 }
 
 // We only use strictly necessary cookies, which need no consent, so this is
-// an information notice with a single "OK", not a fake choice. If analytics or
-// marketing cookies are ever added, replace it with a real accept/decline
-// banner (equal prominence) that blocks them until consent is given.
+// an information notice with a single "OK", not a fake choice — using the
+// service already means accepting the terms, this just makes sure everyone
+// has actually seen the link. If analytics or marketing cookies are ever
+// added, replace it with a real accept/decline banner (equal prominence)
+// that blocks them until consent is given.
 export default function CookieNotice() {
   const { t } = useI18n();
   // Server render and first client render: hidden (avoids a flash and mismatch).
@@ -55,6 +57,13 @@ export default function CookieNotice() {
             className="font-medium text-accent underline-offset-2 hover:text-accent-hover hover:underline"
           >
             {t("cookies.readMore")}
+          </Link>
+          {" · "}
+          <Link
+            href="/vilkar"
+            className="font-medium text-accent underline-offset-2 hover:text-accent-hover hover:underline"
+          >
+            {t("cookies.termsLink")}
           </Link>
         </p>
         <button

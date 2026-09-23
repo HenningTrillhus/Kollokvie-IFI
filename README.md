@@ -36,12 +36,15 @@ Det er laget av en student, for studenter, og er ikke en offisiell tjeneste fra 
 
 **Kalender**
 - Måned og semester (med UiOs semesterdatoer), eksamen, oblig, annet og **notater for dagen**, med emnefarger og filter.
+- Offisielle eksamensdatoer for emnene dine dukker automatisk opp i kalenderen — ingen må legge dem inn selv.
 - Legg til og endre hendelser med appens egen dato- og tidsvelger. Kollokviegruppene dine dukker opp på riktig dag.
 - På PC: to kolonner med frister og valgt dag ved siden av måneden.
 
 **Profil og personvern**
-- Åpen eller privat profil. Privat: andre ser bare navn og ikon. Åpen: også studielinje, årstrinn, emner, bio og lenker. De som følger deg ser alltid alt.
+- Åpen eller privat profil. Privat: andre ser bare navn og ikon. Åpen: også studielinje, årstrinn, emner, foreninger, bio og lenker. De som følger deg ser alltid alt.
 - 85 ferdige profilikoner eller eget bilde. Følgeforespørsler må godkjennes.
+- Foreninger: vis hvilke av IFIs studentforeninger du er med i, med egen tittel som «Intern» eller «Styreleder».
+- Følgere og følger på en egen side du kan søke og bla i (bytt mellom dem med et sveip).
 - GitHub og LinkedIn legges inn som brukernavn (aldri som lenke), og siden lager veien til profilen din, så bare de to nettstedene er mulige.
 - Last ned alle dataene dine eller slett kontoen når som helst.
 
@@ -60,6 +63,7 @@ Personvern og sikkerhet er bygget inn, ikke lagt på:
 - Sikkerhetshoder, Content-Security-Policy med nonce, rens av all tekst før lagring, kvoter og hastighetsgrenser mot misbruk.
 - Ingen sporing, reklame eller analyse. Bare nødvendige informasjonskapsler.
 - Personvernerklæring, bruksvilkår, informasjonskapsler og tilgjengelighetserklæring på norsk og engelsk.
+- Nulltoleranse for mobbing, trakassering og upassende bilder. Rapporter en feil eller en bruker direkte fra appen.
 
 Fant du en sårbarhet? Se [SECURITY.md](SECURITY.md).
 
