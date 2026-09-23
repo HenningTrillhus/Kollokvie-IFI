@@ -273,15 +273,16 @@ export default function SettingsPage() {
       }
     }
 
-    // Same idea for associations: only touch what actually changed.
+    // Same idea for associations: only touch what actually changed. Added and
+    // retitled ones both go through one upsert (user_id, association) is the
+    // primary key, so it either inserts or updates the title in place.
     const savedBySlug = new Map(savedAssociations.map((a) => [a.association, a.title]));
     const currentSlugs = new Set(cleanedAssociations.map((a) => a.association));
     const removedAssoc = savedAssociations
       .filter((a) => !currentSlugs.has(a.association))
       .map((a) => a.association);
-    const addedAssoc = cleanedAssociations.filter((a) => !savedBySlug.has(a.association));
-    const changedAssoc = cleanedAssociations.filter(
-      (a) => savedBySlug.has(a.association) && savedBySlug.get(a.association) !== a.title
+    const upsertAssoc = cleanedAssociations.filter(
+      (a) => savedBySlug.get(a.association) !== a.title
     );
     if (removedAssoc.length > 0) {
       const { error: removeAssocError } = await supabase
@@ -295,23 +296,12 @@ export default function SettingsPage() {
         return;
       }
     }
-    if (addedAssoc.length > 0) {
-      const { error: addAssocError } = await supabase
-        .from("user_associations")
-        .insert(addedAssoc.map((a) => ({ user_id: userId, association: a.association, title: a.title })));
-      if (addAssocError) {
-        setSaving(false);
-        setErrorMessage(t("common.somethingWrong"));
-        return;
-      }
-    }
-    for (const a of changedAssoc) {
-      const { error: updateAssocError } = await supabase
-        .from("user_associations")
-        .update({ title: a.title })
-        .eq("user_id", userId)
-        .eq("association", a.association);
-      if (updateAssocError) {
+    if (upsertAssoc.length > 0) {
+      const { error: upsertAssocError } = await supabase.from("user_associations").upsert(
+        upsertAssoc.map((a) => ({ user_id: userId, association: a.association, title: a.title })),
+        { onConflict: "user_id,association" }
+      );
+      if (upsertAssocError) {
         setSaving(false);
         setErrorMessage(t("common.somethingWrong"));
         return;

@@ -14,7 +14,7 @@ import FollowButton from "@/components/follow-button";
 import ProfileHeader from "@/components/profile-header";
 import BackButton from "@/components/back-button";
 import { FlagIcon } from "@/components/meta-icons";
-import { Page } from "@/components/form-ui";
+import { EmptyCard, Page } from "@/components/form-ui";
 import { getUserCourses } from "@/lib/courses";
 import { getT } from "@/lib/i18n/server";
 
@@ -88,6 +88,13 @@ export default async function PublicProfilePage({
           />
         }
       />
+
+      {/* The counts box (and so the link to the follow lists, where this same
+          notice also lives) doesn't show at all for a hidden profile, so say
+          it here too — otherwise a private profile just goes quiet. */}
+      {hidden && (
+        <EmptyCard>{t("profile.privateNotice", { name: profile.full_name })}</EmptyCard>
+      )}
 
       <Link
         href={`/profile/${profile.id}/rapporter`}

@@ -75,6 +75,7 @@ export default function DayPanel({
           <ul ref={list} className="divide-y divide-card-border px-4">
             {ordered.map((item) => {
               const isNote = item.type === "note";
+              const external = item.href?.startsWith("http") ?? false;
               const body = isNote ? (
                 <div className="flex min-w-0 flex-1 items-start gap-3">
                   <span
@@ -110,6 +111,11 @@ export default function DayPanel({
                       {item.courseCode ? ` · ${item.courseCode}` : ""}
                       {item.time ? ` · ${item.time}` : ""}
                     </p>
+                    {/* An exam's note (which variant, why there's no single
+                        time, ...) — the only place this text is shown. */}
+                    {item.body && (
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted">{item.body}</p>
+                    )}
                   </div>
                 </div>
               );
@@ -127,8 +133,8 @@ export default function DayPanel({
                     // exam info, external, so it opens in a new tab.
                     <Link
                       href={item.href}
-                      target={item.href.startsWith("http") ? "_blank" : undefined}
-                      rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noopener noreferrer" : undefined}
                       className="flex min-w-0 flex-1 transition hover:opacity-80"
                     >
                       {body}
