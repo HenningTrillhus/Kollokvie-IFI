@@ -3,7 +3,7 @@ import { MAX_INPUT_BYTES, MAX_PIXELS, MAX_STORED_BYTES, sniffImage } from "@/lib
 // A profile's `avatar` column is null (show the initial on the accent color),
 // "preset:NN" (one of the built-in icons) or "upload:<version>" (own picture).
 
-export const PRESET_COUNT = 85;
+export const PRESET_COUNT = 100;
 
 export const PRESET_AVATARS = Array.from(
   { length: PRESET_COUNT },
@@ -21,7 +21,7 @@ export function avatarSrc(userId: string, avatar: string | null | undefined) {
 
   if (avatar.startsWith("preset:")) {
     const n = avatar.slice("preset:".length);
-    return /^\d{2}$/.test(n) ? `/avatars/avatar-${n}.webp` : null;
+    return /^\d{2,3}$/.test(n) ? `/avatars/avatar-${n}.webp` : null;
   }
 
   if (avatar.startsWith("upload:")) {
