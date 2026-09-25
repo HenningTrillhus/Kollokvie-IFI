@@ -12,6 +12,7 @@ import {
   SemesterPanes,
 } from "@/components/calendar/semester-view";
 import DayPanel from "@/components/calendar/day-panel";
+import MobileDaySheet from "@/components/calendar/mobile-day-sheet";
 import AddEventForm, { type NewEvent } from "@/components/calendar/add-event-form";
 import CourseFilterPanel, { FilterChips, type FilterCourse } from "@/components/calendar/course-filter";
 import UpcomingStrip from "@/components/calendar/upcoming-strip";
@@ -541,7 +542,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
         {mode === "month" ? (
           <>
-            <div className={`flex min-h-[22rem] flex-[5] flex-col p-2.5 md:min-h-[30rem] md:p-4 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 ${cardClass}`}>
+            <div className={`relative flex min-h-[22rem] flex-[5] flex-col overflow-hidden p-2.5 md:min-h-[30rem] md:p-4 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 ${cardClass}`}>
               <MonthGrid
                 year={year}
                 month={month}
@@ -553,9 +554,29 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
                 onSelect={setSelectedDate}
                 onSwipe={changeMonth}
               />
+              {/* Mobile only: the day's items float over the grid instead of
+                  pushing it down the page (see lg:hidden sibling below for desktop). */}
+              {selectedDate && (
+                <MobileDaySheet
+                  key={selectedDate}
+                  date={selectedDate}
+                  items={itemsByDate.get(selectedDate) ?? []}
+                  onAdd={() => {
+                    setSaveError(false);
+                    setAddOpen(true);
+                  }}
+                  onEdit={(item) => {
+                    setSaveError(false);
+                    setEditing(item);
+                  }}
+                  onDelete={deleteEvent}
+                  onToggleDone={toggleDone}
+                  onClose={() => setSelectedDate(null)}
+                />
+              )}
             </div>
 
-            <div className="contents lg:col-start-2 lg:row-start-3 lg:flex lg:min-h-0 lg:flex-col lg:[&>*]:min-h-0 lg:[&>*]:flex-1">
+            <div className="hidden lg:col-start-2 lg:row-start-3 lg:flex lg:min-h-0 lg:flex-col lg:[&>*]:min-h-0 lg:[&>*]:flex-1">
               <DayPanel
                 key={selectedDate ?? "none"}
                 date={selectedDate}

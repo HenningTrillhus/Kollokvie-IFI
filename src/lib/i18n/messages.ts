@@ -738,6 +738,8 @@ export const messages = {
     no: "Klikk på en dag for å se eller legge til hendelser, som eksamener og innleveringer. Kollokviegruppene dine dukker automatisk opp på sin dato.",
     en: "Click a day to see or add events, like exams and deadlines. Your study groups show up automatically on their date.",
   },
+  "cal.sheetExpand": { no: "Vis dagen", en: "Show the day" },
+  "cal.sheetCollapse": { no: "Vis kalenderen", en: "Show the calendar" },
 } as const satisfies Record<string, { no: string; en: string }>;
 
 // English names for the study programs (stored in Norwegian in the database).

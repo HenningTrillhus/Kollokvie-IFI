@@ -19,6 +19,9 @@ export default function DayPanel({
   onEdit,
   onDelete,
   onToggleDone,
+  // True when a wrapper (MobileDaySheet) already supplies the card's border,
+  // background and rounding, e.g. because it sits above a drag handle.
+  embedded = false,
 }: {
   date: string | null;
   items: CalItem[];
@@ -26,6 +29,7 @@ export default function DayPanel({
   onEdit: (item: CalItem) => void;
   onDelete: (id: string) => void;
   onToggleDone: (item: CalItem, source: HTMLElement) => void;
+  embedded?: boolean;
 }) {
   const { t, lang } = useI18n();
   const list = useRef<HTMLUListElement>(null);
@@ -33,7 +37,9 @@ export default function DayPanel({
 
   if (!date) {
     return (
-      <section className={`flex min-h-[6rem] flex-[3] items-center justify-center p-4 text-center ${cardClass}`}>
+      <section
+        className={`flex min-h-[6rem] flex-[3] items-center justify-center p-4 text-center ${embedded ? "" : cardClass}`}
+      >
         <p className="text-sm text-muted">{t("cal.hint")}</p>
       </section>
     );
@@ -57,7 +63,9 @@ export default function DayPanel({
   ];
 
   return (
-    <section className={`flex min-h-[6rem] flex-[3] flex-col overflow-hidden ${cardClass}`}>
+    <section
+      className={`flex min-h-[6rem] flex-[3] flex-col overflow-hidden ${embedded ? "" : cardClass}`}
+    >
       <div className="flex shrink-0 items-center justify-between border-b border-card-border px-4 py-2.5">
         <h2 className="text-sm font-semibold">{heading}</h2>
         <button

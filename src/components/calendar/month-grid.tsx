@@ -135,9 +135,11 @@ export default function MonthGrid({
                   {day}
                 </span>
                 {top && (
-                  // The kind of thing that's on this day, in small print.
+                  // The kind of thing that's on this day, in small print. Only
+                  // on wide screens: "Eksamen" and friends don't fit a phone's
+                  // narrow column (that's what the dot row below is for).
                   <span
-                    className={`max-w-full truncate text-[10px] font-semibold uppercase leading-none tracking-wide [@media(max-height:700px)]:hidden lg:text-[11px] ${
+                    className={`hidden max-w-full truncate text-[11px] font-semibold uppercase leading-none tracking-wide lg:block ${
                       strong ? "text-foreground/80" : "text-muted"
                     }`}
                   >
@@ -167,7 +169,7 @@ export default function MonthGrid({
                   <span className="px-1.5 text-[10px] text-muted">+{items.length - shownOnDesktop}</span>
                 )}
               </span>
-              <span className="hidden h-1.5 gap-0.5 [@media(max-height:700px)_and_(max-width:1023px)]:flex">
+              <span className="flex h-1.5 gap-0.5 lg:hidden">
                 {items.slice(0, 4).map((item) => (
                   <span
                     key={item.key}

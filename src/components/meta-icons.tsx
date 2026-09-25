@@ -81,6 +81,14 @@ export function FlagIcon({ className = "h-4 w-4" }: IconProps) {
   );
 }
 
+export function CloseIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
 export function BellIcon({ className = "h-4 w-4" }: IconProps) {
   return (
     <svg {...base} className={className} aria-hidden>
