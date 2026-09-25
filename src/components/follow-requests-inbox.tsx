@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PersonRow from "@/components/person-row";
-import { EmptyCard, ListCard } from "@/components/form-ui";
+import { EmptyCard, ListCard, SectionTitle } from "@/components/form-ui";
 import { useI18n } from "@/lib/i18n/client";
 import type { Profile } from "@/lib/profiles";
 
@@ -53,42 +53,49 @@ export default function FollowRequestsInbox({
     router.refresh();
   }
 
-  if (requests.length === 0) {
-    return (
-      <>
-        {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
-        <EmptyCard>{t("inbox.noRequests")}</EmptyCard>
-      </>
-    );
-  }
-
   return (
-    <>
+    <section>
+      <SectionTitle
+        right={
+          requests.length > 0 ? (
+            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
+              {requests.length}
+            </span>
+          ) : null
+        }
+      >
+        {t("inbox.followRequests")}
+      </SectionTitle>
       {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
-      <ListCard>
-        {requests.map((r) => (
-          <PersonRow
-            key={r.followerId}
-            profile={r.profile}
-            below={
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => respond(r.followerId, "accept")}
-                className="h-9 rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover active:scale-95"
-              >
-                {t("common.accept")}
-              </button>
-              <button
-                onClick={() => respond(r.followerId, "decline")}
-                className="h-9 rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-95"
-              >
-                {t("common.decline")}
-              </button>
+      {requests.length === 0 ? (
+        <EmptyCard>{t("inbox.noRequests")}</EmptyCard>
+      ) : (
+        <ListCard>
+          {requests.map((r, i) => (
+            <div key={r.followerId} style={{ ["--i" as string]: i }} className="animate-rise">
+              <PersonRow
+                profile={r.profile}
+                below={
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => respond(r.followerId, "accept")}
+                      className="h-9 rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover active:scale-95"
+                    >
+                      {t("common.accept")}
+                    </button>
+                    <button
+                      onClick={() => respond(r.followerId, "decline")}
+                      className="h-9 rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-95"
+                    >
+                      {t("common.decline")}
+                    </button>
+                  </div>
+                }
+              />
             </div>
-            }
-          />
-        ))}
-      </ListCard>
-    </>
+          ))}
+        </ListCard>
+      )}
+    </section>
   );
 }

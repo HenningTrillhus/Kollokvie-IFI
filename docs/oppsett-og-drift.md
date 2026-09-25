@@ -84,6 +84,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 
 | Fil | Innhold |
 | --- | --- |
+| `0047` | Tillater `custom` i `user_associations` (egen forening, fritt navn i tittel-feltet) |
 | `0046` | Legger til Exphil og Kalkulus-emnene (EXPHIL03, MAT1100, MAT1110) og deres høst 2026-eksamener |
 | `0045` | `user_associations`: foreninger på profilen (forening + tittel), samme synlighet som bio/emner |
 | `0044` | `course_exams`: offisielle eksamensdatoer (skrivebeskyttet), automatisk i kalenderen for alle som har emnet |

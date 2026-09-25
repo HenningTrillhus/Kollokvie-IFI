@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Avatar from "@/components/avatar";
-import { EmptyCard, ListCard } from "@/components/form-ui";
+import { EmptyCard, ListCard, SectionTitle } from "@/components/form-ui";
 import { useI18n } from "@/lib/i18n/client";
 import type { PendingGroupInvite } from "@/lib/group-invites";
 
@@ -40,52 +40,59 @@ export default function GroupInvitesInbox({
     router.refresh();
   }
 
-  if (invites.length === 0) {
-    return (
-      <>
-        {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
-        <EmptyCard>{t("inbox.noInvites")}</EmptyCard>
-      </>
-    );
-  }
-
   return (
-    <>
+    <section>
+      <SectionTitle
+        right={
+          invites.length > 0 ? (
+            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
+              {invites.length}
+            </span>
+          ) : null
+        }
+      >
+        {t("inbox.groupInvites")}
+      </SectionTitle>
       {errorMessage && <p className="mb-2 text-sm text-red-500">{errorMessage}</p>}
-      <ListCard>
-        {invites.map(({ group, inviter }) => (
-          <div
-            key={group.id}
-            className="space-y-3 px-4 py-3"
-          >
-            <Link href={`/groups/${group.id}`} className="flex min-w-0 items-center gap-3">
-              {inviter && <Avatar profile={inviter} className="h-10 w-10 text-sm" />}
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{group.name}</p>
-                <p className="truncate text-xs text-muted">
-                  {inviter
-                    ? t("inbox.invitedBy", { name: inviter.full_name })
-                    : t("inbox.invitation")}
-                </p>
+      {invites.length === 0 ? (
+        <EmptyCard>{t("inbox.noInvites")}</EmptyCard>
+      ) : (
+        <ListCard>
+          {invites.map(({ group, inviter }, i) => (
+            <div
+              key={group.id}
+              style={{ ["--i" as string]: i }}
+              className="animate-rise space-y-3 px-4 py-3"
+            >
+              <Link href={`/groups/${group.id}`} className="flex min-w-0 items-center gap-3">
+                {inviter && <Avatar profile={inviter} className="h-10 w-10 text-sm" />}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{group.name}</p>
+                  <p className="truncate text-xs text-muted">
+                    {inviter
+                      ? t("inbox.invitedBy", { name: inviter.full_name })
+                      : t("inbox.invitation")}
+                  </p>
+                </div>
+              </Link>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => respond(group.id, "accept")}
+                  className="h-9 rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover active:scale-95"
+                >
+                  {t("common.accept")}
+                </button>
+                <button
+                  onClick={() => respond(group.id, "decline")}
+                  className="h-9 rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-95"
+                >
+                  {t("common.decline")}
+                </button>
               </div>
-            </Link>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => respond(group.id, "accept")}
-                className="h-9 rounded-xl bg-accent text-sm font-medium text-white transition hover:bg-accent-hover active:scale-95"
-              >
-                {t("common.accept")}
-              </button>
-              <button
-                onClick={() => respond(group.id, "decline")}
-                className="h-9 rounded-xl border border-card-border text-sm font-medium transition hover:bg-accent-soft active:scale-95"
-              >
-                {t("common.decline")}
-              </button>
             </div>
-          </div>
-        ))}
-      </ListCard>
-    </>
+          ))}
+        </ListCard>
+      )}
+    </section>
   );
 }

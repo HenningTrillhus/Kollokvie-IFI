@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ASSOCIATIONS, associationBySlug, type UserAssociation } from "@/lib/associations";
+import {
+  ASSOCIATIONS,
+  CUSTOM_ASSOCIATION,
+  associationBySlug,
+  type UserAssociation,
+} from "@/lib/associations";
 import { inputClass } from "@/components/form-ui";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -83,7 +88,11 @@ export default function AssociationMultiSelect({
                     }}
                     type="text"
                     maxLength={TITLE_MAX}
-                    placeholder={t("association.titlePlaceholder")}
+                    placeholder={
+                      item.association === CUSTOM_ASSOCIATION.slug
+                        ? t("association.customPlaceholder")
+                        : t("association.titlePlaceholder")
+                    }
                     value={item.title}
                     onChange={(e) => setTitle(item.association, e.target.value)}
                     className="mt-0.5 w-full rounded-lg border border-card-border bg-transparent px-2 py-1 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent-soft"
@@ -139,6 +148,16 @@ export default function AssociationMultiSelect({
           </div>
         )}
       </div>
+
+      {!selectedSlugs.has(CUSTOM_ASSOCIATION.slug) && (
+        <button
+          type="button"
+          onClick={() => add(CUSTOM_ASSOCIATION.slug)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-card-border py-2.5 text-sm font-medium text-accent transition hover:bg-accent-soft active:scale-[0.99]"
+        >
+          + {t("association.addCustom")}
+        </button>
+      )}
     </div>
   );
 }

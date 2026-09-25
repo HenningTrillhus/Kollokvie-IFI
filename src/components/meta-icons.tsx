@@ -80,3 +80,12 @@ export function FlagIcon({ className = "h-4 w-4" }: IconProps) {
     </svg>
   );
 }
+
+export function BellIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M6 9a6 6 0 1112 0c0 3.4 1 5.4 1.8 6.4a1 1 0 01-.8 1.6H5a1 1 0 01-.8-1.6C5 14.4 6 12.4 6 9z" />
+      <path d="M9.5 19.5a2.5 2.5 0 005 0" />
+    </svg>
+  );
+}

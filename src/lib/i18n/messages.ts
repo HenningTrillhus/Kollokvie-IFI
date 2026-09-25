@@ -489,7 +489,8 @@ export const messages = {
   },
   "inbox.invitedBy": { no: "Invitert av {name}", en: "Invited by {name}" },
   "inbox.invitation": { no: "Invitasjon", en: "Invitation" },
-  "inbox.nothingNew": { no: "Ingenting nytt", en: "Nothing new" },
+  "inbox.nothingNew": { no: "Ingenting nytt akkurat nå.", en: "Nothing new right now." },
+  "inbox.subtitleNew": { no: "{n} venter på svar", en: "{n} waiting for a reply" },
 
   // ---- profiles
   "profile.backToProfile": { no: "← Tilbake til profilen", en: "← Back to profile" },
@@ -665,6 +666,8 @@ export const messages = {
   "association.titlePlaceholder": { no: "Tittel, f.eks. Intern", en: "Title, e.g. Member" },
   "association.remove": { no: "Fjern {name}", en: "Remove {name}" },
   "association.noMatches": { no: "Fant ingen forening.", en: "No matching association." },
+  "association.addCustom": { no: "Legg til egen forening", en: "Add your own association" },
+  "association.customPlaceholder": { no: "Navn på foreningen", en: "Name of the association" },
 
   // ---- calendar
   "cal.prevMonth": { no: "Forrige måned", en: "Previous month" },

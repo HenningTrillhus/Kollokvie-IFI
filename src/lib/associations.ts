@@ -35,7 +35,19 @@ export const ASSOCIATIONS: Association[] = [
   { slug: "quizifi", name: "QuizIFI", icon: "/associations/quizifi.webp" },
 ];
 
-const BY_SLUG = new Map(ASSOCIATIONS.map((a) => [a.slug, a]));
+// Not in the pickable list (it's offered as its own "+" button instead): a
+// catch-all for a group that isn't one of the named ones above. Its own
+// typed name becomes the title shown under this icon, the same as any other
+// association's title.
+export const CUSTOM_ASSOCIATION: Association = {
+  slug: "custom",
+  name: "Annen forening",
+  icon: "/associations/custom.webp",
+};
+
+const BY_SLUG = new Map(
+  [...ASSOCIATIONS, CUSTOM_ASSOCIATION].map((a) => [a.slug, a])
+);
 
 export function associationBySlug(slug: string): Association | undefined {
   return BY_SLUG.get(slug);

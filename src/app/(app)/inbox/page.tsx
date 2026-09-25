@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getProfilesByIds } from "@/lib/profiles";
@@ -8,7 +7,9 @@ import FollowRequestsInbox, {
   type PendingRequest,
 } from "@/components/follow-requests-inbox";
 import GroupInvitesInbox from "@/components/group-invites-inbox";
-import { Page, SectionTitle } from "@/components/form-ui";
+import BackButton from "@/components/back-button";
+import { BellIcon } from "@/components/meta-icons";
+import { Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
 
 export default async function InboxPage() {
@@ -53,33 +54,38 @@ export default async function InboxPage() {
     })
     .filter((i): i is PendingGroupInvite => i !== null);
 
+  const totalPending = followRequests.length + groupInvites.length;
+
   return (
     <Page>
-      <Link
-        href="/profile"
-        className="inline-block text-sm font-medium text-muted transition hover:text-foreground"
-      >
-        {t("profile.backToProfile")}
-      </Link>
+      <BackButton />
 
-      <h1 className="text-xl font-semibold">{t("inbox.title")}</h1>
+      <div style={{ ["--i" as string]: 0 }} className="animate-rise flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+          <BellIcon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold leading-tight">{t("inbox.title")}</h1>
+          <p className="truncate text-sm text-muted">
+            {totalPending > 0 ? t("inbox.subtitleNew", { n: totalPending }) : t("inbox.nothingNew")}
+          </p>
+        </div>
+      </div>
 
-      <section>
-        <SectionTitle>{t("inbox.followRequests")}</SectionTitle>
+      <div style={{ ["--i" as string]: 1 }} className="animate-rise">
         <FollowRequestsInbox
           key={followRequests.map((r) => r.followerId).join(",")}
           initialRequests={followRequests}
           currentUserId={user.id}
         />
-      </section>
+      </div>
 
-      <section>
-        <SectionTitle>{t("inbox.groupInvites")}</SectionTitle>
+      <div style={{ ["--i" as string]: 2 }} className="animate-rise">
         <GroupInvitesInbox
           key={groupInvites.map((i) => i.group.id).join(",")}
           initialInvites={groupInvites}
         />
-      </section>
+      </div>
     </Page>
   );
 }

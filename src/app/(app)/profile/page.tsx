@@ -3,11 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
 import { getFollowCounts, getProfileById } from "@/lib/profiles";
 import { getUserAssociations } from "@/lib/associations";
-import { getPendingInviteCount } from "@/lib/group-invites";
 import ProfileHeader from "@/components/profile-header";
 import SignOutButton from "@/components/sign-out-button";
-import { ListCard, Page } from "@/components/form-ui";
-import { ChevronRightIcon } from "@/components/meta-icons";
+import { Page } from "@/components/form-ui";
 import { getUserCourses } from "@/lib/courses";
 import { getT } from "@/lib/i18n/server";
 
@@ -20,27 +18,12 @@ export default async function OwnProfilePage() {
   const profile = await getProfileById(supabase, user.id);
   if (!profile) return null;
 
-  const [
-    counts,
-    courses,
-    associations,
-    { count: pendingFollowCount },
-    pendingInviteCount,
-    { data: bioRow },
-  ] = await Promise.all([
+  const [counts, courses, associations, { data: bioRow }] = await Promise.all([
     getFollowCounts(supabase, user.id),
     getUserCourses(supabase, user.id),
     getUserAssociations(supabase, user.id),
-    supabase
-      .from("follows")
-      .select("*", { count: "exact", head: true })
-      .eq("followee_id", user.id)
-      .eq("status", "pending"),
-    getPendingInviteCount(supabase, user.id),
     supabase.from("profile_bios").select("bio").eq("user_id", user.id).maybeSingle(),
   ]);
-
-  const totalPending = (pendingFollowCount ?? 0) + pendingInviteCount;
 
   return (
     <Page>
@@ -63,25 +46,6 @@ export default async function OwnProfilePage() {
           </>
         }
       />
-
-      <ListCard>
-        <Link
-          href="/inbox"
-          className="flex items-center justify-between px-4 py-3.5 transition hover:bg-accent-soft active:bg-accent-soft"
-        >
-          <span className="text-sm font-medium">{t("inbox.title")}</span>
-          <span className="flex items-center gap-2">
-            {totalPending > 0 ? (
-              <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
-                {totalPending}
-              </span>
-            ) : (
-              <span className="text-xs text-muted">{t("inbox.nothingNew")}</span>
-            )}
-            <ChevronRightIcon className="h-4 w-4 text-muted" />
-          </span>
-        </Link>
-      </ListCard>
     </Page>
   );
 }
