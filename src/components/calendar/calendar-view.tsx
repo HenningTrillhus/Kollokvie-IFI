@@ -22,10 +22,12 @@ import type { Pref, Prefs } from "@/lib/calendar-prefs";
 import {
   getCourseDeadlines,
   getDeadlineCompletions,
+  getHiddenDeadlineIds,
+  hideDeadline,
   setDeadlineCompletion,
   type CourseDeadline,
 } from "@/lib/course-deadlines";
-import { getCourseExams, type CourseExam } from "@/lib/course-exams";
+import { getCourseExams, getHiddenExamIds, hideExam, type CourseExam } from "@/lib/course-exams";
 import { getUserCourses, type Course } from "@/lib/courses";
 import type { Group } from "@/lib/groups";
 import {
@@ -69,6 +71,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [courseExams, setCourseExams] = useState<CourseExam[]>([]);
   const [courseDeadlines, setCourseDeadlines] = useState<CourseDeadline[]>([]);
   const [completedDeadlines, setCompletedDeadlines] = useState<Set<string>>(new Set());
+  const [hiddenExamIds, setHiddenExamIds] = useState<Set<string>>(new Set());
+  const [hiddenDeadlineIds, setHiddenDeadlineIds] = useState<Set<string>>(new Set());
   const [prefs, setPrefs] = useState<Prefs>({});
   const [myCourses, setMyCourses] = useState<Course[]>([]);
   const [extraCourses, setExtraCourses] = useState<Course[]>([]);
@@ -135,10 +139,14 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
         getCourseExams(supabase, courseCodes),
         getCourseDeadlines(supabase, courseCodes),
         getDeadlineCompletions(supabase, currentUserId),
-      ]).then(([exams, deadlines, completions]) => {
+        getHiddenExamIds(supabase, currentUserId),
+        getHiddenDeadlineIds(supabase, currentUserId),
+      ]).then(([exams, deadlines, completions, hiddenExams, hiddenDeadlines]) => {
         setCourseExams(exams);
         setCourseDeadlines(deadlines);
         setCompletedDeadlines(completions);
+        setHiddenExamIds(hiddenExams);
+        setHiddenDeadlineIds(hiddenDeadlines);
       });
       const upcomingList = (upcomingRows ?? []) as CalendarEvent[];
       setUpcoming(upcomingList);
@@ -195,9 +203,22 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
         prefs,
         examTitle,
         deadlineTitle,
-        completedDeadlines
+        completedDeadlines,
+        hiddenExamIds,
+        hiddenDeadlineIds
       ),
-    [events, groups, courseExams, courseDeadlines, prefs, examTitle, deadlineTitle, completedDeadlines]
+    [
+      events,
+      groups,
+      courseExams,
+      courseDeadlines,
+      prefs,
+      examTitle,
+      deadlineTitle,
+      completedDeadlines,
+      hiddenExamIds,
+      hiddenDeadlineIds,
+    ]
   );
   const itemsByDate = useMemo(() => groupByDate(items), [items]);
   // Coming exams and obligs; finished ones go to the back of the row.
@@ -210,7 +231,9 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       prefs,
       examTitle,
       deadlineTitle,
-      completedDeadlines
+      completedDeadlines,
+      hiddenExamIds,
+      hiddenDeadlineIds
     ).filter((i) => i.date >= todayKey && (i.type === "exam" || i.type === "deadline"));
     return [...list.filter((i) => !i.done), ...list.filter((i) => i.done)].slice(0, 10);
   }, [
@@ -221,6 +244,8 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     examTitle,
     deadlineTitle,
     completedDeadlines,
+    hiddenExamIds,
+    hiddenDeadlineIds,
     todayKey,
   ]);
 
@@ -330,6 +355,61 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     if (!editing) return false;
     setSaveError(false);
     const supabase = createClient();
+
+    // First edit of an official exam/oblig: it can't be changed in place (it's
+    // shared with everyone who has the course), so instead we hide it from
+    // your calendar and add your edits as a normal event of your own — from
+    // then on it behaves exactly like one you made from scratch.
+    if (editing.kind === "exam" || editing.kind === "deadline") {
+      const payload: Record<string, unknown> = {
+        user_id: currentUserId,
+        title: v.title,
+        event_date: v.date,
+        type: v.type,
+      };
+      if (v.time) payload.event_time = v.time;
+      if (v.type === "note") payload.body = v.body;
+      if (v.course) payload.course_code = v.course.code;
+
+      const { data, error } = await supabase.from("events").insert(payload).select().single();
+      if (error || !data) {
+        setSaveError(true);
+        return false;
+      }
+      const created = data as CalendarEvent;
+      const original = editing;
+
+      if (original.kind === "exam") {
+        const { error: hideError } = await hideExam(supabase, currentUserId, original.id);
+        if (!hideError) setHiddenExamIds((prev) => new Set(prev).add(original.id));
+      } else {
+        const { error: hideError } = await hideDeadline(supabase, currentUserId, original.id);
+        if (!hideError) setHiddenDeadlineIds((prev) => new Set(prev).add(original.id));
+      }
+
+      setEvents((prev) =>
+        [...prev, created]
+          .filter((e) => e.event_date >= rangeStart && e.event_date <= rangeEnd)
+          .sort((a, b) => a.event_date.localeCompare(b.event_date))
+      );
+      if ((created.type === "exam" || created.type === "deadline") && created.event_date >= todayKey) {
+        setUpcoming((prev) =>
+          [...prev, created].sort(
+            (a, b) =>
+              a.event_date.localeCompare(b.event_date) ||
+              (a.event_time ?? "").localeCompare(b.event_time ?? "")
+          )
+        );
+      }
+      if (v.course) {
+        const course = v.course;
+        setExtraCourses((prev) => (prev.some((c) => c.code === course.code) ? prev : [...prev, course]));
+      }
+      setEditing(null);
+      if (created.event_date !== original.date) pickDate(created.event_date);
+      return true;
+    }
+
     const patch: Record<string, unknown> = {
       title: v.title,
       event_date: v.date,
@@ -429,12 +509,25 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
     }
   }
 
-  async function deleteEvent(id: string) {
+  // Deleting an official exam/oblig can't remove the shared row (everyone
+  // else with the course still has it) — it just hides that one from you.
+  async function deleteEvent(item: CalItem) {
     const supabase = createClient();
-    const { error } = await supabase.from("events").delete().eq("id", id);
+    if (item.kind === "exam" || item.kind === "deadline") {
+      const { error } =
+        item.kind === "exam"
+          ? await hideExam(supabase, currentUserId, item.id)
+          : await hideDeadline(supabase, currentUserId, item.id);
+      if (!error) {
+        if (item.kind === "exam") setHiddenExamIds((prev) => new Set(prev).add(item.id));
+        else setHiddenDeadlineIds((prev) => new Set(prev).add(item.id));
+      }
+      return;
+    }
+    const { error } = await supabase.from("events").delete().eq("id", item.id);
     if (!error) {
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-      setUpcoming((prev) => prev.filter((e) => e.id !== id));
+      setEvents((prev) => prev.filter((e) => e.id !== item.id));
+      setUpcoming((prev) => prev.filter((e) => e.id !== item.id));
     }
   }
 

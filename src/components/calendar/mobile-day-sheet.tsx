@@ -28,7 +28,7 @@ export default function MobileDaySheet({
   items: CalItem[];
   onAdd: () => void;
   onEdit: (item: CalItem) => void;
-  onDelete: (id: string) => void;
+  onDelete: (item: CalItem) => void;
   onToggleDone: (item: CalItem, source: HTMLElement) => void;
   onClose: () => void;
 }) {

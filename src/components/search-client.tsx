@@ -221,6 +221,7 @@ export default function SearchClient({
 
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-2.5 px-4 pb-2.5 pt-2.5 md:max-w-3xl md:gap-3 md:px-6 md:pb-4 md:pt-5">
+      <h1 className="sr-only">{t("nav.search")}</h1>
       <div className="shrink-0">
         <Card className="space-y-3">
           <div className="grid grid-cols-2 rounded-xl border border-card-border p-1 text-sm font-medium">

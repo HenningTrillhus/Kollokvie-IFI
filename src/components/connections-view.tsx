@@ -47,6 +47,7 @@ export default function ConnectionsView({
 
   return (
     <div className="space-y-3">
+      <h1 className="sr-only">{t("profile.connectionsTitle")}</h1>
       <SearchInput
         value={query}
         onChange={setQuery}

@@ -21,6 +21,20 @@ export async function getCourseDeadlines(supabase: SupabaseClient, courseCodes: 
   return (data ?? []) as CourseDeadline[];
 }
 
+// Which official obliger you've edited or deleted (see user_hidden_deadlines,
+// migration 0050) — hidden from your calendar from then on.
+export async function getHiddenDeadlineIds(supabase: SupabaseClient, userId: string) {
+  const { data } = await supabase
+    .from("user_hidden_deadlines")
+    .select("deadline_id")
+    .eq("user_id", userId);
+  return new Set((data ?? []).map((r) => r.deadline_id as string));
+}
+
+export function hideDeadline(supabase: SupabaseClient, userId: string, deadlineId: string) {
+  return supabase.from("user_hidden_deadlines").insert({ user_id: userId, deadline_id: deadlineId });
+}
+
 // Which of your automatically-added obliger you've ticked off (see
 // user_deadline_completions, migration 0049). course_deadlines itself is
 // shared and read-only, so "done" can't live on that row.

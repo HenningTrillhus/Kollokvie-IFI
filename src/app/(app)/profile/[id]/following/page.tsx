@@ -39,6 +39,7 @@ export default async function OtherFollowingPage({
     return (
       <Page>
         <BackButton />
+        <h1 className="sr-only">{t("profile.connectionsTitle")}</h1>
         <EmptyCard>
           {hidden
             ? t("profile.privateNotice", { name: profile.full_name })

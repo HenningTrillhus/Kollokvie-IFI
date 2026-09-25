@@ -510,6 +510,7 @@ export const messages = {
   "profile.following": { no: "følger", en: "following" },
   "profile.tabFollowers": { no: "Følgere", en: "Followers" },
   "profile.tabFollowing": { no: "Følger", en: "Following" },
+  "profile.connectionsTitle": { no: "Følgere og følger", en: "Followers and following" },
   "profile.noFollowers": { no: "Ingen følgere ennå.", en: "No followers yet." },
   "profile.followNobody": { no: "Du følger ingen ennå.", en: "You're not following anyone yet." },
   "profile.userFollowsNobody": {

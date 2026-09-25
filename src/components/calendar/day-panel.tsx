@@ -27,7 +27,7 @@ export default function DayPanel({
   items: CalItem[];
   onAdd: () => void;
   onEdit: (item: CalItem) => void;
-  onDelete: (id: string) => void;
+  onDelete: (item: CalItem) => void;
   onToggleDone: (item: CalItem, source: HTMLElement) => void;
   embedded?: boolean;
 }) {
@@ -83,6 +83,7 @@ export default function DayPanel({
           <ul ref={list} className="divide-y divide-card-border px-4">
             {ordered.map((item) => {
               const isNote = item.type === "note";
+              const editable = item.kind === "event" || item.kind === "exam" || item.kind === "deadline";
               const external = item.href?.startsWith("http") ?? false;
               const body = isNote ? (
                 <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -165,7 +166,7 @@ export default function DayPanel({
                       {t("cal.done")}
                     </span>
                   )}
-                  {item.kind === "event" && (
+                  {editable && (
                     <button
                       type="button"
                       onClick={() => onEdit(item)}
@@ -177,9 +178,9 @@ export default function DayPanel({
                       </svg>
                     </button>
                   )}
-                  {item.kind === "event" && (
+                  {editable && (
                     <button
-                      onClick={() => onDelete(item.id)}
+                      onClick={() => onDelete(item)}
                       aria-label={t("cal.deleteEvent")}
                       className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-muted transition hover:bg-red-500/10 hover:text-red-500"
                     >

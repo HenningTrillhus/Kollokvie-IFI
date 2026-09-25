@@ -37,7 +37,12 @@ export function buildItems(
   examTitle: string,
   deadlineTitle: string,
   // Which automatically-added obliger you've ticked off (course_deadlines.id).
-  completedDeadlineIds: Set<string> = new Set()
+  completedDeadlineIds: Set<string> = new Set(),
+  // Official exams/obliger you've edited or deleted (see user_hidden_exams /
+  // user_hidden_deadlines) — once hidden, an edited one lives on as a normal
+  // event instead, so it isn't dropped, just no longer shown twice.
+  hiddenExamIds: Set<string> = new Set(),
+  hiddenDeadlineIds: Set<string> = new Set()
 ): CalItem[] {
   const items: CalItem[] = [];
 
@@ -84,7 +89,7 @@ export function buildItems(
   }
 
   for (const x of exams) {
-    if (!isVisible(prefs, x.course_code)) continue;
+    if (!isVisible(prefs, x.course_code) || hiddenExamIds.has(x.id)) continue;
     items.push({
       key: `x-${x.id}`,
       kind: "exam",
@@ -103,7 +108,7 @@ export function buildItems(
   }
 
   for (const d of deadlines) {
-    if (!isVisible(prefs, d.course_code)) continue;
+    if (!isVisible(prefs, d.course_code) || hiddenDeadlineIds.has(d.id)) continue;
     items.push({
       key: `d-${d.id}`,
       kind: "deadline",
