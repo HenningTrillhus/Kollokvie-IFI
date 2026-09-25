@@ -84,6 +84,7 @@ Kjør filene i `supabase/migrations` i **Supabase → SQL Editor**, i rekkefølg
 
 | Fil | Innhold |
 | --- | --- |
+| `0049` | `user_deadline_completions`: huker av automatisk lagt-inn obliger, per bruker |
 | `0048` | `course_deadlines`: offisielle oblig-frister (skrivebeskyttet), samme prinsipp som `course_exams` |
 | `0047` | Tillater `custom` i `user_associations` (egen forening, fritt navn i tittel-feltet) |
 | `0046` | Legger til Exphil og Kalkulus-emnene (EXPHIL03, MAT1100, MAT1110) og deres høst 2026-eksamener |

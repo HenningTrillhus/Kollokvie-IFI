@@ -282,9 +282,14 @@ export function SemesterDeadlines({
   const range = semesterRange(semester);
   const monthNames = t("cal.months").split("|");
 
+  // Old obliger and exams just clutter this list once they've passed — once
+  // today moves past them they drop off instead of piling up all semester.
   const deadlines = items.filter(
     (i) =>
-      (i.type === "exam" || i.type === "deadline") && i.date >= range.start && i.date <= range.end
+      (i.type === "exam" || i.type === "deadline") &&
+      i.date >= todayKey &&
+      i.date >= range.start &&
+      i.date <= range.end
   );
   const byMonth = new Map<number, CalItem[]>();
   deadlines.forEach((i) => {
@@ -310,7 +315,6 @@ export function SemesterDeadlines({
               {list.map((item) => {
                 const date = parseKey(item.date);
                 const weekday = date.toLocaleDateString(localeFor(lang), { weekday: "short" });
-                const overdue = item.date < todayKey && !item.done;
                 return (
                   <li key={item.key} className="flex items-center gap-2 pr-4 transition hover:bg-accent-soft/60">
                     <button
@@ -318,9 +322,7 @@ export function SemesterDeadlines({
                       className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-5 text-left transition active:bg-accent-soft"
                     >
                       <div className="w-9 shrink-0 text-center leading-tight">
-                        <p className={`text-base font-semibold ${overdue ? "text-red-500" : ""}`}>
-                          {date.getDate()}
-                        </p>
+                        <p className="text-base font-semibold">{date.getDate()}</p>
                         <p className="text-[10px] uppercase text-muted">{weekday}</p>
                       </div>
                       <span

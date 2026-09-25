@@ -35,7 +35,9 @@ export function buildItems(
   // official exams and obliger never have their own title, same as a
   // title-less one you'd add yourself.
   examTitle: string,
-  deadlineTitle: string
+  deadlineTitle: string,
+  // Which automatically-added obliger you've ticked off (course_deadlines.id).
+  completedDeadlineIds: Set<string> = new Set()
 ): CalItem[] {
   const items: CalItem[] = [];
 
@@ -113,8 +115,8 @@ export function buildItems(
       type: "deadline",
       color: colorFor(prefs, d.course_code),
       href: d.source_url,
-      done: false,
-      completable: false,
+      done: completedDeadlineIds.has(d.id),
+      completable: true,
       body: d.note,
     });
   }

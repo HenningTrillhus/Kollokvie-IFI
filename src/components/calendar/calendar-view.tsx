@@ -19,7 +19,12 @@ import UpcomingStrip from "@/components/calendar/upcoming-strip";
 import { daysInMonth, daysUntil, toDateKey, type CalendarEvent } from "@/lib/events";
 import { buildItems, groupByDate, type CalItem } from "@/lib/calendar-items";
 import type { Pref, Prefs } from "@/lib/calendar-prefs";
-import { getCourseDeadlines, type CourseDeadline } from "@/lib/course-deadlines";
+import {
+  getCourseDeadlines,
+  getDeadlineCompletions,
+  setDeadlineCompletion,
+  type CourseDeadline,
+} from "@/lib/course-deadlines";
 import { getCourseExams, type CourseExam } from "@/lib/course-exams";
 import { getUserCourses, type Course } from "@/lib/courses";
 import type { Group } from "@/lib/groups";
@@ -63,6 +68,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const [groups, setGroups] = useState<Group[]>([]);
   const [courseExams, setCourseExams] = useState<CourseExam[]>([]);
   const [courseDeadlines, setCourseDeadlines] = useState<CourseDeadline[]>([]);
+  const [completedDeadlines, setCompletedDeadlines] = useState<Set<string>>(new Set());
   const [prefs, setPrefs] = useState<Prefs>({});
   const [myCourses, setMyCourses] = useState<Course[]>([]);
   const [extraCourses, setExtraCourses] = useState<Course[]>([]);
@@ -128,9 +134,11 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       Promise.all([
         getCourseExams(supabase, courseCodes),
         getCourseDeadlines(supabase, courseCodes),
-      ]).then(([exams, deadlines]) => {
+        getDeadlineCompletions(supabase, currentUserId),
+      ]).then(([exams, deadlines, completions]) => {
         setCourseExams(exams);
         setCourseDeadlines(deadlines);
+        setCompletedDeadlines(completions);
       });
       const upcomingList = (upcomingRows ?? []) as CalendarEvent[];
       setUpcoming(upcomingList);
@@ -178,8 +186,18 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   const examTitle = t("cal.exam");
   const deadlineTitle = t("cal.oblig");
   const items = useMemo(
-    () => buildItems(events, groups, courseExams, courseDeadlines, prefs, examTitle, deadlineTitle),
-    [events, groups, courseExams, courseDeadlines, prefs, examTitle, deadlineTitle]
+    () =>
+      buildItems(
+        events,
+        groups,
+        courseExams,
+        courseDeadlines,
+        prefs,
+        examTitle,
+        deadlineTitle,
+        completedDeadlines
+      ),
+    [events, groups, courseExams, courseDeadlines, prefs, examTitle, deadlineTitle, completedDeadlines]
   );
   const itemsByDate = useMemo(() => groupByDate(items), [items]);
   // Coming exams and obligs; finished ones go to the back of the row.
@@ -191,10 +209,20 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
       courseDeadlines,
       prefs,
       examTitle,
-      deadlineTitle
+      deadlineTitle,
+      completedDeadlines
     ).filter((i) => i.date >= todayKey && (i.type === "exam" || i.type === "deadline"));
     return [...list.filter((i) => !i.done), ...list.filter((i) => i.done)].slice(0, 10);
-  }, [upcoming, courseExams, courseDeadlines, prefs, examTitle, deadlineTitle, todayKey]);
+  }, [
+    upcoming,
+    courseExams,
+    courseDeadlines,
+    prefs,
+    examTitle,
+    deadlineTitle,
+    completedDeadlines,
+    todayKey,
+  ]);
 
   const filterCourses: FilterCourse[] = useMemo(() => {
     const byCode = new Map<string, FilterCourse>();
@@ -357,7 +385,33 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
   // Mark an oblig / other event as done (or undo it). Optimistic: it moves and
   // the confetti fires at once; if saving fails it goes back.
   async function toggleDone(item: CalItem, source?: HTMLElement) {
-    if (item.kind !== "event" || !item.completable) return;
+    if (!item.completable) return;
+
+    if (item.kind === "deadline") {
+      const wasDone = completedDeadlines.has(item.id);
+      const next = !wasDone;
+      setCompletedDeadlines((prev) => {
+        const copy = new Set(prev);
+        if (next) copy.add(item.id);
+        else copy.delete(item.id);
+        return copy;
+      });
+      if (next && source) confettiFrom(source);
+
+      const supabase = createClient();
+      const { error } = await setDeadlineCompletion(supabase, currentUserId, item.id, next);
+      if (error) {
+        setCompletedDeadlines((prev) => {
+          const copy = new Set(prev);
+          if (wasDone) copy.add(item.id);
+          else copy.delete(item.id);
+          return copy;
+        });
+      }
+      return;
+    }
+
+    if (item.kind !== "event") return;
     const previous = events.find((e) => e.id === item.id)?.completed_at ?? null;
     const next = item.done ? null : new Date().toISOString();
     const apply = (stamp: string | null) => (list: CalendarEvent[]) =>

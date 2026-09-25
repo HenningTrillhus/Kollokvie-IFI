@@ -86,3 +86,11 @@ select table_name, privilege_type
 from information_schema.column_privileges
 where table_schema = 'public' and table_name in ('course_exams', 'course_deadlines')
   and privilege_type in ('INSERT', 'UPDATE', 'DELETE');
+
+-- 13. user_deadline_completions (huk av på obliger, etter 0049): ingen UPDATE-
+--     rettighet finnes (bare huk av / fjern), det gir ingen mening å endre en rad.
+--     Forventet: ingen rader.
+select table_name, privilege_type
+from information_schema.role_table_grants
+where table_schema = 'public' and table_name = 'user_deadline_completions'
+  and grantee = 'authenticated' and privilege_type = 'UPDATE';

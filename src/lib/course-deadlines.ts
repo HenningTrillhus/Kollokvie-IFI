@@ -20,3 +20,32 @@ export async function getCourseDeadlines(supabase: SupabaseClient, courseCodes: 
   const { data } = await supabase.from("course_deadlines").select("*").in("course_code", codes);
   return (data ?? []) as CourseDeadline[];
 }
+
+// Which of your automatically-added obliger you've ticked off (see
+// user_deadline_completions, migration 0049). course_deadlines itself is
+// shared and read-only, so "done" can't live on that row.
+export async function getDeadlineCompletions(supabase: SupabaseClient, userId: string) {
+  const { data } = await supabase
+    .from("user_deadline_completions")
+    .select("deadline_id")
+    .eq("user_id", userId);
+  return new Set((data ?? []).map((r) => r.deadline_id as string));
+}
+
+export async function setDeadlineCompletion(
+  supabase: SupabaseClient,
+  userId: string,
+  deadlineId: string,
+  done: boolean
+) {
+  if (done) {
+    return supabase
+      .from("user_deadline_completions")
+      .upsert({ user_id: userId, deadline_id: deadlineId }, { onConflict: "user_id,deadline_id" });
+  }
+  return supabase
+    .from("user_deadline_completions")
+    .delete()
+    .eq("user_id", userId)
+    .eq("deadline_id", deadlineId);
+}
