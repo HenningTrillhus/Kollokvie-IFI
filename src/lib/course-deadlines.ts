@@ -39,9 +39,13 @@ export async function setDeadlineCompletion(
   done: boolean
 ) {
   if (done) {
-    return supabase
-      .from("user_deadline_completions")
-      .upsert({ user_id: userId, deadline_id: deadlineId }, { onConflict: "user_id,deadline_id" });
+    // ignoreDuplicates -> ON CONFLICT DO NOTHING instead of DO UPDATE: there's
+    // nothing to update (the row's mere existence is the "done" state), and
+    // DO UPDATE would need an update grant/policy we don't otherwise need.
+    return supabase.from("user_deadline_completions").upsert(
+      { user_id: userId, deadline_id: deadlineId },
+      { onConflict: "user_id,deadline_id", ignoreDuplicates: true }
+    );
   }
   return supabase
     .from("user_deadline_completions")
