@@ -6,7 +6,6 @@ import { getProfilesByIds } from "@/lib/profiles";
 import { getGroupMemberCount, VISIBILITY_KEYS, type Group } from "@/lib/groups";
 import ProfileList from "@/components/profile-list";
 import GroupJoinButton from "@/components/group-join-button";
-import DeleteGroupButton from "@/components/delete-group-button";
 import GroupInvitePanel from "@/components/group-invite-panel";
 import { Card, Page, SectionTitle } from "@/components/form-ui";
 import { ClockIcon, PeopleIcon, PinIcon, SettingsIcon } from "@/components/meta-icons";
@@ -124,10 +123,8 @@ export default async function GroupDetailPage({
           )}
         </ul>
 
-        <div className="pt-1">
-          {isOwner ? (
-            <DeleteGroupButton groupId={typedGroup.id} />
-          ) : (
+        {!isOwner && (
+          <div className="pt-1">
             <GroupJoinButton
               groupId={typedGroup.id}
               currentUserId={user.id}
@@ -136,15 +133,15 @@ export default async function GroupDetailPage({
               canJoin={Boolean(canJoinData)}
               leaveGoesToList={typedGroup.visibility !== "public"}
             />
-          )}
-          {!isOwner && !isMember && !canJoinData && (
-            <p className="mt-2 text-xs text-muted">
-              {typedGroup.visibility === "invite"
-                ? t("group.mustBeInvited")
-                : t("group.mustFollowOwner")}
-            </p>
-          )}
-        </div>
+            {!isMember && !canJoinData && (
+              <p className="mt-2 text-xs text-muted">
+                {typedGroup.visibility === "invite"
+                  ? t("group.mustBeInvited")
+                  : t("group.mustFollowOwner")}
+              </p>
+            )}
+          </div>
+        )}
       </Card>
 
       <div className="space-y-4">

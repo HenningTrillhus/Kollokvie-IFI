@@ -460,6 +460,10 @@ export const messages = {
   "group.leave": { no: "Forlat kollokviegruppe", en: "Leave study group" },
   "group.fullBadge": { no: "Full", en: "Full" },
   "group.delete": { no: "Slett kollokviegruppe", en: "Delete study group" },
+  "group.deleteHint": {
+    no: "Dette sletter kollokviegruppa for godt, inkludert medlemslisten og invitasjoner. Kan ikke angres.",
+    en: "This permanently deletes the study group, including its member list and invitations. It can't be undone.",
+  },
   "group.deleteConfirm": { no: "Ja, slett kollokviegruppa", en: "Yes, delete the study group" },
   "group.settingsTitle": {
     no: "Innstillinger for kollokviegruppa",

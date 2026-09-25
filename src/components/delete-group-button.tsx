@@ -26,23 +26,29 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
     router.refresh();
   }
 
-  const base = "h-11 rounded-xl text-sm font-medium transition active:scale-[0.99] disabled:opacity-60";
-
   return (
-    <div className="w-full">
+    <div className="rounded-2xl border border-red-500/30 bg-card p-4">
+      <h2 className="text-sm font-semibold text-red-500">{t("group.delete")}</h2>
+      <p className="mt-1 text-xs text-muted">{t("group.deleteHint")}</p>
+      {errorMessage && (
+        <p role="alert" className="mt-2 text-xs text-red-500">
+          {errorMessage}
+        </p>
+      )}
+
       {confirming ? (
-        <div className="flex gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className={`${base} flex-1 bg-red-500 text-white hover:bg-red-600`}
+            className="h-9 rounded-xl bg-red-500 text-xs font-medium text-white transition hover:bg-red-600 active:scale-[0.98] disabled:opacity-60"
           >
             {deleting ? t("common.deleting") : t("group.deleteConfirm")}
           </button>
           <button
             onClick={() => setConfirming(false)}
             disabled={deleting}
-            className={`${base} border border-card-border px-4 hover:bg-accent-soft`}
+            className="h-9 rounded-xl border border-card-border text-xs font-medium transition hover:bg-accent-soft active:scale-[0.98]"
           >
             {t("common.cancel")}
           </button>
@@ -50,12 +56,11 @@ export default function DeleteGroupButton({ groupId }: { groupId: string }) {
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className={`${base} w-full border border-red-500/30 text-red-500 hover:bg-red-500/10`}
+          className="mt-3 rounded-lg border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10 active:scale-95"
         >
           {t("group.delete")}
         </button>
       )}
-      {errorMessage && <p className="mt-2 text-xs text-red-500">{errorMessage}</p>}
     </div>
   );
 }

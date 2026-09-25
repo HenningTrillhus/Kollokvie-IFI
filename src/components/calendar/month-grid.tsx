@@ -98,8 +98,9 @@ export default function MonthGrid({
           const top = [...items].sort((a, b) => rank(a) - rank(b))[0];
           const label = top ? (top.type ? t(EVENT_TYPE_KEYS[top.type]) : t("cal.groupShort")) : "";
           const strong = top ? rank(top) <= 1 : false;
-          // Two lines per event (title + course) when there are courses to show.
-          const shownOnDesktop = items.some((i) => i.courseCode) ? 2 : 3;
+          // One line per event (title, then course if there's one) so a full
+          // week of busy days still has room for a few of them.
+          const shownOnDesktop = 3;
 
           return (
             <button
@@ -112,7 +113,7 @@ export default function MonthGrid({
                     }
                   : undefined
               }
-              className={`relative flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-1.5 lg:active:scale-[0.99] ${
+              className={`relative flex min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition active:scale-95 lg:items-stretch lg:justify-start lg:gap-1 lg:overflow-hidden lg:p-2 lg:active:scale-[0.99] ${
                 isSelected
                   ? "border-accent bg-accent-soft"
                   : "border-transparent hover:bg-accent-soft/60 lg:border-card-border/60"
@@ -136,7 +137,7 @@ export default function MonthGrid({
                 {top && (
                   // The kind of thing that's on this day, in small print.
                   <span
-                    className={`max-w-full truncate text-[9px] font-semibold uppercase leading-none tracking-wide [@media(max-height:700px)]:hidden lg:text-[10px] ${
+                    className={`max-w-full truncate text-[10px] font-semibold uppercase leading-none tracking-wide [@media(max-height:700px)]:hidden lg:text-[11px] ${
                       strong ? "text-foreground/80" : "text-muted"
                     }`}
                   >
@@ -145,27 +146,25 @@ export default function MonthGrid({
                   </span>
                 )}
               </span>
-              {/* Wide screens have room for the titles themselves. */}
-              <span className="hidden min-h-0 flex-col gap-0.5 text-left lg:flex">
+              {/* Wide screens have room for the titles themselves, one line
+                  each (title, then course) so a busy day still fits a few. */}
+              <span className="hidden min-h-0 flex-col gap-1 text-left lg:flex">
                 {items.slice(0, shownOnDesktop).map((item) => (
                   <span
                     key={item.key}
                     style={{ borderLeft: `3px solid ${item.color}` }}
-                    className={`block min-w-0 rounded-sm bg-accent-soft/70 px-1 py-px ${
+                    className={`flex min-w-0 items-baseline gap-1 rounded-sm bg-accent-soft/70 px-1.5 py-0.5 text-[11px] leading-4 ${
                       item.done ? "text-muted line-through" : ""
                     }`}
                   >
-                    <span className="block truncate text-[11px] font-medium leading-4">{item.title}</span>
-                    {/* The course sits under the title (wide screens only). */}
+                    <span className="min-w-0 truncate font-medium">{item.title}</span>
                     {item.courseCode && (
-                      <span className="block truncate text-[10px] leading-3 text-muted">
-                        {item.courseCode}
-                      </span>
+                      <span className="shrink-0 text-muted">{item.courseCode}</span>
                     )}
                   </span>
                 ))}
                 {items.length > shownOnDesktop && (
-                  <span className="px-1 text-[10px] text-muted">+{items.length - shownOnDesktop}</span>
+                  <span className="px-1.5 text-[10px] text-muted">+{items.length - shownOnDesktop}</span>
                 )}
               </span>
               <span className="hidden h-1.5 gap-0.5 [@media(max-height:700px)_and_(max-width:1023px)]:flex">

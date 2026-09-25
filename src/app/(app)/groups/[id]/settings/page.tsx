@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getUserCourses, type Course } from "@/lib/courses";
 import GroupForm, { type GroupFormValues } from "@/components/group-form";
+import DeleteGroupButton from "@/components/delete-group-button";
 import { useI18n } from "@/lib/i18n/client";
 import type { Group } from "@/lib/groups";
 
@@ -128,6 +129,10 @@ export default function GroupSettingsPage() {
         showSaved
         onSubmit={save}
       />
+
+      <div className="mb-8 mt-6">
+        <DeleteGroupButton groupId={groupId} />
+      </div>
     </div>
   );
 }

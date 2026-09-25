@@ -541,7 +541,7 @@ export default function CalendarView({ currentUserId }: { currentUserId: string 
 
         {mode === "month" ? (
           <>
-            <div className={`flex min-h-[14rem] flex-[5] flex-col p-2.5 md:min-h-[22rem] md:p-4 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 ${cardClass}`}>
+            <div className={`flex min-h-[22rem] flex-[5] flex-col p-2.5 md:min-h-[30rem] md:p-4 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 ${cardClass}`}>
               <MonthGrid
                 year={year}
                 month={month}
