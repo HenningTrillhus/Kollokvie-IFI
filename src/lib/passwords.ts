@@ -5,9 +5,6 @@ import type { MessageKey } from "@/lib/i18n";
 // same minimum in Supabase → Authentication → Sign In / Providers → Email.
 export const MIN_PASSWORD_LENGTH = 8;
 
-// A long passphrase is fine on its own; a short one needs a mix of characters.
-const LONG_ENOUGH = 12;
-
 // The passwords people pick most, in English and Norwegian. Compared after
 // turning "p@ssw0rd" into "password" and dropping digits and symbols.
 const COMMON = new Set([
@@ -38,11 +35,6 @@ function readings(password: string) {
   ];
 }
 
-function classes(password: string) {
-  return [/[a-zæøå]/, /[A-ZÆØÅ]/, /\d/, /[^A-Za-zæøåÆØÅ0-9]/].filter((re) => re.test(password))
-    .length;
-}
-
 // "aaaaaaaa", "abababab", "12345678", "abcdefgh"
 function isPattern(password: string) {
   if (/^(.)\1+$/.test(password)) return true;
@@ -56,15 +48,19 @@ function isPattern(password: string) {
 
 export type PasswordCheck = {
   ok: boolean;
-  // 0 = empty, 1 = not accepted, 2 = fine, 3 = good, 4 = strong
-  score: 0 | 1 | 2 | 3 | 4;
+  // 0 = empty, 1 = not accepted (red), 2 = accepted (yellow), 3 = accepted, letters + a
+  // number + a symbol (green).
+  score: 0 | 1 | 2 | 3;
   // What to tell the user when it isn't accepted.
   problem?: MessageKey;
 };
 
-// Not "crazy strong", just not trivially guessable: at least 8 characters,
-// a mix of letters and digits (or 12+ characters), and nothing from the
-// most-used lists or built from the user's own name or username.
+// The only real requirement is length: at least 8 characters (any mix of
+// letters, digits or symbols), and not one of the most-used passwords, a
+// simple repeat/sequence, or built from the user's own name or username.
+// Beyond that it's just a nudge, shown as the strength color: letters and a
+// number is fine (yellow), adding a symbol on top is best (green), neither
+// is required.
 export function checkPassword(
   password: string,
   personal: { username?: string; name?: string } = {}
@@ -91,20 +87,8 @@ export function checkPassword(
   }
   if (isPattern(password)) return { ok: false, score: 1, problem: "pw.pattern" };
 
-  const kinds = classes(password);
-  if (password.length < LONG_ENOUGH && kinds < 2) {
-    return { ok: false, score: 1, problem: "pw.simple" };
-  }
-  // 8-11 characters need letters *and* something else (a digit, capital or symbol).
-  if (password.length < LONG_ENOUGH && !/[a-zæøåA-ZÆØÅ]/.test(password)) {
-    return { ok: false, score: 1, problem: "pw.simple" };
-  }
-
-  const score =
-    password.length >= 14 || (password.length >= LONG_ENOUGH && kinds >= 3)
-      ? 4
-      : password.length >= LONG_ENOUGH || (password.length >= 10 && kinds >= 3)
-        ? 3
-        : 2;
-  return { ok: true, score };
+  const hasLetter = /[a-zæøåA-ZÆØÅ]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSymbol = /[^A-Za-zæøåÆØÅ0-9]/.test(password);
+  return { ok: true, score: hasLetter && hasDigit && hasSymbol ? 3 : 2 };
 }

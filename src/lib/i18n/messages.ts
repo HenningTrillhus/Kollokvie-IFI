@@ -185,7 +185,6 @@ export const messages = {
   },
   "pw.weak": { no: "Svakt", en: "Weak" },
   "pw.ok": { no: "Greit", en: "Fine" },
-  "pw.good": { no: "Bra", en: "Good" },
   "pw.strong": { no: "Sterkt", en: "Strong" },
   "pw.common": {
     no: "Det passordet er altfor vanlig. Velg noe mer personlig.",
