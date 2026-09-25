@@ -14,16 +14,19 @@ create table if not exists public.user_deadline_completions (
 
 alter table public.user_deadline_completions enable row level security;
 
+drop policy if exists "user_deadline_completions_select_own" on public.user_deadline_completions;
 create policy "user_deadline_completions_select_own"
   on public.user_deadline_completions for select
   to authenticated
   using (user_id = auth.uid());
 
+drop policy if exists "user_deadline_completions_insert_own" on public.user_deadline_completions;
 create policy "user_deadline_completions_insert_own"
   on public.user_deadline_completions for insert
   to authenticated
   with check (user_id = auth.uid());
 
+drop policy if exists "user_deadline_completions_delete_own" on public.user_deadline_completions;
 create policy "user_deadline_completions_delete_own"
   on public.user_deadline_completions for delete
   to authenticated
