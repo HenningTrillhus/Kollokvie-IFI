@@ -1,14 +1,15 @@
 import { GROUPS_KEY, NO_COURSE_KEY, colorFor, isVisible, type Prefs } from "@/lib/calendar-prefs";
+import type { CourseDeadline } from "@/lib/course-deadlines";
 import type { CourseExam } from "@/lib/course-exams";
 import { shortTime, type CalendarEvent, type EventType } from "@/lib/events";
 import type { Group } from "@/lib/groups";
 
 // One thing on the calendar: the user's own event, a study group session, or
-// an official exam date, already resolved to a color and filtered by the
-// course settings.
+// an official exam/oblig date, already resolved to a color and filtered by
+// the course settings.
 export type CalItem = {
   key: string;
-  kind: "event" | "group" | "exam";
+  kind: "event" | "group" | "exam" | "deadline";
   id: string;
   date: string;
   time: string | null;
@@ -28,10 +29,13 @@ export function buildItems(
   events: CalendarEvent[],
   groups: Group[],
   exams: CourseExam[],
+  deadlines: CourseDeadline[],
   prefs: Prefs,
-  // The generic "Exam" title, translated (see cal.exam) — official exams
-  // never have their own title, same as a title-less exam you'd add yourself.
-  examTitle: string
+  // The generic "Exam"/"Oblig" titles, translated (see cal.exam / cal.oblig) —
+  // official exams and obliger never have their own title, same as a
+  // title-less one you'd add yourself.
+  examTitle: string,
+  deadlineTitle: string
 ): CalItem[] {
   const items: CalItem[] = [];
 
@@ -93,6 +97,25 @@ export function buildItems(
       done: false,
       completable: false,
       body: x.note,
+    });
+  }
+
+  for (const d of deadlines) {
+    if (!isVisible(prefs, d.course_code)) continue;
+    items.push({
+      key: `d-${d.id}`,
+      kind: "deadline",
+      id: d.id,
+      date: d.deadline_date,
+      time: shortTime(d.deadline_time),
+      title: deadlineTitle,
+      courseCode: d.course_code,
+      type: "deadline",
+      color: colorFor(prefs, d.course_code),
+      href: d.source_url,
+      done: false,
+      completable: false,
+      body: d.note,
     });
   }
 
