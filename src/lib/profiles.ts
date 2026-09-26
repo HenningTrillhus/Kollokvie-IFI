@@ -15,6 +15,8 @@ export type Profile = {
   avatar: string | null;
   // Which privacy policy version the user consented to (see lib/privacy.ts).
   privacy_version?: string | null;
+  // When you completed (or skipped) the one-time profile setup, see app/velkommen.
+  onboarded_at?: string | null;
   // Open or private profile, and whether the details are hidden from *you*.
   is_private?: boolean;
   details_hidden?: boolean;

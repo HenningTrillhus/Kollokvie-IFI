@@ -115,3 +115,18 @@ export function withFullGroupsLast<T extends { group: Group; memberCount: number
   const full = items.filter((i) => isGroupFull(i.group, i.memberCount));
   return [...open, ...full];
 }
+
+// How long a one-time session stays worth discovering after it starts —
+// after that, joining it would be pointless, so it drops out of Utforsk
+// (but stays visible to its own members under "Mine kollokviegrupper").
+const SESSION_VISIBLE_HOURS_AFTER_START = 2;
+
+// A group with no scheduled date is an ongoing/ad-hoc one, always current.
+export function isSessionOver(group: Pick<Group, "event_date" | "event_time">, now: Date) {
+  if (!group.event_date) return false;
+  const [y, m, d] = group.event_date.split("-").map(Number);
+  const [h, min] = (group.event_time ?? "00:00").split(":").map(Number);
+  const start = new Date(y, m - 1, d, h, min);
+  const cutoff = new Date(start.getTime() + SESSION_VISIBLE_HOURS_AFTER_START * 60 * 60 * 1000);
+  return now >= cutoff;
+}

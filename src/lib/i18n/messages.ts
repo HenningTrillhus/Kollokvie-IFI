@@ -342,6 +342,16 @@ export const messages = {
   },
   "consent.error": { no: "Kunne ikke lagre samtykket. Prøv igjen.", en: "Couldn't save your consent. Try again." },
 
+  "onboarding.title": { no: "Sett opp profilen din", en: "Set up your profile" },
+  "onboarding.intro": {
+    no: "Alt her er valgfritt, og du kan endre det når som helst i innstillinger.",
+    en: "Everything here is optional, and you can change it anytime in settings.",
+  },
+  "onboarding.skip": { no: "Hopp over", en: "Skip" },
+  "onboarding.continue": { no: "Lagre og fortsett", en: "Save and continue" },
+  "onboarding.saving": { no: "Lagrer…", en: "Saving…" },
+  "onboarding.error": { no: "Noe gikk galt. Prøv igjen.", en: "Something went wrong. Try again." },
+
   // ---- signed-in toast
   "toast.signedInAs": { no: "Logget inn som {name}", en: "Signed in as {name}" },
 

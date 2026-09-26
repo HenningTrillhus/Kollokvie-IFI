@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupCardData, withFullGroupsLast, type Group } from "@/lib/groups";
+import { getGroupCardData, isSessionOver, withFullGroupsLast, type Group } from "@/lib/groups";
 import GroupBrowser from "@/components/group-browser";
 import { Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
@@ -20,7 +20,11 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(100);
 
-  const groups = (publicGroups ?? []) as Group[];
+  const now = new Date();
+  // A session that already happened isn't worth discovering anymore — it
+  // stays visible to its own members under "Mine kollokviegrupper", just
+  // not here.
+  const groups = (publicGroups ?? []).filter((g) => !isSessionOver(g, now)) as Group[];
   const items = withFullGroupsLast(await getGroupCardData(supabase, groups));
 
   return (

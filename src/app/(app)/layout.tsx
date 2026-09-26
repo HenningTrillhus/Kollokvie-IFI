@@ -46,6 +46,13 @@ export default async function AppLayout({
     redirect("/samtykke");
   }
 
+  // First time in the app: a one-time, entirely optional page to set up icon,
+  // study line/year, courses and associations, before Utforsk. Same
+  // column-presence guard as above.
+  if (profile && "onboarded_at" in profile && !profile.onboarded_at) {
+    redirect("/velkommen");
+  }
+
   return (
     <>
       <AppShell
