@@ -116,9 +116,9 @@ export function withFullGroupsLast<T extends { group: Group; memberCount: number
   return [...open, ...full];
 }
 
-// How long a one-time session stays worth discovering after it starts —
-// after that, joining it would be pointless, so it drops out of Utforsk
-// (but stays visible to its own members under "Mine kollokviegrupper").
+// How long a one-time session stays current after it starts — after that
+// it's done, so it drops off both Utforsk and "Mine kollokviegrupper"
+// (the group itself isn't deleted, it just stops being listed there).
 const SESSION_VISIBLE_HOURS_AFTER_START = 2;
 
 // A group with no scheduled date is an ongoing/ad-hoc one, always current.

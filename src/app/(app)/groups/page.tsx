@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/get-user";
-import { getGroupCardData, type Group } from "@/lib/groups";
+import { getGroupCardData, isSessionOver, type Group } from "@/lib/groups";
 import GroupCard from "@/components/group-card";
 import { CardGrid, EmptyCard, Page } from "@/components/form-ui";
 import { getT } from "@/lib/i18n/server";
@@ -17,9 +17,10 @@ export default async function GroupsPage() {
     .select("groups(*)")
     .eq("user_id", user.id);
 
+  const now = new Date();
   const groups = (memberRows ?? [])
     .map((row) => (row as unknown as { groups: Group | null }).groups)
-    .filter((g): g is Group => g !== null)
+    .filter((g): g is Group => g !== null && !isSessionOver(g, now))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
   const items = await getGroupCardData(supabase, groups);

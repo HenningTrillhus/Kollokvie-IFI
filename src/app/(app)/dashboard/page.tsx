@@ -21,9 +21,8 @@ export default async function DashboardPage() {
     .limit(100);
 
   const now = new Date();
-  // A session that already happened isn't worth discovering anymore — it
-  // stays visible to its own members under "Mine kollokviegrupper", just
-  // not here.
+  // A session that already happened isn't worth discovering anymore (see
+  // groups/page.tsx for the same cutoff applied to "Mine kollokviegrupper").
   const groups = (publicGroups ?? []).filter((g) => !isSessionOver(g, now)) as Group[];
   const items = withFullGroupsLast(await getGroupCardData(supabase, groups));
 
