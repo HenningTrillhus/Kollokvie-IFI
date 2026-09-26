@@ -13,8 +13,13 @@ update public.profiles set onboarded_at = created_at where onboarded_at is null;
 grant update (onboarded_at) on public.profiles to authenticated;
 
 -- Lesbart for deg selv (samme mønster som privacy_version), slik at appen
--- kan sjekke om du trenger å se siden.
-create or replace function public.masked_profile_fields(profile_id uuid, is_private_flag boolean)
+-- kan sjekke om du trenger å se siden. Returtypen endres (én ny kolonne),
+-- så funksjonen må droppes først — det tar visningen som bruker den med
+-- seg, men den opprettes på nytt lenger ned i denne filen uansett.
+drop view if exists public.visible_profiles;
+drop function if exists public.masked_profile_fields(uuid, boolean);
+
+create function public.masked_profile_fields(profile_id uuid, is_private_flag boolean)
 returns table (
   username text,
   ifi_username text,
