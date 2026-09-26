@@ -38,6 +38,8 @@ const HINT_KEYS = {
   invite: "group.inviteHint",
 } as const;
 
+const ROOM_BOOKING_URL = "https://tp.educloud.no/uio/app/rombestilling";
+
 // Shared by "create" and "settings": same fields, same layout. The page
 // supplies the initial values and what happens on submit (return an error
 // message, or null on success).
@@ -173,6 +175,15 @@ export default function GroupForm({
             onChange={(e) => set("location", e.target.value)}
             className={inputClass}
           />
+          <p className="mt-1.5 text-xs text-muted">{t("group.roomHint")}</p>
+          <a
+            href={ROOM_BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 rounded-lg border border-card-border px-3 py-1.5 text-xs font-medium transition hover:bg-accent-soft"
+          >
+            {t("group.roomBookButton")}
+          </a>
         </Field>
 
         <div className="grid grid-cols-2 gap-3">

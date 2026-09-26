@@ -429,6 +429,8 @@ export const messages = {
   },
   "group.room": { no: "Rom", en: "Room" },
   "group.roomPlaceholder": { no: "Ada Lovelaces hus, rom 2439", en: "Ada Lovelace building, room 2439" },
+  "group.roomHint": { no: "Ikke booket rom ennå?", en: "Haven't booked a room yet?" },
+  "group.roomBookButton": { no: "Book rom på UiO", en: "Book a room at UiO" },
   "group.date": { no: "Dato", en: "Date" },
   "group.time": { no: "Tid", en: "Time" },
   "group.max": { no: "Maks antall personer", en: "Max number of people" },
